@@ -1,0 +1,72 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block title %}充电桩信息{% endblock %}
+{% block container %}
+    {% if errmsg %}
+    <div class="valign-wrapper" style="height: 93vh">
+        <div class="row">
+            <p class="center-align"><i class="material-icons red-text size-10rem">highlight_off</i></p>
+            <p class="center-align flow-text">{{ errmsg }}</p>
+        </div>
+    </div>
+    {% endif %}
+    {% if pile_gun %}
+         <ul id="pile-collection" class="collection z-depth-2">
+            <li class="collection-item avatar">
+               <i class="material-icons cyan circle">assignment</i>
+               <span class="title">{{ pile_gun.charg_pile.name }}</span>
+{#               <p>{{ order.out_trade_no }}</p>#}
+            </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">电桩编码SN</p></div>
+                   <div class="col s8"><p class="cyan order-item">{{ pile_gun.charg_pile.pile_sn|default:'' }}</p></div>
+               </div>
+           </li>
+           <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">枪口号</p></div>
+                   <div class="col s8"><p class="cyan order-item">{{ pile_gun.gun_num|default:'' }}</p></div>
+               </div>
+           </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">工作状态</p></div>
+                   <div class="col s8"><p class="cyan  order-item" id="id_work_status">{{ pile_gun.get_work_status_display|default:'' }}</p></div>
+               </div>
+           </li>
+
+    </ul>
+    {% endif%}
+{% endblock container %}
+ {% if pile_gun%}
+ <script>
+$(function () {
+        // Correctly decide between ws:// and wss://
+        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+        var ws_path = ws_scheme + '://' + window.location.host + "/ws/recharge/{{ pile_gun.charg_pile.pile_sn }}/{{ pile_gun.gun_num }}/";
+        console.log("Connecting to " + ws_path);
+        var socket = new ReconnectingWebSocket(ws_path);
+
+        // Handle incoming messages
+        socket.onmessage = function (message) {
+            var data = JSON.parse( message.data);
+            var msg = JSON.parse(data.message);
+            if(msg.cmd == "01"){            /*充电桩上报状态信息*/
+                if(msg.return_code == "success"){
+                    $("#id_work_status").text(msg.work_status);
+                }
+            }
+
+        };
+        // Helpful debugging
+        socket.onopen = function () {
+            console.log("Connected to chat socket");
+        };
+        socket.onclose = function () {
+            console.log("Disconnected from chat socket");
+        }
+    });
+</script>
+ {% endif%}
+{% block bottomjs %}
+{% endblock %}

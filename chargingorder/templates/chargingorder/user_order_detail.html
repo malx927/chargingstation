@@ -1,0 +1,63 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+    <style>
+        .container{
+            width: 100%;
+        }
+    </style>
+{% endblock extra%}
+{% block container %}
+    <ul id="order-collection" class="collection">
+            <li class="collection-item avatar">
+               <i class="material-icons cyan circle">assignment</i>
+               <span class="title">{{ object.name }}</span>
+               <p>{{ object.out_trade_no }}</p>
+            </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">充电桩SN</p></div>
+                   <div class="col s8"><p class="cyan  order-item" ><span>{{ object.charg_pile.pile_sn }}</span></p></div>
+               </div>
+           </li>
+           <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">枪口号</p></div>
+                   <div class="col s8"><p class="cyan order-item"><span id="id_total_reading">{{ object.gun_num }}</span></p></div>
+               </div>
+           </li>
+           <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">充电方式</p></div>
+                   <div class="col s8"><p class="cyan order-item">{{ object.get_charg_mode_display }}</p></div>
+               </div>
+           </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">开始时间</p></div>
+                   <div class="col s8"><p class="cyan order-item"><span>{{ object.begin_time }}</span></p></div>
+               </div>
+           </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">结束时间</p></div>
+                   <div class="col s8"><p class="cyan order-item"><span>{{ object.end_time }}</span></p></div>
+               </div>
+           </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">充电电量</p></div>
+                  <div class="col s8"><p class="cyan order-item">{{ object.get_total_reading }} KWH</p></div>
+               </div>
+           </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">消费金额</p></div>
+                  <div class="col s8"><p class="cyan order-item"><span id="id_consum_money">{{ order.consum_money }}</span> 元</p></div>
+               </div>
+           </li>
+    </ul>
+
+{% endblock container %}
+{% block bottomjs %}
+
+{% endblock bottomjs %}

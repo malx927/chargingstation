@@ -1,0 +1,86 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+    {% include 'wxchat/include/jssdk.html' %}
+    <script type="text/javascript">
+    wx.ready(function () {
+        $('#pay_now').on('click',function(){
+            var money = $("#id_money").val();
+            if(money == ""  || money.length ==0){
+                M.toast({html: '充值金额不能为空'});
+                return false;
+            }
+            var params ={
+              money: $("#id_money").val(),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "wxchat-order-pay" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  if(data.package !=undefined){
+                      wxpay(data)
+                  }
+                  else if(data.return_code == "FAIL"){
+                      M.toast({html: data.return_msg});
+                  }
+              },
+              error: function(error){
+                  M.toast({html: '充值失败!!'});
+                  {#window.location.href = "{% url 'shopping-list' %}";#}
+              }
+            });
+        });
+
+        function wxpay(data){
+            wx.chooseWXPay({
+                  timestamp:data.timestamp,
+                  nonceStr: data.nonceStr,
+                  package:  data.package ,
+                  signType: data.signType,
+                  paySign:  data.paySign,
+                  success: function(res){
+                    if (res.errMsg == "chooseWXPay:ok") {
+                        M.toast({html: '充值成功!'});
+                    } else {
+                      M.toast({html: '充值失败!'});
+                    }
+                  },
+                   cancel: function(res) {
+                         M.toast({html: '充值失败!'});
+                   },
+                   fail:function(res){
+                         M.toast({html: '充值失败!'});
+                   }
+            });
+        }
+
+    });
+    </script>
+{% endblock extra%}
+{% block container %}
+    <div class="section header-margin-top">
+            <h5 class="center-align  light-blue-text text-darken-2">用户充值</h5>
+    </div>
+    <form class="col s12" name="deposit_form"  method="post">{% csrf_token %}
+    <div class="row">
+        <input type="hidden" id="url" name="url" value="{{ url|default:'' }}">
+        <div class="input-field col s12 m12">
+            <i class="material-icons prefix">payment</i>
+            <input id="id_money" name="money" type="number" class="validate" required >
+            <label for="id_money">金额(元)</label>
+            {% if errors.money.0 %}<span>{{ errors.money.0 }}</span>{% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <p class="center-align">
+        <a class="btn waves-effect waves-light gradient-45deg-red-pink" href="javascript:void(0)" id="pay_now">充值
+            <i class="material-icons right">send</i>
+        </a>
+        </p>
+    </div>
+    </form>
+{% endblock container %}

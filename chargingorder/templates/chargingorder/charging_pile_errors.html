@@ -1,0 +1,11 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block title %}错误{% endblock %}
+{% block container %}
+    <div class="valign-wrapper" style="height: 93vh">
+        <div class="row">
+            <p class="center-align"><i class="material-icons red-text size-10rem">highlight_off</i></p>
+            <p class="center-align flow-text">{{ errmsg }}</p>
+        </div>
+    </div>
+{% endblock container %}
+

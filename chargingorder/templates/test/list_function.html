@@ -1,0 +1,45 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>功能列表</title>
+  <!-- CSS  -->
+  <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'materialize/css/googlefonticon.css' %}" rel="stylesheet">
+    <style>
+
+    </style>
+</head>
+<body>
+    <div class="container"><br><br>
+          <div class="row center">
+                <div class="col s12">
+                      <a href="{% url 'send-recharge-cmd' %}" class="btn-large waves-effect waves-light orange"><i class="material-icons left">cloud</i>下发充电指令</a>
+                </div>
+          </div>
+        <div class="row center">
+                <div class="col s12">
+                      <a href="{% url 'pile-params-search' %}" class="btn-large waves-effect waves-light orange"><i class="material-icons left">cloud</i>查询电桩参数</a>
+                </div>
+          </div>
+        <div class="row center">
+                <div class="col s12">
+                      <a class="btn-large waves-effect waves-light orange"><i class="material-icons left">cloud</i>下发停止充电</a>
+                </div>
+          </div>
+{#        <div class="row center">#}
+{#                <div class="col s12">#}
+{#                      <a class="btn-large waves-effect waves-light orange"><i class="material-icons left">cloud</i>回复停止充电</a>#}
+{#                </div>#}
+{#          </div>#}
+        <div class="row center">
+                <div class="col s12">
+                      <a class="btn-large waves-effect waves-light orange"><i class="material-icons left">cloud</i>充电命令</a>
+                </div>
+          </div>
+    </div>
+</body>
+  <script src="{% static 'materialize/js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
+</html>

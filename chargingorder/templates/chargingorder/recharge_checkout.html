@@ -1,0 +1,364 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    {% include 'shopping/include/jssdk.html' %}
+    <link rel="stylesheet" href="{% static 'css/foster.css' %}">
+    <script type="text/javascript">
+    wx.ready(function () {
+
+        $('#pay_now_balance').on('click',function(){
+            window.location.href = "{% url 'foster-pay-balance' %}?id=" + $("#id").text();
+        });
+
+
+        $('#pay_now').on('click',function(){
+            var params ={
+              id: $("#id").text(),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+           var ts = sessionStorage.getItem('checkout');
+           if(ts==null) {
+               sessionStorage.setItem('checkout', new Date().getTime());
+           }else{
+               var cur_ts = new Date().getTime();
+               var diff = (cur_ts - Number(ts))/1000;
+               if(diff < 20 ){
+                   weui.alert('您刚才已经提交过，如果没有成功请30秒后再提交!');
+                    return false;
+               }
+               sessionStorage.setItem('checkout', cur_ts);
+           }
+           $.ajax({
+              type: 'POST',
+              url: '{% url "foster-pay" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  if(data.package !=undefined){
+                      wxpay(data)
+                  }
+              },
+              error: function(error){
+                  window.location.href = "{% url 'dog-index' %}";
+              }
+            });
+        });
+
+        function wxpay(data){
+            wx.chooseWXPay({
+                  timestamp:data.timestamp,
+                  nonceStr: data.nonceStr,
+                  package:  data.package ,
+                  signType: data.signType,
+                  paySign:  data.paySign,
+                  success: function(res){
+                    if (res.errMsg == "chooseWXPay:ok") {
+                        window.location.replace('{% url "foster-success" %}');
+                    } else {
+                       weui.alert('宠物寄养订单支付失败!');
+                    }
+                  },
+                   cancel: function(res) {
+
+                   },
+                   fail:function(res){
+
+                   }
+            });
+        }
+
+});
+
+</script>
+{% endblock extra %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+      <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 寄养订单详情 {% endif %}</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__hd" style="text-align: right;line-height: 1.5em">
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">付款金额</label><span id="id" style="display: none" >{{ instance.id }}</span>
+                        <em class="weui-form-preview__value  color-danger" id="total_cost_top" > {{ instance.total_price|floatformat:"2" }} 元</em>
+                    </div>
+                </div>
+                 <div class="weui-form-preview__hd" style="text-align: right;line-height: 1.5em">
+                     {% if not weixin_pay %}
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">储值卡</label>
+                        <em class="weui-form-preview__value "> -{{ instance.total_price|floatformat:"2" }} 元</em>
+                    </div>
+                     {% elif weixin_pay %}
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">微信支付</label>
+                        <em class="weui-form-preview__value  "> -{{ instance.total_price|floatformat:"2" }} 元</em>
+                    </div>
+                     {% endif %}
+                </div>
+                <div class="weui-cells  cells_top">
+                    {% if instance.status == 1 %}
+
+                    {% if request.session.role == 2 or request.session.role == 1 %}
+                    <div class="weui-cell weui-cell_vcode">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">设置房间:</label></div>
+                        <div class="weui-cell__bd">
+                            <select class="weui-select" id="id_room" name="room" >
+                                <option value="" >未分配房间</option>
+                                {% for room in rooms %}
+                                <option value="{{ room.id }}" {% if instance.room.id == room.id %} selected="selected" {% endif %}>{{ room.name }}(数量:{{ room.petcounts }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="weui-cell__ft">
+                               <a id="room_set" href="javascript:;" class="weui-vcode-btn">寄养确认</a>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">物品交接:</label></div>
+                        <div class="weui-cell__bd"><a href="{% url 'hand-over-list' %}?orderid={{ instance.id }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">交接记录</a></div>
+                    </div>
+                    <div class="weui-cell weui-cell_vcode">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">填写宠物码:</label></div>
+                        <div class="weui-cell__bd"><input class="weui-input" id="pet_vcode" type="number" placeholder="请输入宠物提取码"></div>
+                        <div class="weui-cell__ft">
+                               <a id="foster_stop" href="javascript:;" class="weui-vcode-btn">寄养结束</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">提取宠物码:</label></div>
+                        <div class="weui-cell__bd"><a href="javascript:;" id="pet_code" class="weui-btn weui-btn_mini weui-btn_plain-primary">提宠码</a></div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>
+                        <div class="weui-cell__bd">{{ instance.out_trade_no|default:'' }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">支付时间:</label></div>
+                        <div class="weui-cell__bd">{{ instance.pay_time|default:'' }}</div>
+                    </div>
+                    {% endif %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养类型:</label></div>
+                        <div class="weui-cell__bd">{{ instance.foster_type }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养方式:</label></div>
+                        <div class="weui-cell__bd">{{ instance.foster_mode }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养时间:</label></div>
+                        <div class="weui-cell__bd">
+                            <p>开始: {{ instance.begin_time }}</p>
+                            <p>结束: {{ instance.end_time }}</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                           共{{ instance.get_days }}天
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-cells weui-cells_form cells_top flex" >
+                    <div class="weui-cell" style="width:35%">
+                        <div class="weui-cell__hd"><label class="weui-label">大型犬数量:</label></div>
+                        <div class="weui-cell__bd">{{ instance.big_dog|default:0 }}</div>
+                    </div>
+                    <div class="weui-cell" style="width:55%">
+                        <div class="weui-cell__hd"><label class="weui-label">每日费用(元):</label></div>
+                        <div class="weui-cell__bd color-danger">{{ instance.big_price|floatformat:2 }}</div>
+                    </div>
+                 </div>
+                 <div class="weui-cells weui-cells_form cells_top flex" >
+                    <div class="weui-cell" style="width:35%">
+                        <div class="weui-cell__hd">
+                            <label for="" class="weui-label">中型犬数量:</label>
+                        </div>
+                        <div class="weui-cell__bd">{{ instance.middle_dog|default:0 }}</div>
+                    </div>
+                     <div class="weui-cell" style="width:55%">
+                        <div class="weui-cell__hd">
+                            <label for="" class="weui-label">每日费用(元):</label>
+                        </div>
+                        <div class="weui-cell__bd color-danger">{{ instance.middle_price|floatformat:2 }}</div>
+                    </div>
+                 </div>
+                 <div class="weui-cells weui-cells_form cells_top flex">
+                    <div class="weui-cell" style="width:35%">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">小型犬数量:</label></div>
+                        <div class="weui-cell__bd">{{ instance.small_dog|default:0 }}</div>
+                    </div>
+                     <div class="weui-cell" style="width:55%">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">每日费用(元):</label></div>
+                        <div class="weui-cell__bd color-danger">{{ instance.small_price|floatformat:2 }}</div>
+                    </div>
+                </div>
+                <div class="weui-cells__title">客户信息</div>
+                <div class="weui-cells" >
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">姓名：</label></div>
+                        <div class="weui-cell__bd">{{ petowner.name }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
+                        <div class="weui-cell__bd">{{ petowner.telephone }}</div>
+                    </div>
+                     <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">地址:</label></div>
+                        <div class="weui-cell__bd">{{ petowner.address }}</div>
+                    </div>
+                </div>
+                <div class="weui-cells__title">寄养宠物</div>
+                <div class="weui-cells flex_wrap" >
+                    {% for pet in pets %}
+                    <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-detail' pet.id %}" style="width: 38%;min-width: 38%;max-width: 38%">
+                        <div class="weui-cell__hd">
+                            <img src="{{ pet.picture.url }}"  width="60px" height="60px">
+                        </div>
+                        <div class="weui-cell__bd"><p class="center"> {{ pet.name }} </p></div>
+                    </a>
+                    {% endfor %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">查看协议：</div>
+                        <div class="weui-cell__bd" >
+                            <p><a class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="{% url 'foster-contract-detail' %}?contract_id={{ contract_id }}">寄养协议</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    {% if instance.status == 0 %}
+    <div class="weui-tabbar">
+        {% if weixin_pay %}
+         <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_price }}</span></p>
+        </a>
+        {% elif not weixin_pay%}
+        <a href="#" id="pay_now_balance" class="weui-tabbar__item tabbar_item bg-warning" >
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_price }}</span></p>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script>
+    $(function(){
+        {% if request.session.role == 2 or request.session.role == 1 %}
+            $("#room_set").on("click", function(){
+                var room_id = $('#id_room option:selected').val();
+                if(room_id=="" || room_id.length==0){
+                    weui.alert("请选择房间");
+                    $("#room_id").focus();
+                    return false;
+                }
+                var params ={
+                  id: $("#id").text(),
+                  room_id: room_id,
+                  csrfmiddlewaretoken:'{{ csrf_token }}'
+                }
+
+               $.ajax({
+                  type: 'POST',
+                  url: '{% url "foster-room-update" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+
+                      if(data.success=="true"){
+                          weui.alert("设置成功！");
+                      }
+                      else{
+                          weui.alert("设置失败！");
+                      }
+                  },
+                  error: function(error){
+                      weui.alert("设置失败!");
+                  }
+                });
+            });
+
+            $("#foster_stop").on("click", function(){
+                var vcode = $("#pet_vcode").val();
+                if(vcode.length == 0){
+                    weui.alert("请输入宠物提取码！");
+                    return false
+                }
+                var params ={
+                  orderid: $("#id").text(),
+                  vcode: vcode,
+                  csrfmiddlewaretoken:'{{ csrf_token }}'
+                }
+
+               $.ajax({
+                  type: 'POST',
+                  url: '{% url "foster-pet-stop" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+
+                      if(data.success=="true"){
+                          weui.alert("设置成功！");
+                      }
+                      else if(data.vcode == "false"){
+                          weui.alert("宠物提取码不正确!");
+                      }
+                      else{
+                          weui.alert("设置失败！");
+                      }
+                  },
+                  error: function(error){
+                      weui.alert("设置失败!");
+                  }
+                });
+            });
+
+        {% endif %}
+
+         $("#pet_code").on("click", function(){
+                var params ={
+                  orderid: $("#id").text(),
+                  csrfmiddlewaretoken:'{{ csrf_token }}'
+                }
+
+               $.ajax({
+                  type: 'POST',
+                  url: '{% url "foster-pet-code" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+                      if(data.success=="true"){
+                          weui.alert("宠物提取码:" + data.code);
+                          if( $("#pet_vcode").length > 0 ){
+                              $("#pet_vcode").val(data.code);
+                          }
+                      }
+                      else{
+                          weui.alert("提取失败！");
+                      }
+                  },
+                  error: function(error){
+                      weui.alert("提取失败!");
+                  }
+                });
+            });
+
+    })
+    </script>
+{% endblock bottomjs %}

@@ -1,0 +1,59 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+    <style>
+    .container{
+        width: 100%
+    }
+    .collections-title {
+        font-size: 1.0rem;
+        padding: 0;
+        margin: 0;
+        font-weight: 500;
+    }
+    .collections-content {
+        font-size: 0.9rem;
+        padding: 0;
+        margin: 0;
+        font-weight: 400;
+    }
+    .task-cat {
+        padding: 2px 4px;
+        color: #fff;
+        font-weight: 300;
+        font-size: 0.8rem;
+        border-radius: 2px;
+        background-clip: padding-box;
+    }
+    </style>
+{% endblock extra%}
+{% block container %}
+    <div class="row">
+        <div class="col s12 m12 l6">
+          <div class="collection">
+            <a class="collection-item avatar">
+              <i class="material-icons cyan circle">card_travel</i>
+              <h6 class="collection-header m-0">订单列表</h6>
+              <p>{% if request.session.username %}
+                         <span>{{ request.session.username|default:'' }}</span>
+                    {% else %}
+                        <span>{{ request.session.nickname|default:'' }}</span>
+                    {% endif %}</p>
+            </a>
+            {% for order in orders %}
+            <a class="collection-item" href="{{ order.get_absolute_url }}">
+              <div class="row">
+                <div class="col s9">
+                  <p class="collections-title">单号:{{order.out_trade_no}}</p>
+                  <p class="collections-content">时间:{{ order.begin_time }}</p>
+                </div>
+                <div class="col s3">
+                  <div class="task-cat cyan">¥{{ order.consum_money }}</div>
+                  <div class="task-cat teal-text lighten-2">{{ order.consum_money }}KWH</div>
+                </div>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+    </div>
+{% endblock container %}

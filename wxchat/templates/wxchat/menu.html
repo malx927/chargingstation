@@ -1,0 +1,83 @@
+{% extends "xadmin/base_site.html" %}
+{% load i18n %}
+
+{% load xadmin_tags %}
+
+{% block content-nav %}{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12 col-md-2">
+            <p>
+            <a href="#"  id="create_action" class="btn btn-primary">
+                <i class="fa fa-plus"></i>   创建菜单
+            </a>
+            </p>
+        </div>
+        <div class="col-sm-12 col-md-2">
+           <p><a href="#" data-item="{% url 'wxchat-get-menu' %}" id="search_action" class="btn btn-primary">
+                <i class="fa fa-search-plus"></i>   查询菜单
+            </a> </p>
+        </div>
+        <div class="col-sm-12 col-md-2">
+             <p><a href="#" data-item="{% url 'wxchat-delete-menu' %}" id="del_action" class="btn btn-primary">
+                <i class="fa fa-trash" aria-hidden="true"></i>   删除菜单
+            </a></p>
+        </div>
+    </div>
+    <div class="row">
+        <p id="msg"></p>
+    </div>
+    <script>
+    $(function(){
+        $("#create_action").on("click", function(event){
+             $.ajax({
+                  type: 'GET',
+                  url: "{% url 'wxchat-create-menu' %}",
+                  dataType: 'json',
+                  timeout: 5000,
+                  success: function(data){
+
+                    alert(JSON.stringify(data));
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type);
+                  }
+                });
+        });
+
+        $("#search_action").on("click", function(event){
+            $.ajax({
+                  type: 'GET',
+                  url: "{% url 'wxchat-get-menu' %}",
+                  dataType: 'json',
+                  timeout: 5000,
+                  success: function(data){
+
+                    alert(JSON.stringify(data));
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type);
+                  }
+                });
+        });
+
+        $("#del_action").on("click", function(event){
+            $.ajax({
+                  type: 'GET',
+                  url: "{% url 'wxchat-delete-menu' %}",
+                  dataType: 'json',
+                  timeout: 5000,
+                  success: function(data){
+
+                    alert(JSON.stringify(data));
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type);
+                  }
+                });
+        });
+    })
+    </script>
+
+
+{% endblock %}

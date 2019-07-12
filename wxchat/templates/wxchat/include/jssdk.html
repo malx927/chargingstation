@@ -1,0 +1,34 @@
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    wx.config({
+        debug: false,
+        appId: '{{ sign.appId }}',
+        timestamp:'{{ sign.timestamp }}',
+        nonceStr: '{{ sign.nonceStr }}',
+        signature: '{{ sign.signature }}',
+        jsApiList: [
+            'chooseWXPay',
+            'openAddress',
+            'closeWindow',
+            'openLocation',
+            'getLocation',
+        ]
+    });
+
+     wx.ready(function (){
+         wx.checkJsApi({
+             jsApiList: [
+                 'chooseWXPay',
+                 'openAddress',
+                 'closeWindow',
+                 'openLocation',
+                 'getLocation',
+             ],
+             success: function (res) {
+             },
+             fail: function (errors) {
+                 console.log('加载jssdk失败' + errors);
+             }
+         });
+     });
+ </script>

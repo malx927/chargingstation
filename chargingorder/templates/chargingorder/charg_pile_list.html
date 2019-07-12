@@ -1,0 +1,24 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block title %}首页{% endblock %}
+{% block container %}
+    <div class="row">
+    {% for pile in piles %}
+      {% for gun in pile.get_guns %}
+        <div class="col s12 m4 l3">
+              <div class="card">
+                    <div class="card-image">
+                        {% if gun.qrcode %}
+                        <img src="{{ gun.qrcode.url }}">
+                        {% endif %}
+                      <span class="card-title"></span>
+                    </div>
+                    <div class="card-content">
+                      <p>{{ pile.name }}--{{ gun.gun_num }} [{{ gun.get_work_status_display }}]</p>
+                    </div>
+                    <div class="card-action"><a href="#">SN:{{ pile.pile_sn }}--{{ gun.gun_num }}</a></div>
+              </div>
+        </div>
+      {%  endfor %}
+    {% endfor %}
+    </div>
+{% endblock container %}

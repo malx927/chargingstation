@@ -1,0 +1,178 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>服务器下发充电命令</title>
+  <!-- CSS  -->
+  <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'materialize/css/googlefonticon.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container"><br><br>
+         <div class="row">
+             <h5 class="center">服务器下发充电指令</h5>
+            <form class="col s12"  action="{% url 'order-recharge' %}" method="post">{% csrf_token %}
+              <div class="row">
+                <div class="input-field col s6">
+                  <input id="pile_sn" name="pile_sn" type="text" class="validate">
+                  <label for="pile_sn">电桩编号SN：</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="gun_num" name="gun_num" type="text" class="validate">
+                  <label for="gun_num">枪口号:</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12 inline">
+                    <select id="charg_type" name="charg_type">
+                      <option value="" disabled selected>充电策略</option>
+                      <option value="0">系统默认策略</option>
+                      <option value="1">使用充电策略</option>
+                    </select>
+                    <label for="charg_type">充电策略:</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                    <select id="charg_type" name="charg_type">
+                      <option value="" disabled selected>选择充电类型</option>
+                      <option value="0">即时</option>
+                      <option value="1">预约</option>
+                    </select>
+                    <label for="charg_type">充电类型:</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="subscribe_time" name="subscribe_time" type="number" class="validate">
+                  <label for="subscribe_time">预约时间(分钟):</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <select id="charg_mode" name="charg_mode">
+                      <option value="" disabled selected>选择设备充电模式</option>
+                      <option value="0">后台</option>
+                      <option value="1">本地离线</option>
+                   </select>
+                  <label for="charg_mode">设备充电模式</label>
+                </div>
+                <div class="input-field col s6">
+                  <select id="charg_style" name="charg_style">
+                      <option value="" disabled selected>选择充电方式</option>
+                      <option value="0">充满</option>
+                      <option value="1">按金额</option>
+                      <option value="2">按时间(分钟)</option>
+                      <option value="3">按SOC</option>
+                      <option value="4">按电量</option>
+                   </select>
+                  <label for="charg_style">用户充电方式</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                    <select id="offline_status" name="offline_status">
+                      <option value="" disabled selected>请选择断网设置</option>
+                      <option value="0">不可充电</option>
+                      <option value="1">继续充电</option>
+                    </select>
+                     <label for="offline_status">断网设置</label>
+                </div>
+                 <div class="input-field col s6">
+                    <select id="occupy_fee" name="occupy_fee">
+                      <option value="" disabled selected>请选择占位费</option>
+                      <option value="0">不收取</option>
+                      <option value="1">收取</option>
+                    </select>
+                     <label for="occupy_fee">占位费</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                    <select id="subscribe_fee" name="subscribe_fee">
+                      <option value="" disabled selected>请选择预约费</option>
+                      <option value="0">不收取</option>
+                      <option value="1">收取</option>
+                    </select>
+                     <label for="subscribe_fee">预约费</label>
+                </div>
+                 <div class="input-field col s6">
+                    <select id="lower_offset" name="lower_offset">
+                      <option value="" disabled selected>请选择小电流补偿费</option>
+                      <option value="0">不收取</option>
+                      <option value="1">收取</option>
+                    </select>
+                     <label for="lower_offset">小电流补偿费</label>
+                </div>
+              </div>
+              <div class="row">
+                 <div class="input-field col s6">
+                    <select id="subscribe_fee" name="subscribe_fee">
+                      <option value="" disabled selected>请选择小电流输出</option>
+                      <option value="0">不限制</option>
+                      <option value="1">限制</option>
+                    </select>
+                     <label for="subscribe_fee">小电流输出</label>
+                 </div>
+                 <div class="input-field col s6">
+                  <input id="charg_policy_value" name="charg_policy_value" type="text" class="validate">
+                  <label for="charg_policy_value">充值策略值：</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input id="openid" name="openid" type="text" class="validate">
+                  <label for="openid">用户识别号:</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="out_trade_no" name="out_trade_no" type="text" class="validate">
+                  <label for="out_trade_no">订单号：</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input type="text" id="sync_date" name="sync_date" class="datepicker">
+                  <label for="sync_date">同步日期:</label>
+                </div>
+                <div class="input-field col s6">
+                  <input type="text" id="sync_time" name="sync_time" class="timepicker">
+                  <label for="sync_time">同步时间:</label>
+                </div>
+              </div>
+            </form>
+          </div>
+    </div>
+</body>
+  <script src="{% static 'materialize/js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
+<script>
+  $(document).ready(function() {
+       $('select').formSelect();
+       $('.datepicker').datepicker({
+            selectMonths: true,
+            selectYears: 15,
+            format: 'yyyy-mm-dd',
+            showClearBtn:true,
+            i18n:{
+                cancel: '取消',
+                clear: '清除',
+                done: '确定',
+                weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+                weekdaysShort: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+                months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                monthsShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                weekdaysAbbrev:['日', '一', '二', '三', '四', '五', '六']
+           }
+        });
+
+       $('.timepicker').timepicker({
+           i18n:{
+            cancel: '取消',
+            clear: '清除',
+            done: '确定',
+           },
+           twelveHour:false,
+           showClearBtn:true,
+       });
+  });
+</script>
+</html>

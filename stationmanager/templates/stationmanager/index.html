@@ -1,0 +1,36 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>首页</title>
+  <!-- CSS  -->
+  <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'materialize/css/googlefonticon.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+          <div class="row">
+              {% for pile in piles %}
+                <div class="col s12 m4 l3">
+                      <div class="card">
+                            <div class="card-image">
+                              <img src="{{ pile.qrcode.url }}">
+                              <span class="card-title"></span>
+                            </div>
+                            <div class="card-content">
+                              <p>{{ pile.name }}</p>
+                            </div>
+                            <div class="card-action">
+                              <a href="#">{{ pile.sn }}</a>
+                            </div>
+                      </div>
+                </div>
+              {% endfor %}
+          </div>
+        <div class="chips"></div>
+    </div>
+</body>
+  <script src="{% static 'materialize/js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
+</html>

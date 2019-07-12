@@ -1,0 +1,186 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block title %}充电桩充电{% endblock %}
+{% block js %}
+    <script src="{% static "js/reconnecting-websocket.min.js" %}" type="text/javascript"></script>
+{% endblock js %}
+{% block extra %}
+    {% include 'wxchat/include/jssdk.html' %}
+{% endblock extra%}
+{% block side_nav %}
+    {% include "chargingorder/include/side_nav.html" %}
+{% endblock side_nav %}
+{% block container %}
+{#    {% for mode in charg_modes %}#}
+{#          <p><label><input class="with-gap" name="charg_mode" type="radio" value="{{ mode.0 }}" {% if mode.0 == 0 %} checked {% endif %}><span>{{ mode.1 }}</span></label></p>#}
+{#    {% endfor %}#}
+     <div class="row">
+        <div class="col s12 m4 l4">
+            <div class="card gradient-45deg-light-blue-cyan gradient-shadow">
+                <div class="card-content white-text">
+                    <span class="card-title  activator"><i class="material-icons left">battery_charging_full</i>充满为止<i class="material-icons right">more_vert</i></span>
+                    <p class="activator">充电前请保证账号上有足够余额。<br>当余额不足时，电桩将自动停止充电。</p>
+                </div>
+                <div class="card-reveal padding-bottom-0">
+                  <span class="card-title grey-text text-darken-4">直接充电充满为止<i class="material-icons right">close</i></span>
+                    <div class="row">
+                       <div class="col s12 margin-top-1rem center-align">
+                            <a class="waves-effect waves-light btn gradient-45deg-red-pink" id="full_recharge" data-item="0"><i class="material-icons left">cloud</i>开始充电</a>
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m4 l4">
+            <div class="card gradient-45deg-red-pink gradient-shadow">
+                <div class="card-content white-text">
+                    <span class="card-title  activator"><i class="material-icons left">battery_alert</i>按金额充电<i class="material-icons right">more_vert</i></span>
+                    <p class="activator">充电桩根据输入的金额进行充电。<br>当金额消费完毕或者充满时，电桩自动结束充电</p>
+                </div>
+                <div class="card-reveal padding-bottom-0">
+                  <span class="card-title">请输入充电金额<i class="material-icons right">close</i></span>
+                  <div class="row margin-top-0rem">
+                      <div class="input-field inline col s6 ">
+                            <input id="total_fee" type="number" name="total_fee" class="validate">
+                            <label for="total_fee">充电金额(元)</label>
+                      </div>
+                       <div class="col s6 margin-top-1rem">
+                            <a class="waves-effect waves-light btn gradient-45deg-red-pink" id="money_recharge" data-item="1"><i class="material-icons left">settings_input_hdmi</i>充电</a>
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m4 l4">
+            <div class="card gradient-45deg-green-teal gradient-shadow">
+                <div class="card-content white-text">
+                    <span class="card-title activator">
+                        <i class="material-icons left">battery_alert</i>按时间充电(min)<i class="material-icons right">more_vert</i></span>
+                    <p class="activator">充电前请保证账号上有足够余额。<br>余额不足或者充满时，电桩自动停止充电。</p>
+                </div>
+                 <div class="card-reveal padding-bottom-0">
+                      <span class="card-title activator grey-text text-darken-4">按时间充电(分钟)<i class="material-icons right">close</i></span>
+                      <div class="row margin-top-0rem">
+                          <div class="input-field inline col s6">
+                                <input id="charg_min_val" type="number" name="charg_min_val" class="validate">
+                                <label for="charg_min_val">充电时间(分钟)</label>
+                          </div>
+                           <div class="col s6 margin-top-1rem">
+                                <a class="waves-effect waves-light btn gradient-45deg-red-pink" id="min_recharge" data-item="2"><i class="material-icons left">access_alarm</i>充电</a>
+                           </div>
+                      </div>
+                </div>
+            </div>
+         </div>
+         <div class="col s12 m4 l4">
+            <div class="card gradient-45deg-deep-orange-orange gradient-shadow">
+                <div class="card-content white-text">
+                    <span class="card-title activator"><i class="material-icons left">battery_alert</i>按SOC充电<i class="material-icons right">more_vert</i></span>
+                    <p class="activator">充电前请保证账号上有足够余额。<br>余额不足或充满时，电桩自动结束充电</p>
+                </div>
+                <div class="card-reveal padding-bottom-0">
+                    <span class="card-title activator grey-text text-darken-4">按SOC充电<i class="material-icons right">close</i></span>
+                    <div class="row margin-top-0rem">
+                      <div class="input-field inline col s6 ">
+                            <input id="charg_soc_val" type="number" name="charg_soc_val" class="validate">
+                            <label for="charg_soc_val">SOC充电(%)</label>
+                      </div>
+                       <div class="col s6 margin-top-1rem">
+                            <a class="waves-effect waves-light btn gradient-45deg-red-pink" id="soc_recharge" data-item="3"><i class="material-icons left">backup</i>充电</a>
+                       </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+
+{#    <div class="row">#}
+{#        <div class="col s12 center-align">#}
+{#            <a class="btn waves-effect waves-light" href="{% url 'pile-charging-status' %}?pile_sn={{ pile_sn }}&gun_num={{ gun_num }}"><i class="material-icons left">cloud</i>充电状态</a>#}
+{#        </div>#}
+{#    </div>#}
+{% endblock container%}
+
+{% block bottomjs %}
+<script>
+    $(document).ready(function(){
+        $('.sidenav').sidenav();
+        // 充满为止
+        $("#full_recharge").on("click", function (event) {
+            var charg_mode = $(this).attr("data-item");
+            var params = {
+                pile_sn: '{{ pile_sn }}',
+                gun_num: '{{ gun_num }}',
+                charg_mode: charg_mode,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            }
+            recharge(params);
+        })
+        // 按金额充电
+         $("#money_recharge").on("click", function (event) {
+            var charg_mode = $(this).attr("data-item");
+            var total_fee = $("#total_fee").val()||"0"
+            if(total_fee=="0" || total_fee.length==0 )
+            {
+                M.toast({html: '请输入充电金额'});
+                return;
+            }
+            var params = {
+                pile_sn: '{{ pile_sn }}',
+                gun_num: '{{ gun_num }}',
+                charg_mode: charg_mode,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                total_fee: total_fee,
+            }
+            recharge(params);
+        })
+        // 按时间充电
+         $("#min_recharge").on("click", function (event) {
+            var charg_mode = $(this).attr("data-item");
+            var charg_min_val = $("#charg_min_val").val()
+            var params = {
+                pile_sn: '{{ pile_sn }}',
+                gun_num: '{{ gun_num }}',
+                charg_mode: charg_mode,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                charg_min_val: charg_min_val,
+            }
+            recharge(params);
+        })
+         // 按时间充电
+         $("#soc_recharge").on("click", function (event) {
+            var charg_mode = $(this).attr("data-item");
+            var charg_soc_val = $("#charg_soc_val").val()
+            var params = {
+                pile_sn: '{{ pile_sn }}',
+                gun_num: '{{ gun_num }}',
+                charg_mode: charg_mode,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                charg_soc_val: charg_soc_val,
+            }
+            recharge(params);
+        })
+
+      });
+
+    function recharge(params){
+        $.ajax({
+              type: 'POST',
+              url: '{% url "order-recharge" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                 if(data.return_code == "fail") {
+                     M.toast({html: data.errmsg});
+                 } else if( data.return_code == "success" ){
+                     window.location.replace(data.redirect_url) ;
+                 }
+              },
+              error: function(error){
+                    M.toast({html: '充电失败!'});
+              }
+        });
+    }
+
+    </script>
+{% endblock bottomjs %}

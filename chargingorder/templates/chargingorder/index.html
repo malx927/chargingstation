@@ -1,0 +1,40 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+
+{% endblock extra%}
+{% block container %}
+    <ul class="collection z-depth-2 hide">
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">工作状态</p></div>
+                   <div class="col s8"><p class="cyan order-item"><span id="id_work_status">{{ order.get_work_status|default:'' }}</span></p></div>
+               </div>
+           </li>
+           <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">充电状态</p></div>
+                   <div class="col s8"><p class="cyan order-item"><span id="id_charg_status">{{ order.charg_status.name|default:'' }}</span></p></div>
+               </div>
+           </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">实际充电时间</p></div>
+                   <div class="col s8"><p class="cyan  order-item" ><span id="id_total_minutes">{{ order.total_minutes }}</span> 分钟</p></div>
+               </div>
+           </li>
+           <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">实际充电电量</p></div>
+                   <div class="col s8"><p class="cyan order-item"><span id="id_total_reading">{{ order.get_total_reading }}</span> 度(KWH)</p></div>
+               </div>
+           </li>
+            <li class="collection-item co-item">
+               <div class="row">
+                  <div class="col s4 pad-top-5"><p class="title">消费金额</p></div>
+                  <div class="col s8"><p class="cyan order-item"><span id="id_consum_money">{{ order.consum_money }}</span> 元</p></div>
+               </div>
+           </li>
+    </ul>
+
+{% endblock container %}
+{% block bottomjs %}{% endblock bottomjs %}

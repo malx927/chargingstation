@@ -1,0 +1,33 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+    <div class="section header-margin-top">
+            <h5 class="center-align  light-blue-text text-darken-2">用户信息完善</h5>
+    </div>
+    <form class="col s12" name="register_form" action="{% url 'wxchat-register' %}" method="post">{% csrf_token %}
+    <div class="row">
+        <input type="hidden" id="openid" name="openid" value="{{ openid|default:'test' }}">
+        <input type="hidden" id="url" name="url" value="{{ url|default:'' }}">
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">account_circle</i>
+            <input id="user_name" name="user_name" type="text" class="validate" required >
+            <label for="user_name">姓名</label>
+            {% if errors.user_name.0 %}<span>{{ errors.user_name.0 }}</span>{% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">phone</i>
+            <input id="telephone" name="telephone" type="text" class="validate" required>
+            <label for="telephone">手机</label>
+            {% if errors.telephone.0 %}<span>{{ errors.telephone.0 }}</span>{% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <p class="center-align">
+        <button class="btn waves-effect waves-light gradient-45deg-red-pink" type="submit" name="action">提交
+            <i class="material-icons right">send</i>
+        </button>
+        </p>
+    </div>
+    </form>
+{% endblock container %}

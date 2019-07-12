@@ -1,0 +1,176 @@
+{% load staticfiles %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title>服务器查询充电桩参数</title>
+  <!-- CSS  -->
+  <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="{% static 'materialize/css/googlefonticon.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container"><br><br>
+         <div class="row">
+             <h5 class="center">查询充电桩参数</h5>
+            <form class="col s12"  action="{% url 'order-recharge' %}" method="post">{% csrf_token %}
+            <div class="row">
+                <div class="col s6 m6">
+                  <div class="input-field">
+                    <input id="pile_sn" name="pile_sn" type="text" class="validate">
+                    <label for="pile_sn" data-error="wrong" data-success="right">电桩编号SN</label>
+                  </div>
+                </div>
+                <div class="col s6 m6">
+                  <a class="waves-effect waves-light btn-large">查询</a>
+                </div>
+            </div>
+            </form>
+             <h5 class="center">充电桩返回参数</h5>
+              <div class="row">
+                <div class="input-field col s6">
+                  <input id="pile_sn" name="pile_sn" type="text" class="validate">
+                  <label for="pile_sn">电桩编号SN</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="extend_sn" name="extend_sn" type="text" class="validate">
+                  <label for="extend_sn">扩展枪SN</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                    <select id="charg_type" name="charg_type">
+                      <option value="" disabled selected>运营属性</option>
+                      <option value="0">私有</option>
+                      <option value="1">自有公司运营</option>
+                      <option value="2">自有平台运营</option>
+                      <option value="3">其他公司运营</option>
+                      <option value="4">合作运营</option>
+                    </select>
+                    <label for="charg_type">运营属性</label>
+                </div>
+              </div>
+                <div class="row">
+                    <div class="input-field col s12 m6">
+                        <input id="qr_code1" name="qr_code1" type="text" class="validate">
+                        <label for="qr_code1">枪1二维码</label>
+                    </div>
+                    <div class="input-field col s12 m6">
+                        <input id="qr_code2" name="qr_code2" type="text" class="validate">
+                        <label for="qr_code2">枪1二维码</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                      <input id="gun_max_voltage" name="gun_max_voltage" type="text" class="validate">
+                      <label for="gun_max_voltage">单枪最大输出电压</label>
+                    </div>
+                    <div class="input-field col s6">
+                      <input id="gun_min_voltage" name="gun_min_voltage" type="text" class="validate">
+                      <label for="gun_min_voltage">单枪最小输出电压</label>
+                    </div>
+                </div>
+                 <div class="row">
+                    <div class="input-field col s6">
+                      <input id="gun_max_current" name="gun_max_current" type="text" class="validate">
+                      <label for="gun_max_current">单枪最大输出电流</label>
+                    </div>
+                    <div class="input-field col s6">
+                      <input id="gun_min_current" name="gun_min_current" type="text" class="validate">
+                      <label for="gun_min_current">单枪最小输出电流</label>
+                    </div>
+                 </div>
+              <div class="row">
+                <div class="input-field col s6">
+                    <select id="occupy_flag" name="occupy_flag">
+                      <option value="" disabled selected>请选择占位费标志</option>
+                      <option value="0">不启动</option>
+                      <option value="1">启动</option>
+                    </select>
+                    <label for="occupy_flag">收占位费标志</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="occupy_fee" name="occupy_fee" type="text" class="validate">
+                  <label for="occupy_fee">占位费(每5分钟)</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                  <select id="subscribe_flag" name="subscribe_flag">
+                      <option value="" disabled selected>请选择预约费标志</option>
+                      <option value="0">不启动</option>
+                      <option value="1">启动</option>
+                   </select>
+                  <label for="subscribe_flag">收预约费标志</label>
+                </div>
+                <div class="input-field col s6">
+                  <input id="subscribe_fee" name="subscribe_fee" type="text" class="validate">
+                  <label for="subscribe_fee">预约费(每5分钟)</label>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                    <select id="lower_offset" name="lower_offset">
+                      <option value="" disabled selected>请选择补偿标志</option>
+                      <option value="0">不启动</option>
+                      <option value="1">启动</option>
+                    </select>
+                     <label for="lower_offset">小电流补偿标志</label>
+                </div>
+                 <div class="input-field col s6">
+                     <input id="lower_offset_value" name="lower_offset_value" type="text" class="validate">
+                     <label for="lower_offset_value">小电流补偿值(每分钟)</label>
+                 </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s6">
+                    <select id="subscribe_fee" name="subscribe_fee">
+                      <option value="" disabled selected>请选择电流限制</option>
+                      <option value="0">不启动</option>
+                      <option value="1">启动</option>
+                    </select>
+                     <label for="subscribe_fee">小电流限制标志</label>
+                </div>
+                 <div class="input-field col s6">
+                     <input id="low_cur_value" name="low_cur_value" type="text" class="validate">
+                     <label for="low_cur_value">输出小电流值</label>
+                </div>
+              </div>
+
+            </form>
+          </div>
+    </div>
+</body>
+  <script src="{% static 'materialize/js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
+<script>
+  $(document).ready(function() {
+       $('select').formSelect();
+       $('.datepicker').datepicker({
+            selectMonths: true,
+            selectYears: 15,
+            format: 'yyyy-mm-dd',
+            showClearBtn:true,
+            i18n:{
+                cancel: '取消',
+                clear: '清除',
+                done: '确定',
+                weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+                weekdaysShort: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+                months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+                monthsShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                weekdaysAbbrev:['日', '一', '二', '三', '四', '五', '六']
+           }
+        });
+
+       $('.timepicker').timepicker({
+           i18n:{
+            cancel: '取消',
+            clear: '清除',
+            done: '确定',
+           },
+           twelveHour:false,
+           showClearBtn:true,
+       });
+  });
+</script>
+</html>

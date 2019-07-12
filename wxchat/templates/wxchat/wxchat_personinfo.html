@@ -1,0 +1,58 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+    <div class="row">
+        <div  class="card" id="personinfo">
+            <div class="card-image">
+              <img src="{% static 'wxchat/images/3.png' %}" >
+                <div class="card-title">
+                    {% if request.session.username %}
+                         <span>{{ request.session.username|default:'' }}</span>
+                    {% else %}
+                        <span>{{ request.session.nickname|default:'' }}</span>
+                    {% endif %}
+                </div>
+{#            {{ request.session.headimgurl }}#}
+             {% if request.session.headimgurl%}
+              <a class="btn-floating btn-large halfway-fab light-blue lighten-5 padding-5"><img class="imgheader"  src="{{ request.session.headimgurl }}"></a>
+              {% else %}
+              <a class="btn-floating btn-large halfway-fab cyan lighten-1 " ><i class="material-icons font-large">person</i></a>
+             {% endif %}
+            </div>
+            <div class="card-content" style="padding-top: 10px;">
+                {% if user %}
+                <p class="card-title" style="font-size:16px;">账户余额: <span class="balance gradient-45deg-red-pink">{{ user.account_balance }}元</span></p>
+                {% endif %}
+               <div class="collection border-none">
+                    <a class="collection-item avatar" href="{% url 'wxchat-order-pay' %}">
+                      <i class="material-icons circle blue">credit_card</i>
+                      <span>用户充值</span>
+                      <span  class="secondary-content"><i class="material-icons">grade</i></span>
+                    </a>
+                    <a class="collection-item avatar" href="{% url 'user-order-list' %}">
+                      <i class="material-icons circle cyan lighten-2">library_books</i>
+                      <span class="title">充电订单</span>
+                      <span  class="secondary-content"><i class="material-icons">grade</i></span>
+                    </a>
+                    <a class="collection-item avatar">
+                      <i class="material-icons circle green">person_pin</i>
+                      <span class="title">用户信息</span>
+                      <span  class="secondary-content"><i class="material-icons">grade</i></span>
+                    </a>
+{#                    <a class="collection-item avatar">#}
+{#                      <i class="material-icons circle red">play_arrow</i>#}
+{#                      <span class="title">标题</span>#}
+{#                      <span  class="secondary-content"><i class="material-icons">grade</i></span>#}
+{#                    </a>#}
+               </div>
+        </div>
+    </div>
+
+
+{% endblock container %}
+{% block bottomjs %}
+<script>
+
+</script>
+{% endblock bottomjs %}

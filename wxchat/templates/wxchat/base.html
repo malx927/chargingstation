@@ -1,0 +1,35 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no,shrink-to-fit=no"/>
+    <title>{% block title %}亚电电气充电桩系统{% endblock %}</title>
+    {% block css %}
+    <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="{% static 'materialize/css/googlefonticon.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% endblock css %}
+    {% block js %}
+    {% endblock js %}
+    {% block extra %}{% endblock extra%}
+{#    <script>#}
+{#          // 对浏览器的UserAgent进行正则匹配，不含有微信独有标识的则为其他浏览器#}
+{#        var useragent = navigator.userAgent;#}
+{#        if(useragent.match(/WindowsWechat/) == 'WindowsWechat' || useragent.match(/MicroMessenger/i) != 'MicroMessenger') {#}
+{#            window.location.href = "{% url 'wx-error' %}";#}
+{#        }#}
+{#     </script>#}
+</head>
+<body>
+{% block side_nav %}{% endblock side_nav %}
+<div class="container">
+{% block container %}{% endblock container %}
+</div>
+{% block footer %}
+{% endblock footer %}
+</body>
+<script src="{% static 'materialize/js/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'materialize/js/materialize.min.js' %}"></script>
+<script src="{% static 'js/reconnecting-websocket.min.js' %}"></script>
+{% block bottomjs %}{% endblock bottomjs %}
+</html>

@@ -1,0 +1,45 @@
+# coding=utf-8
+from django.shortcuts import render
+from django.views import View
+
+from wxchat.views import getJsApiSign
+from .models import ChargingPile, Station
+
+
+class StationListView(View):
+    """充电站列表"""
+    def get(self, request, *arg, **kwargs):
+        sign = getJsApiSign(request)
+        stations = Station.objects.all()
+        context = {
+            "sign": sign,
+            "stations": stations,
+        }
+        return render(request, template_name='stationmanager/station_index.html', context=context)
+
+
+# class RechargeView(View):
+#     def get(self, request, *args, **kwargs):
+#         pile_sn = kwargs.get('sn', None)
+#         gun_num = kwargs.get('num', None)
+#         print(pile_sn, gun_num)
+#         if pile_sn and gun_num:
+#             return render(request, template_name='stationmanager/recharge.html', context={"pile_sn": pile_sn})
+#         else:
+#             piles = ChargingPile.objects.all()
+#             return render(request, template_name='stationmanager/station_index.html', context={"piles": piles})
+#
+#     def post(self, request, *args, **kwargs):
+#         # 生产订单
+#         pass
+
+
+# class DashboardListView(View):
+#     def get(self, request, *args, **kwargs):
+#         station_id = request.GET.get("station_id", None)
+#
+#         if pile_sn and gun_num:
+#             return render(request, template_name='stationmanager/recharge.html', context={"pile_sn": pile_sn})
+#         else:
+#             piles = ChargingPile.objects.all()
+#             return render(request, template_name='stationmanager/index.html', context={"piles": piles})

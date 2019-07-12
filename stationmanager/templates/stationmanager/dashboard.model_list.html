@@ -1,0 +1,144 @@
+
+<div class="col-sm-12 column ui-sortable">
+    <nav class="navbar navbar-default">
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">选择充电站 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                {% for station in stations  %}
+                {% if forloop.counter > 1 %}
+                <li role="separator" class="divider"></li>
+                {% endif %}
+                <li><a href="javascript:;" id="station_{{ station.id }}" data-item="{{ station.id }}">{{ station.name }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+          <form class="navbar-form navbar-left">
+            <div class="form-group">
+              <input type="text" id="pile_sn" class="form-control" placeholder="输入电桩编号">
+            </div>
+            <button type="button" id="btn_search" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>  查 询</button>
+          </form>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+    <div class="panel panel-default widget list" id="stations">
+        <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
+            <h3 class="panel-title"><i class="fa fa-align-justify"></i>充电站列表</h3>
+        </div>
+      <div class="panel-body nopadding x-scroll">
+        <table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>充电站名称</th><th>运营商</th><th>省市区</th><th>地址</th>
+              <th>联系电话</th><th>收费标准</th><th>充电桩数量</th>
+            </tr>
+          </thead>
+          <tbody id="station_lists">
+          {% for station in stations %}
+          <tr>
+              <td><a href="./stationmanager/station/{{ station.id }}/update">{{ station.name }}</a></td>
+              <td>{{ station.seller.name }}</td>
+              <td>{{ station.province_city_district|default:'' }}</td>
+              <td>{{ station.address|default:'' }}</td>
+              <td>{{ station.telephone|default:''}}</td>
+              <td>{{ station.fee_scale }}</td>
+              <td><a href="javascript:;" id="sta_{{ station.id }}" data-item="{{ station.id }}">共：{{ station.pile_totals|default:0 }}</a></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel panel-default widget list hidden" id="piles">
+        <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
+            <h3 class="panel-title"><i class="fa fa-align-justify"></i>充电桩列表</h3>
+        </div>
+      <div class="panel-body nopadding x-scroll">
+        <table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>充电桩名称</th><th>SN编码</th><th>所属充电站</th><th>电桩类型</th>
+              <th>电桩模式</th><th>运营属性</th><th>运行状态</th><th>订阅状态</th><th>订单详情</th>
+            </tr>
+          </thead>
+          <tbody id="pile_lists">
+
+          </tbody>
+        </table>
+      </div>
+    </div>  
+</div>
+<script>
+    $(function(){
+        $("#btn_search").on("click", function(event){
+            var pile_sn = $("#pile_sn").val();
+            params = {
+                "pile_sn":pile_sn
+            }
+
+
+            getPileList(params);
+        })
+
+        $("a[id^='station']").on("click", function(event){
+             params ={
+                 "station_id": $(this).attr("data-item"),
+             }
+             $("#stations").addClass("hidden");
+             $("#piles").removeClass("hidden");
+             getPileList(params);
+        })
+
+        $("a[id^='sta_']").on("click", function(event){
+             params ={
+                 "station_id": $(this).attr("data-item"),
+             }
+             $("#stations").addClass("hidden");
+             $("#piles").removeClass("hidden");
+             getPileList(params);
+        })
+
+
+{#         getPileList({});#}
+
+    })
+
+    function getPileList(params){
+        $("#pile_lists").children().remove();
+        $.ajax({
+              type: 'GET',
+              url: '{% url "charging-pile-list" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  appendItem(data);
+              },
+              error: function(error){
+
+              }
+        });
+    }
+
+    function appendItem(data){
+{#        alert(JSON.stringify(data));#}
+        $.each(data,function(index, item){
+            var new_item = "<tr>" +
+                        "<td><a href='./stationmanager/chargingpile/" + item.id +"/update'>" + item.name + "</a></td>" +
+                        "<td>" + item.pile_sn + "</td>" +
+                        "<td>" + item.station_name +"</td>" +
+                        "<td>" + item.piletype +"</td>" +
+                        "<td>" + item.pilemode +"</td>" +
+                        "<td>" + item.businessmode +"</td>" +
+                        "<td>" + item.get_work_status +"</td>" +
+                        "<td>" + item.substatus +"</td>" +
+                        "<td><a href='" + item.get_order_url +"'>电桩订单</a></td>" +
+                        "<tr>"
+            $("#pile_lists").append(new_item);
+        })
+    }
+
+</script>

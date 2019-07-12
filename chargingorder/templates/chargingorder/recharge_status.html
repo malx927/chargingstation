@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>dddddddd</h1>
+</body>
+<script>
+    {#$(function () {#}
+    {#    // Correctly decide between ws:// and wss://#}
+    {#    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";#}
+    {#    var ws_path = ws_scheme + '://' + window.location.host + "/ws/recharge/{{ pile_gun.charg_pile.pile_sn }}/{{ pile_gun.gun_num }}/";#}
+    {#    console.log("Connecting to " + ws_path);#}
+    {#    var socket = new ReconnectingWebSocket(ws_path);#}
+    {##}
+    {#    // Handle incoming messages#}
+    {#    socket.onmessage = function (message) {#}
+    {#        // Decode the JSON#}
+    {#        console.log("Got websocket message " + message.data);#}
+    {#        var data = JSON.parse(message.data);#}
+    {#        // Handle errors#}
+    {#        if (data.error) {#}
+    {#            alert(data.error);#}
+    {#            return;#}
+    {#        }#}
+    {#    };#}
+    {#    // Helpful debugging#}
+    {#    socket.onopen = function () {#}
+    {#        console.log("Connected to chat socket");#}
+    {#    };#}
+    {#    socket.onclose = function () {#}
+    {#        console.log("Disconnected from chat socket");#}
+    {#    }#}
+    {#});#}
+</script>
+</html>
