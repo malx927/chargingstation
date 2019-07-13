@@ -1,0 +1,105 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+    {% include 'wxchat/include/jssdk.html' %}
+    <script type="text/javascript">
+    wx.ready(function () {
+        $('.money_btn').on('click',function(){
+            var money = $(this).attr("data-item");
+            var params ={
+              money: money,
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "wxchat-order-pay" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  if(data.package !=undefined){
+                      wxpay(data)
+                  }
+                  else if(data.return_code == "FAIL"){
+                      M.toast({html: data.return_msg});
+                      removeOrder();
+                  }
+              },
+              error: function(error){
+                  M.toast({html: '充值失败!!'});
+                  removeOrder();
+              }
+            });
+        });
+
+        function wxpay(data){
+            wx.chooseWXPay({
+                  timestamp:data.timestamp,
+                  nonceStr: data.nonceStr,
+                  package:  data.package ,
+                  signType: data.signType,
+                  paySign:  data.paySign,
+                  success: function(res){
+                    if (res.errMsg == "chooseWXPay:ok") {
+                        M.toast({html: '充值成功!'});
+                    } else {
+                      M.toast({html: '充值失败!'});
+                      removeOrder();
+                    }
+                  },
+                   cancel: function(res) {
+                         M.toast({html: '充值失败!'});
+                         removeOrder();
+                   },
+                   fail:function(res){
+                         M.toast({html: '充值失败!'});
+                         removeOrder();
+                   }
+            });
+        }
+
+    });
+
+    function removeOrder() {
+        var openid = $("#openid").val();
+        var params ={
+              openid: openid,
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+        };
+        $.ajax({
+              type: 'POST',
+              url: '{% url "wxchat-order-remove" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  console.log(data)
+              },
+              error: function(error){
+                  console.log(error)
+              }
+            });
+    }
+
+    </script>
+<style>
+    .container{
+        width: 100%
+    }
+
+</style>
+{% endblock extra%}
+{% block container %}
+      <div class="collection">
+        <div class="collection-item avatar">
+          <i class="material-icons cyan circle">shopping_basket</i>
+          <h6 class="collection-header m-0">充值金额列表</h6>
+           <input id="openid" type="hidden" value="{{ request.session.openid }}">
+        </div>
+        <div class="collection-item">
+            {% for list in lists %}
+                <a data-item="{{ list.money }}" class="btn money_btn  waves-effect waves-light gradient-45deg-light-blue-cyan" href="javascript:void(0);">{{ list.money }}元</a>
+            {% endfor %}
+        </div>
+      </div>
+{% endblock container %}

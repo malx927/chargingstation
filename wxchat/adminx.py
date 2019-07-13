@@ -3,7 +3,7 @@ __author__ = 'Administrator'
 import xadmin
 from xadmin import views
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText
-from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord
+from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord, RechargeList
 
 
 class GroupClientsAdmin(object):
@@ -139,3 +139,13 @@ class RechargeRecordAdmin(object):
 
 
 xadmin.site.register(RechargeRecord, RechargeRecordAdmin)
+
+
+class RechargeListAdmin(object):
+    """用户充值设置"""
+    list_display = ('money', 'create_at')
+    list_per_page = 50
+    model_icon = 'fa fa-check-square'
+
+
+xadmin.site.register(RechargeList, RechargeListAdmin)

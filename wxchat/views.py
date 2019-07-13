@@ -23,7 +23,7 @@ from wechatpy.utils import check_signature, random_string
 from chargingstation import settings
 from wxchat.decorators import weixin_decorator
 from wxchat.forms import RegisterForm
-from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult
+from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList
 
 redis_client = Redis.from_url(settings.REDIS_URL)
 session_interface = RedisStorage(
@@ -201,13 +201,16 @@ class OrderPayView(View):
     def get(self, request, *args, **kwargs):
         openid = request.session.get("openid", None)
         url = request.GET.get("url", None)
+        lists = RechargeList.objects.all()
         signPackage = getJsApiSign(self.request)
         context = {
             "openid": openid,
             "url": url,
-            "sign": signPackage
+            "sign": signPackage,
+            "lists": lists,
         }
-        return render(request, template_name="wxchat/wxchat_pay.html", context=context)
+        # return render(request, template_name="wxchat/wxchat_pay.html", context=context)
+        return render(request, template_name="wxchat/recharge_list.html", context=context)
 
     def post(self, request, *args, **kwargs):
         trade_type ='JSAPI'
@@ -245,7 +248,6 @@ class OrderPayView(View):
         try:
             wxPay = WeixinPay()
             data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, attach=attach, notify_url=settings.NOTIFY_URL, user_id=openid)
-            print("abc:", data)
             prepay_id = data.get('prepay_id', None)
             save_data = dict(data)
             # 保存统一订单数据
@@ -407,3 +409,13 @@ class PersonInfoView(View):
 
     def post(self, request, *args, **kwargs):
         pass
+
+
+class OrderRemoveView(View):
+    """删除未支付的订单"""
+    def post(self, request, *args, **kwargs):
+        openid = request.POST.get("openid", None)
+        if openid:
+            ret = RechargeRecord.objects.filter(openid=openid, status=0).delete()
+            print("OrderRemoveView:", ret)
+        return HttpResponse("success")

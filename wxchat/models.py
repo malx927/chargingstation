@@ -230,3 +230,19 @@ class Menu(models.Model):
 
     def __str__(self):
         return self.Meta.verbose_name
+
+
+class RechargeList(models.Model):
+    money = models.IntegerField(verbose_name="充值金额(元)", default=0)
+    create_at = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+
+    def __str__(self):
+        return '{}'.format(self.money)
+
+    class Meta:
+        verbose_name = '充值金额设置'
+        verbose_name_plural = verbose_name
+        ordering = ["money"]
+
+
+
