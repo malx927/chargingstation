@@ -45,9 +45,9 @@ class Station(models.Model):
     充电站管理
     """
     name = models.CharField(verbose_name='充电站名称', max_length=100)
-    province = models.ForeignKey(AreaCode, verbose_name='省份', related_name='provinces', blank=True, null=True, on_delete=models.SET_NULL)
-    city = models.ForeignKey(AreaCode, verbose_name='城市', related_name='cities', blank=True, null=True, on_delete=models.SET_NULL)
-    district = models.ForeignKey(AreaCode, verbose_name='县区', related_name='districts', blank=True, null=True, on_delete=models.SET_NULL)
+    province = models.ForeignKey(AreaCode, verbose_name='省份', related_name='provinces', null=True, on_delete=models.SET_NULL)
+    city = models.ForeignKey(AreaCode, verbose_name='城市', related_name='cities', null=True, on_delete=models.SET_NULL)
+    district = models.ForeignKey(AreaCode, verbose_name='县区', related_name='districts', null=True, on_delete=models.SET_NULL)
     address = models.CharField(verbose_name='详细地址', max_length=50)
     longitude = models.DecimalField(verbose_name='经度', default=0, decimal_places=6, max_digits=12)
     latitude = models.DecimalField(verbose_name='经度', default=0, decimal_places=6, max_digits=12)
