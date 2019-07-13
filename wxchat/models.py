@@ -68,7 +68,7 @@ class UserInfo(models.Model):
     country = models.CharField(verbose_name='国家', max_length=64, blank=True, null=True)
     language =models.CharField(verbose_name='使用语言', max_length=12, blank=True, null=True)
     headimgurl = models.CharField(verbose_name='头像', max_length=240, blank=True, null=True)
-    subscribe_time = models.DateTimeField(verbose_name='注册时间', null=True)
+    subscribe_time = models.DateTimeField(verbose_name='注册时间', null=True, blank=True)
     subscribe_scene = models.CharField(verbose_name='渠道来源', max_length=64, blank=True, null=True)
     qr_scene = models.IntegerField(verbose_name='扫码场景', default=0, blank=True, null=True)
     last_charg_time = models.DateTimeField(verbose_name='最后充电时间', blank=True, null=True)

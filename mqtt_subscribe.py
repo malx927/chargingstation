@@ -19,9 +19,9 @@ import paho.mqtt.client as mqtt
 from asgiref.sync import async_to_sync
 from django.db.models import F, Sum, DecimalField
 
-logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
-                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+# logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
+#                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 # 导入django model
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASEDIR)
