@@ -1,11 +1,32 @@
 {% extends 'wxchat/base.html' %}{% load static %}
 {% block extra %}
+    {% include 'wxchat/include/jssdk.html' %}
+<script type="text/javascript">
+  wx.ready(function () {
+    $('#recharge').on('click',function(){
+       wx.scanQRCode({
+            needResult: 0,
+            scanType: ["qrCode","barCode"],
+            success: function (res) {
+                var result = res.resultStr;
+                console.log(result);
+            }
+       });
+    });
+
+});
+</script>
+<style>
+.margin_top_10{
+    margin: 20px;
+}
+</style>
 {% endblock extra%}
 {% block container %}
     <div class="row">
         <div  class="card" id="personinfo">
             <div class="card-image">
-              <img src="{% static 'wxchat/images/3.png' %}" >
+                <img src="{% static 'wxchat/images/3.png' %}" >
                 <div class="card-title">
                     {% if request.session.username %}
                          <span>{{ request.session.username|default:'' }}</span>
@@ -24,6 +45,13 @@
                 {% if user %}
                 <p class="card-title" style="font-size:16px;">账户余额: <span class="balance gradient-45deg-red-pink">{{ user.account_balance }}元</span></p>
                 {% endif %}
+                <div class="row margin_top_10">
+                    <div class="col s12 center-align">
+                        <a id="recharge" class="btn waves-effect waves-light pink">
+                          扫描充电<i class="material-icons left">battery_charging_full</i>
+                        </a>
+                    </div>
+                </div>
                <div class="collection border-none">
                     <a class="collection-item avatar" href="{% url 'wxchat-order-pay' %}">
                       <i class="material-icons circle blue">credit_card</i>
