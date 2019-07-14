@@ -407,7 +407,12 @@ class PersonInfoView(View):
             user = UserInfo.objects.get(openid=openid)
         except UserInfo.DoesNotExist as ex:
             user = None
-        return render(request, template_name="wxchat/wxchat_personinfo.html", context={"user": user})
+        signPackage = getJsApiSign(self.request)
+        context = {
+            "user": user,
+            "sign": signPackage
+        }
+        return render(request, template_name="wxchat/wxchat_personinfo.html", context=context)
 
     def post(self, request, *args, **kwargs):
         pass
