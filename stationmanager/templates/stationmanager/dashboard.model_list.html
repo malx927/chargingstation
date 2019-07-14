@@ -24,6 +24,35 @@
           </form>
         </div><!-- /.navbar-collapse -->
     </nav>
+    <!--故障枪口-->
+    <div class="panel panel-default widget list" id="fault_gun">
+        <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
+            <h3 class="panel-title"><i class="fa fa-align-justify"></i>故障枪口列表</h3>
+        </div>
+      <div class="panel-body nopadding x-scroll">
+        <table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>充电桩</th><th>电桩SN</th><th>枪口</th><th>工作状态</th>
+              <th>充电状态</th><th>故障时间</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for gun in fault_guns %}
+          <tr>
+              <td>{{ gun.charg_pile }}</td>
+              <td>{{ gun.charging_pile_sn}}</td>
+              <td>{{ gun.gun_num}}</td>
+              <td>{{ gun.get_work_status_display }}</td>
+              <td>{{ gun.charg_status.name}}</td>
+              <td>{{ gun.add_time }}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+ <!--故障枪口结束-->
     <div class="panel panel-default widget list" id="stations">
         <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
             <h3 class="panel-title"><i class="fa fa-align-justify"></i>充电站列表</h3>

@@ -44,7 +44,7 @@
               <div class="row">
                 <div class="col s9">
                   <p class="collections-title">单号:{{order.out_trade_no}}</p>
-                  <p class="collections-content">时间:{{ order.begin_time }}</p>
+                  <p class="collections-content">时间:{{ order.begin_time|default:'' }}</p>
                 </div>
                 <div class="col s3">
                   <div class="task-cat cyan">¥{{ order.consum_money }}</div>

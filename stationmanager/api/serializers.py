@@ -18,16 +18,13 @@ class ChargingPileSerializer(serializers.ModelSerializer):
     station_name = serializers.CharField(source="station.name")
     pilemode = SerializerMethodField()
     businessmode = SerializerMethodField()
-    substatus = SerializerMethodField()
 
     class Meta:
         model = ChargingPile
         fields = [
-            'id', 'name', 'pile_sn', 'piletype', 'pilemode', 'max_gun', 'fireware', 'get_work_status', 'businessmode', 'station_name', 'extend_sn',
-            'cabinet_temp1_status', 'cabinet_temp2_status', 'cabinet_temp1', 'spd_status', 'emerg_stop_status',
-            'water_status', 'door_status', 'power_fail_status', 'elec_leak_status', 'symbol_4g', 'symbol_eth',
-            'gun_max_voltage', 'gun_min_voltage', 'gun_max_current', 'low_restrict', 'low_offset', 'subscribe_status',
-            'faults', 'substatus', 'get_order_url'
+           'id', 'name', 'pile_sn', 'piletype', 'pilemode', 'max_gun', 'fireware', 'get_work_status', 'businessmode', 'station_name',
+           'symbol_4g', 'symbol_eth', 'gun_max_voltage', 'gun_min_voltage', 'gun_max_current', 'low_restrict', 'low_offset', 'subscribe_status',
+           'faults', 'get_order_url'
         ]
 
     def get_pilemode(self, obj):
@@ -35,9 +32,6 @@ class ChargingPileSerializer(serializers.ModelSerializer):
 
     def get_businessmode(self, obj):
         return obj.get_business_mode_display() if obj.get_business_mode_display() is not None else '无'
-
-    def get_substatus(self, obj):
-        return obj.get_sub_status_display() if obj.get_sub_status_display() is not None else '无'
 
 
 class AreaCodeSerializer(serializers.ModelSerializer):

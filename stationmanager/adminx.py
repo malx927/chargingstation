@@ -1,6 +1,8 @@
 # coding=utf8
 import os
 import time
+
+from django.db.models import Q
 from django.forms import CharField
 import qrcode
 from django.conf import settings
@@ -18,7 +20,7 @@ from xadmin.plugins.inline import Inline
 from xadmin.views import Dashboard
 from xadmin.views.website import LoginView
 from .models import Seller, Station, ChargingPile, ChargingPrice, ChargingPriceDetail, MqttSubData, ChargingGun, \
-    PowerModuleStatus, StationImage
+    PowerModuleStatus, StationImage, FaultChargingGun
 
 site.register_plugin(DashBoardPlugin, Dashboard)
 
@@ -256,7 +258,7 @@ class ChargingPileAdmin(object):
     """
     充电桩管理
     """
-    list_display = ['name', 'pile_sn', 'pile_type', 'station', 'pile_mode', 'max_gun', 'fireware', 'business_mode',
+    list_display = ['name', 'pile_sn', 'pile_type', 'station', 'pile_mode', 'business_mode',
                     'get_work_status']
     search_fields = ['pile_sn', 'name', 'pile_type', 'station']
     exclude = ["qrcode"]
@@ -264,7 +266,7 @@ class ChargingPileAdmin(object):
     readonly_fields = ['group', 'user']
 
     model_icon = 'fa fa-battery-half'
-    show_all_rel_details = 'False'
+    show_all_rel_details = False
     list_editable = ['pile_type', 'pile_sn']
     refresh_times = [3, 5]  # 计时刷新
     save_as = True
@@ -372,13 +374,13 @@ xadmin.site.register(ChargingPile, ChargingPileAdmin)
 
 
 class ChargingGunAdmin(object):
-    list_display = ['gun_num', 'charg_pile', 'work_status', 'charg_status', 'cc_status', 'cp_status', 'gun_temp_status', 'elec_lock_status', 'relay_status',]
+    list_display = ['charg_pile', 'charging_pile_sn', 'gun_num', 'work_status', 'charg_status', 'cc_status', 'cp_status', 'gun_temp_status', 'elec_lock_status', 'relay_status',]
     search_fields = ['gun_num', 'charg_pile__pile_sn']
-    # exclude = ['out_trade_no']
+    exclude = ['out_trade_no']
     list_display_links = ['gun_num', 'charg_pile']
     list_filter = ['charg_pile', 'work_status', 'cc_status', 'cp_status']
     model_icon = 'fa fa-random'
-    show_all_rel_details = 'False'
+    show_all_rel_details = False
     # save_as = True
     # save_on_top = True
 
@@ -404,7 +406,7 @@ class ChargingGunAdmin(object):
         Fieldset(
             '其他信息',
             Row('occupy_min', 'subscribe_min',),
-            Row( 'recharge_min', "qrcode"),
+            Row('recharge_min', "qrcode"),
 
         ),
 
@@ -452,6 +454,27 @@ class ChargingGunAdmin(object):
 
 
 xadmin.site.register(ChargingGun, ChargingGunAdmin)
+
+
+class FaultChargingGunAdmin(object):
+    list_display = ['charg_pile', 'charging_pile_sn', 'gun_num', 'work_status', 'charg_status', 'add_time']
+    search_fields = ['gun_num', 'charg_pile__pile_sn']
+    list_display_links = ['gun_num', 'charg_pile']
+    list_filter = ['charg_pile', 'work_status', 'charg_status']
+    model_icon = 'fa fa-random'
+    show_all_rel_details = False
+
+    def queryset(self):
+        queryset = super(FaultChargingGunAdmin, self).queryset().filter(Q(work_status=2)| Q(work_status=9))
+        if self.request.user.is_superuser:
+            return queryset
+        elif self.request.user.station:
+            return queryset.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            return queryset.filter(charg_pile__station__seller=self.request.user.seller)
+
+
+xadmin.site.register(FaultChargingGun, FaultChargingGunAdmin)
 
 
 class ChargingPriceDetailInline(object):

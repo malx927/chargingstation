@@ -350,8 +350,6 @@ class OrderView(View):
     """订单"""
     def get(self, request, *args, **kwargs):
         openid = request.session.get("openid", None)
-        if openid is None:
-            openid = 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs'
         if openid:
             orders = Order.objects.filter(openid=openid, status=2)[0:20]
         else:

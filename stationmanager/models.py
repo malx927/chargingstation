@@ -205,7 +205,7 @@ class ChargingGun(models.Model):
     recharge_min = models.IntegerField(verbose_name='充电分钟数', null=True, blank=True)
     occupy_min = models.IntegerField(verbose_name='占位分钟数', null=True, blank=True)
     qrcode = models.ImageField(verbose_name='二维码', upload_to='qrcode/', blank=True, null=True) # pile_sn + gun_num
-    add_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+    add_time = models.DateTimeField(verbose_name='时间', auto_now=True)
     out_trade_no = models.CharField(verbose_name="最新订单号", max_length=32, blank=True, null=True)
 
     def __str__(self):
@@ -214,6 +214,11 @@ class ChargingGun(models.Model):
     class Meta:
         verbose_name = '充电桩枪口信息'
         verbose_name_plural = verbose_name
+
+    def charging_pile_sn(self):
+        return self.charg_pile.pile_sn
+
+    charging_pile_sn.short_description = '充电桩SN'
 
 
 class ChargingPileStatus(models.Model):
@@ -234,6 +239,16 @@ class ChargingPileStatus(models.Model):
 
     class Meta:
         verbose_name = '充电桩状态信息'
+        verbose_name_plural = verbose_name
+
+
+class FaultChargingGun(ChargingGun):
+    """
+    故障充电桩枪信息表
+    """
+    class Meta:
+        proxy = True
+        verbose_name = '故障枪口信息'
         verbose_name_plural = verbose_name
 
 

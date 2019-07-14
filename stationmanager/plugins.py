@@ -1,6 +1,6 @@
 # coding=utf-8
 from django.template import loader
-from stationmanager.models import Station, ChargingPile
+from stationmanager.models import Station, ChargingPile, ChargingGun
 from xadmin.plugins.utils import get_context_dict
 
 __author__ = 'Administrator'
@@ -20,14 +20,20 @@ class DashBoardPlugin(BaseAdminPlugin):
     def get_context(self, context):
         if self.request.user.is_superuser:
             stations = Station.objects.all()
+            fault_guns = ChargingGun.objects.all()
         elif self.request.user.station:
             stations = Station.objects.filter(id=self.request.user.station.id)
+            fault_guns = ChargingGun.objects.filter(charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             stations = Station.objects.filter(seller=self.request.user.seller)
+            fault_guns = ChargingGun.objects.filter(charg_pile__station__seller=self.uest.user.seller)
         else:
             stations = None
-        if stations:
-            context.update({'stations': stations})
+            fault_guns = None
+
+        context.update({'stations': stations})
+        context.update({'fault_guns': fault_guns})
+
         return context
 
     def block_results_top(self, context, nodes):
