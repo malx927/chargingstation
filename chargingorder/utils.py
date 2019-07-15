@@ -188,6 +188,8 @@ def send_data_to_client(pile_sn, gun_num, **data):
 
 def user_account_deduct_money(order):
     """扣款"""
+    if order.begin_time is None:        # 充电命令未得到回复
+        return
     if order.status == 2 and order.pay_time is None and order.cash_fee == 0:
         consum_money = order.consum_money
         openid = order.openid
