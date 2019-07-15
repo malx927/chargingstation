@@ -171,7 +171,7 @@ class StationAdmin(object):
             ),
             Fieldset(
                 '地理信息',
-                'longitude', 'latitude', 'altitude',
+                'latitude', 'longitude', 'altitude',
             ),
         ),
 
