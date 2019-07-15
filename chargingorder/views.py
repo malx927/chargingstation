@@ -362,3 +362,5 @@ class OrderDetailView(DetailView):
     """订单详情"""
     model = Order
     template_name = 'chargingorder/user_order_detail.html'
+
+
