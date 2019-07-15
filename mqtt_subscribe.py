@@ -959,7 +959,7 @@ def calculate_order(**kwargs):
     accumulated_service_amount = totals.get('accumulated_service_amount') if totals.get('accumulated_service_amount') is not None else decimal.Decimal(0)
     order.end_time = currRec.end_time
     order.prev_reading = order.end_reading
-    order.end_reading = currRec.end_reading
+    order.end_reading = currRec.end_reading.quantize(decimal.Decimal("0.01"))
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
     order.consum_money = order.power_fee + order.service_fee
