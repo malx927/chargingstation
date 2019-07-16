@@ -599,17 +599,33 @@ def update_order_car_info(**data):
     }
     try:
         order = Order.objects.get(out_trade_no=out_trade_no)
-        order.protocol = data["protocol"]
-        order.vin_code = data["vin_code"]
-        order.max_current = data["max_current"]
-        order.max_voltage = data["max_voltage"]
-        order.max_single_voltage = data["max_single_voltage"]
-        order.max_temp = data["max_temp"]
-        order.begin_soc = data["begin_soc"]
-        order.save()
+        if order.begin_time is None:
+            stop_data = {
+                "pile_sn": pile_sn,
+                "gun_num": gun_num,
+                "out_trade_no": out_trade_no,
+                "consum_money": 0,
+                "total_reading": 0,
+                "stop_code": 0,  # 0 主动停止，1被动响应，
+                "fault_code": 92, # 后台主动停止－通讯超时
+            }
+            order.status = 2
+            order.charg_status_id = 92
+            order.save()
+            logging.info(stop_data)
+            server_send_stop_charging_cmd(**stop_data)
+        else:
+            order.protocol = data["protocol"]
+            order.vin_code = data["vin_code"]
+            order.max_current = data["max_current"]
+            order.max_voltage = data["max_voltage"]
+            order.max_single_voltage = data["max_single_voltage"]
+            order.max_temp = data["max_temp"]
+            order.begin_soc = data["begin_soc"]
+            order.save()
+
         client_data["charg_status"] = order.charg_status.name
         client_data["order_status"] = order.get_status_display()
-        client_data["begin_time"] = order.begin_time.strftime("%Y-%m-%d %H:%M")
         client_data["begin_soc"] = order.begin_soc
         logging.info(client_data)
     except Order.DoesNotExist as ex:
@@ -734,7 +750,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "end_time": charg_time,
-        "end_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS),
+        "end_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01")),
         "current_soc": current_soc,
         "voltage": int(voltage * settings.FACTOR_VOLTAGE),
         "current": int(current * settings.FACTOR_CURRENT),
@@ -756,7 +772,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "gun_temp1": int(gun_temp1 * settings.FACTOR_TEMPERATURE),
         "cab_temp": int(cab_temp * settings.FACTOR_TEMPERATURE),
         "cab_temp1": int(cab_temp1 * settings.FACTOR_TEMPERATURE),
-        "current_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS),
+        "current_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01")),
     }
     logging.info(org_data)
     OrderChargDetail.objects.create(**org_data)
@@ -959,7 +975,7 @@ def calculate_order(**kwargs):
     accumulated_service_amount = totals.get('accumulated_service_amount') if totals.get('accumulated_service_amount') is not None else decimal.Decimal(0)
     order.end_time = currRec.end_time
     order.prev_reading = order.end_reading
-    order.end_reading = currRec.end_reading.quantize(decimal.Decimal("0.01"))
+    order.end_reading = currRec.end_reading
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
     order.consum_money = order.power_fee + order.service_fee

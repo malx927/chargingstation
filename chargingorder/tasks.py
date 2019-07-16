@@ -50,16 +50,17 @@ def update_pile_status_overtime():
 
 @shared_task
 def send_start_stop_cmd_overtime():
-    log.info('Enter send_charging_cmd_overtime')
+    print('Enter send_charging_cmd_overtime')
     for rec in ChargingCmdRecord.objects.all():
         over_time = rec.over_time
         current_time = datetime.datetime.now()
         if current_time < over_time:
             continue
-        log.warning((datetime.datetime.now() - rec.over_time).seconds)
+        print("send_charging_cmd_overtime:{}".format((current_time - rec.over_time).seconds))
         if (datetime.datetime.now() - rec.over_time).seconds > 20 or rec.send_count >= 3:
             try:
                 order = Order.objects.get(out_trade_no=rec.out_trade_no)
+                print("send_charging_cmd_overtime:订单{}".format(order.out_trade_no))
                 if order.status == 2:
                     rec.delete()
                     continue
@@ -77,6 +78,7 @@ def send_start_stop_cmd_overtime():
                     "charg_status": order.charg_status.name,
                     "order_status": order.get_status_display(),
                 }
+                print("send_charging_cmd_overtime:订单{}".format(order.out_trade_no))
                 user_account_deduct_money(order)
             except Order.DoesNotExist as ex:
                 log.warning(ex)
@@ -84,21 +86,20 @@ def send_start_stop_cmd_overtime():
             except FaultCode.DoesNotExist as ex:
                 send_data = {"return_code": "fail", "cmd": "07", "message": "状态码不存在"}
                 log.warning(ex)
-            log.info(send_data)
+            print("send_charging_cmd_overtime:订单{}".format(send_data))
             send_data_to_client(rec.pile_sn, rec.gun_num, **send_data)
-
             rec.delete()
             continue
 
         if datetime.datetime.now() >= rec.over_time and (datetime.datetime.now() - rec.over_time).seconds <= 20 and rec.send_count < 3:
             b_reply_proto = rec.send_cmd.encode("utf-8")
-            log.warning("{}--------{}.{}".format(rec.send_count, rec.send_cmd, rec.cmd_flag))
+            print("{}--------{}.{}".format(rec.send_count, rec.send_cmd, rec.cmd_flag))
             server_publish(rec.pile_sn, b_reply_proto)
             rec.send_count = rec.send_count + 1
             rec.send_time = datetime.datetime.now()
             rec.over_time = datetime.datetime.now() + datetime.timedelta(seconds=settings.CHARGING_SEND_CMD_INTERVAL)
             rec.save()
-    log.info('Leave send_charging_cmd_overtime')
+    print('Leave send_charging_cmd_overtime')
 
 
 @shared_task

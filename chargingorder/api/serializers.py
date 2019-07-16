@@ -10,7 +10,7 @@ from rest_framework import serializers
 __author__ = 'malixin'
 
 
-# # 宠物丢失
+#
 # class ChargingPileSerializer(serializers.ModelSerializer):
 #     piletype = serializers.CharField(source="pile_type.name")
 #     station_name = serializers.CharField(source="station.name")
