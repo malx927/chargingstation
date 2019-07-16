@@ -15,43 +15,43 @@ from stationmanager.models import ChargingPile
 __author__ = 'malixin'
 
 
-class ChargingPileListAPIView(ListAPIView):
-    """
-    电桩列表
-    """
-    permission_classes = [AllowAny]
-    queryset = ChargingPile.objects.all()
-    serializer_class = ChargingPileSerializer
-
-    def get_queryset(self):
-        station_id = self.request.GET.get("station_id", None)
-        pile_sn = self.request.GET.get("pile_sn", None)
-        if station_id:
-            return ChargingPile.objects.filter(station=station_id)
-
-        if pile_sn:
-            return ChargingPile.objects.filter(pile_sn=pile_sn)
-
-        return ChargingPile.objects.all()[:10]
-
-
-class AreaCodeListAPIView(ListAPIView):
-    """
-    地区编码
-    """
-    permission_classes = [AllowAny]
-    queryset = AreaCode.objects.all()
-    serializer_class = AreaCodeSerializer
-    pagination_class = None
-
-    def get_queryset(self):
-        code = self.request.GET.get("code", None)
-        if code and len(code) == 2:
-            return AreaCode.objects.extra(where=['left(code,2)=%s', 'length(code)=4'], params=[code])
-        elif code and len(code) == 4:
-            return AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[code])
-        else:
-            return AreaCode.objects.extra(where=['length(code)=2'])
+# class ChargingPileListAPIView(ListAPIView):
+#     """
+#     电桩列表
+#     """
+#     permission_classes = [AllowAny]
+#     queryset = ChargingPile.objects.all()
+#     serializer_class = ChargingPileSerializer
+#
+#     def get_queryset(self):
+#         station_id = self.request.GET.get("station_id", None)
+#         pile_sn = self.request.GET.get("pile_sn", None)
+#         if station_id:
+#             return ChargingPile.objects.filter(station=station_id)
+#
+#         if pile_sn:
+#             return ChargingPile.objects.filter(pile_sn=pile_sn)
+#
+#         return ChargingPile.objects.all()[:10]
+#
+#
+# class AreaCodeListAPIView(ListAPIView):
+#     """
+#     地区编码
+#     """
+#     permission_classes = [AllowAny]
+#     queryset = AreaCode.objects.all()
+#     serializer_class = AreaCodeSerializer
+#     pagination_class = None
+#
+#     def get_queryset(self):
+#         code = self.request.GET.get("code", None)
+#         if code and len(code) == 2:
+#             return AreaCode.objects.extra(where=['left(code,2)=%s', 'length(code)=4'], params=[code])
+#         elif code and len(code) == 4:
+#             return AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[code])
+#         else:
+#             return AreaCode.objects.extra(where=['length(code)=2'])
 
 # #狗配种
 # class DogbreedListAPIView(ListAPIView):
