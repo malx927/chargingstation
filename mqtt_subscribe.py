@@ -734,7 +734,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "end_time": charg_time,
-        "end_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS),
+        "end_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01")),
         "current_soc": current_soc,
         "voltage": int(voltage * settings.FACTOR_VOLTAGE),
         "current": int(current * settings.FACTOR_CURRENT),
@@ -756,7 +756,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "gun_temp1": int(gun_temp1 * settings.FACTOR_TEMPERATURE),
         "cab_temp": int(cab_temp * settings.FACTOR_TEMPERATURE),
         "cab_temp1": int(cab_temp1 * settings.FACTOR_TEMPERATURE),
-        "current_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS),
+        "current_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01")),
     }
     logging.info(org_data)
     OrderChargDetail.objects.create(**org_data)
@@ -959,7 +959,7 @@ def calculate_order(**kwargs):
     accumulated_service_amount = totals.get('accumulated_service_amount') if totals.get('accumulated_service_amount') is not None else decimal.Decimal(0)
     order.end_time = currRec.end_time
     order.prev_reading = order.end_reading
-    order.end_reading = currRec.end_reading.quantize(decimal.Decimal("0.01"))
+    order.end_reading = currRec.end_reading
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
     order.consum_money = order.power_fee + order.service_fee
