@@ -504,8 +504,6 @@ def pile_report_car_info_handler(topic, byte_msg):
     :param byte_msg:
     :return:
     """
-    logging.info("Enter pile_report_car_info_handler function")
-
     data_nums = get_data_nums(byte_msg)
     # 读取电桩编码(sn)
     pile_sn = get_pile_sn(byte_msg)
@@ -513,7 +511,6 @@ def pile_report_car_info_handler(topic, byte_msg):
     gun_num = byte_msg[38]
     # 订单
     out_trade_no = byte_msg[39:71].decode('utf-8').strip('\000')
-
     # 充电国标协议 0交流单相，1交流三相，2普天协议，3国标2011，4国标2015
     protocol = byte_msg[71]
     logging.info("电桩编码:{},枪口号:{},订单:{},协议:{}".format(pile_sn, gun_num, out_trade_no, protocol))
@@ -552,8 +549,6 @@ def pile_report_car_info_handler(topic, byte_msg):
     logging.info(save_data)
     update_order_car_info(**save_data)
 
-    logging.info("Leave pile_report_car_info_handler function")
-
 
 def get_charging_price(station_id, curTime):
     """
@@ -589,8 +584,6 @@ def update_order_car_info(**data):
     out_trade_no = data.pop("out_trade_no", None)
     pile_sn = data.pop("pile_sn", None)
     gun_num = data.pop("gun_num", None)
-    # 更新订单
-    # Order.objects.filter(out_trade_no=out_trade_no).update(**data)
 
     # 通知前端用户
     client_data = {
@@ -599,22 +592,8 @@ def update_order_car_info(**data):
     }
     try:
         order = Order.objects.get(out_trade_no=out_trade_no)
-        if order.begin_time is None:
-            stop_data = {
-                "pile_sn": pile_sn,
-                "gun_num": gun_num,
-                "out_trade_no": out_trade_no,
-                "consum_money": 0,
-                "total_reading": 0,
-                "stop_code": 0,  # 0 主动停止，1被动响应，
-                "fault_code": 92, # 后台主动停止－通讯超时
-            }
-            order.status = 2
-            order.charg_status_id = 92
-            order.save()
-            logging.info(stop_data)
-            server_send_stop_charging_cmd(**stop_data)
-        else:
+        b_ret = stop_charging(order)
+        if not b_ret:
             order.protocol = data["protocol"]
             order.vin_code = data["vin_code"]
             order.max_current = data["max_current"]
@@ -636,13 +615,33 @@ def update_order_car_info(**data):
     send_data_to_client(pile_sn, gun_num, **client_data)
 
 
+def stop_charging(order):
+    if order.begin_time is None:
+        stop_data = {
+            "pile_sn": order.charg_pile.pile_sn,
+            "gun_num": order.gun_num,
+            "out_trade_no": order.out_trade_no,
+            "consum_money": 0,
+            "total_reading": 0,
+            "stop_code": 0,  # 0 主动停止，1被动响应，
+            "fault_code": 92,  # 后台主动停止－通讯超时
+        }
+        order.status = 2
+        order.charg_status_id = 92
+        order.save()
+        logging.info(stop_data)
+        server_send_stop_charging_cmd(**stop_data)
+        return True
+    else:
+        return False
+
+
 # 10 (0x85)
 def server_reply_charging_info_handler(*args, **kwargs):
     """
     服务器->充电桩，服务器主动向充电桩发送帐单信息，收到06命令的回复（48字节）。
     """
-    logging.info("Enter server_reply_charging_info_handler function")
-
+    logging.info(kwargs)
     pile_sn = kwargs.get("pile_sn")
     if pile_sn is None:
         logging.warning("电桩SN不能为空")
@@ -680,7 +679,6 @@ def server_reply_charging_info_handler(*args, **kwargs):
     byte_data = message_escape(byte_data)
     b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
     server_publish(pile_sn, b_reply_proto)  # 发送主题
-    logging.info("Leave server_reply_charging_info_handler")
 
 
 # 11(0x06)
@@ -691,7 +689,6 @@ def pile_charging_status_handler(topic, byte_msg):
     数据区：命令号0x06（1字节）+ 枪口号（1字节）+ 用户识别号（32字节）+订单号（32字节）+时间（7字节）+所需电压值（2字节）+所需电流值（2字节）+输出电压值（2字节）
         +输出电流值（2字节）+当前电表读数（4字节）+保留（11字节）
     """
-    logging.info("Enter pile_charging_status_handler function")
     data_nums = get_data_nums(byte_msg)
     # 读取电桩编码(sn)
     pile_sn = get_pile_sn(byte_msg)
@@ -725,22 +722,13 @@ def pile_charging_status_handler(topic, byte_msg):
     logging.info("所需电压值:{},所需电流值:{},输出电压值:{},输出电流值:{},枪头温度值:{}-{},柜内温度值:{}--{},当前电表读数{}"
                  .format(voltage, current, output_voltage, output_current, gun_temp, gun_temp1, cab_temp, cab_temp1, current_readings))
 
-    # save data to table OrderRecord in database
     charg_time = datetime.datetime.strptime(charg_time, '%Y-%m-%d %H:%M:%S')
-    
-    order_count = Order.objects.filter(out_trade_no=out_trade_no, status__lt=2).count()
-    if order_count == 0:
-        logging.warning("{}订单不存在".format(out_trade_no))
-        return
 
-    # try:
-    #     charg_pile = ChargingPile.objects.get(pile_sn=pile_sn)
-    # except ChargingPile.DoesNotExist as ex:
-    #     logging.warning("{}:{}".format(ex, pile_sn))
-    #     return
-    # except Exception as ex:
-    #     logging.warning(ex)
-    #     return
+    try:
+        order = Order.objects.get(out_trade_no=out_trade_no)
+        stop_charging(order)
+    except Order.DoesNotExist as ex:
+        logging.warning("{}订单不存在".format(out_trade_no))
 
     serial_num = '{0}{1}'.format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
 
@@ -779,14 +767,14 @@ def pile_charging_status_handler(topic, byte_msg):
     logging.info(data)
     save_pile_charg_status_to_db(**data)
 
-    logging.info("Leave pile_charging_status_handler function")
     # 更新redis 数据
     current_time = datetime.datetime.now()
     defaults = {
         "recv_time": current_time,
         "over_time": current_time + datetime.timedelta(seconds=settings.CHARG_STATUS_OVER_TIME),
     }
-    ChargingStatusRecord.objects.update_or_create(pile_sn=pile_sn, gun_num=gun_num, out_trade_no=out_trade_no, defaults=defaults)
+    ret = ChargingStatusRecord.objects.update_or_create(pile_sn=pile_sn, gun_num=gun_num, out_trade_no=out_trade_no, defaults=defaults)
+    logging.info(ret)
 
 
 # 11
@@ -802,9 +790,10 @@ def save_pile_charg_status_to_db(**data):
 
     order = calculate_order(**data)
     if order is None:
-        send_data = {"return_code": "fail", "cmd": "06", "message": "订单不存在"}
+        send_data = {"return_code": "fail", "cmd": "06", "message": "配置异常或订单不存在"}
         logging.info(send_data)
         send_data_to_client(pile_sn, gun_num, **send_data)
+        return
 
     if order.end_reading - order.begin_reading < 0 or order.power_fee < 0 or order.service_fee < 0:
         stop_error_data = {
@@ -816,34 +805,34 @@ def save_pile_charg_status_to_db(**data):
             "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
             "fault_code": 95
         }
-        logging.warning("订单数据异常....")
-        logging.info(stop_error_data)
+        logging.warning("订单数据异常....订单：{},{},{},{}".format(out_trade_no, order.end_reading - order.begin_reading, order.power_fee, order.service_fee))
         server_send_stop_charging_cmd(**stop_error_data)
+        return
 
-    if order:
-        # 回复充电状态数据
-        reply_charging_data = {
-            "pile_sn": pile_sn,
-            "gun_num": gun_num,
-            "out_trade_no": out_trade_no,
-            "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-            "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
-        }
-        server_reply_charging_info_handler(**reply_charging_data)
+    # 回复充电状态数据
+    reply_charging_data = {
+        "pile_sn": pile_sn,
+        "gun_num": gun_num,
+        "out_trade_no": out_trade_no,
+        "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
+        "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+    }
+    logging.info(reply_charging_data)
+    server_reply_charging_info_handler(**reply_charging_data)
 
-        send_data = {
-            "return_code": "success",
-            "cmd": "06",            # 充电中状态上报
-            "total_minutes": str(order.total_minutes()),
-            "total_reading": str(order.get_total_reading()),
-            "consum_money": str(order.consum_money.quantize(decimal.Decimal("0.01"))),
-            "voltage": data.get("voltage", 0),
-            "current": data.get("current", 0),
-            "output_voltage": data.get("output_voltage"),
-            "output_current": data.get("output_current"),
-            "current_soc": data.get("current_soc", 0),
-            "order_status": order.get_status_display(),
-        }
+    send_data = {
+        "return_code": "success",
+        "cmd": "06",            # 充电中状态上报
+        "total_minutes": str(order.total_minutes()),
+        "total_reading": str(order.get_total_reading()),
+        "consum_money": str(order.consum_money.quantize(decimal.Decimal("0.01"))),
+        "voltage": data.get("voltage", 0),
+        "current": data.get("current", 0),
+        "output_voltage": data.get("output_voltage"),
+        "output_current": data.get("output_current"),
+        "current_soc": data.get("current_soc", 0),
+        "order_status": order.get_status_display(),
+    }
 
     logging.info(send_data)
     send_data_to_client(pile_sn, gun_num, **send_data)
@@ -868,7 +857,7 @@ def save_pile_charg_status_to_db(**data):
     except UserInfo.DoesNotExist as ex:
         logging.warning(ex)
         # 发送停充指令
-        stop_data["fault_code"] = 91        # 后台主动停止－用户停止
+        stop_data["fault_code"] = 93        # 后台主动停止－用户停止
         logging.info(stop_data)
         server_send_stop_charging_cmd(**stop_data)
 
@@ -896,7 +885,6 @@ def save_pile_charg_status_to_db(**data):
 
 
 def calculate_order(**kwargs):
-    logging.info("Enter calculate_order")
     out_trade_no = kwargs.get("out_trade_no", None)   # 订单
     pile_sn = kwargs.get("pile_sn", None)
     gun_num = kwargs.get("gun_num", None)
@@ -947,15 +935,23 @@ def calculate_order(**kwargs):
         first_data["out_trade_no"] = out_trade_no
         first_data["price"] = price.price
         first_data["service_price"] = price.service_price
-        first_data["begin_time"] = order.begin_time
+        if order.begin_time is None:
+            logging.warning("订单开始时间为空。")
+            order.begin_time = kwargs["end_time"]
+            order.begin_reading = kwargs["end_reading"]
+            first_data["begin_time"] = kwargs["end_time"]
+            first_data["begin_reading"] = kwargs["end_reading"]
+        else:
+            first_data["begin_time"] = order.begin_time
+            if order.end_reading >= order.begin_reading:
+                first_data["begin_reading"] = order.end_reading
+            else:
+                first_data["begin_reading"] = order.begin_reading
+
         first_data["end_time"] = kwargs["end_time"]
         first_data["price_begin_time"] = price.begin_time
         first_data["price_end_time"] = price.end_time
         first_data["current_soc"] = kwargs["current_soc"]
-        if order.end_reading >= order.begin_reading:
-            first_data["begin_reading"] = order.end_reading
-        else:
-            first_data["begin_reading"] = order.begin_reading
         first_data["end_reading"] = kwargs["end_reading"]
         first_data["accumulated_readings"] = first_data["end_reading"] - first_data["begin_reading"]
         if first_data["accumulated_readings"] <= 0:
@@ -973,6 +969,7 @@ def calculate_order(**kwargs):
 
     accumulated_amount = totals.get('accumulated_amount') if totals.get('accumulated_amount') is not None else decimal.Decimal(0)
     accumulated_service_amount = totals.get('accumulated_service_amount') if totals.get('accumulated_service_amount') is not None else decimal.Decimal(0)
+
     order.end_time = currRec.end_time
     order.prev_reading = order.end_reading
     order.end_reading = currRec.end_reading
@@ -983,7 +980,6 @@ def calculate_order(**kwargs):
     order.charg_status = gun.charg_status
     order.status = order_status
     order.save(update_fields=['end_time', 'prev_reading', 'end_reading', 'power_fee', 'service_fee', 'consum_money', 'end_soc', 'charg_status', 'status'])
-    logging.info("Leave calculate_order")
     return order
 
 
