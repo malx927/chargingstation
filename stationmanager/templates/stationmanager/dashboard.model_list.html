@@ -25,6 +25,7 @@
         </div><!-- /.navbar-collapse -->
     </nav>
     <!--故障枪口-->
+    {% if fault_guns %}
     <div class="panel panel-default widget list" id="fault_gun">
         <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
             <h3 class="panel-title"><i class="fa fa-align-justify"></i>故障枪口列表</h3>
@@ -33,8 +34,7 @@
         <table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>充电桩</th><th>电桩SN</th><th>枪口</th><th>工作状态</th>
-              <th>充电状态</th><th>故障时间</th>
+              <th>充电桩</th><th>电桩SN</th><th>枪口</th><th>工作状态</th><th>充电状态</th><th>故障时间</th>
             </tr>
           </thead>
           <tbody>
@@ -52,6 +52,7 @@
         </table>
       </div>
     </div>
+    {% endif %}
  <!--故障枪口结束-->
     <div class="panel panel-default widget list" id="stations">
         <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
