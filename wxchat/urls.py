@@ -5,7 +5,7 @@ from django.conf import settings
 # from django.contrib import admin
 from django.views.generic import TemplateView
 from .views import wechat, createMenu, getMenu, deleteMenu, pay_notify, OrderPayView, RegisterView, PersonInfoView, \
-    OrderRemoveView
+    OrderRemoveView, ScanQRCodeView
 
 urlpatterns = [
     url(r'^$', wechat),  # 微信入口
@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^getmenu/$', getMenu, name="wxchat-get-menu"),
     url(r'^delmenu/$', deleteMenu, name="wxchat-delete-menu"),
     # url(r'^pay/orderpay$', OrderPayView.as_view(), name='wxchat-order-pay'),    # 微信充值
-    # url(r'^pay/notify/$', pay_notify, name='wxchat-notify'),
+    url(r'^scanqrcode/$', ScanQRCodeView.as_view(), name='wxchat-scanqrcode'),
     url(r'^register/$', RegisterView.as_view(), name='wxchat-register'),
     url(r'^personinfo/$', PersonInfoView.as_view(), name='wxchat-personinfo'),
     url(r'^orderdel/$', OrderRemoveView.as_view(), name='wxchat-order-remove'),

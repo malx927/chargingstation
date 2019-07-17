@@ -426,3 +426,13 @@ class OrderRemoveView(View):
             ret = RechargeRecord.objects.filter(openid=openid, status=0).delete()
             print("OrderRemoveView:", ret)
         return HttpResponse("success")
+
+
+class ScanQRCodeView(View):
+    """二维码扫描"""
+    def get(self, request, *args, **kwargs):
+        signPackage = getJsApiSign(self.request)
+        context = {
+            "sign": signPackage
+        }
+        return render(request, template_name="wxchat/wxchat_qrcode.html", context=context)
