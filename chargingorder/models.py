@@ -176,7 +176,7 @@ class OrderChargDetail(models.Model):
         return self.out_trade_no
 
     class Meta:
-        verbose_name = '订单充电记录'
+        verbose_name = '充电监控'
         verbose_name_plural = verbose_name
 
 

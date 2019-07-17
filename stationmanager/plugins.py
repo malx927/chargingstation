@@ -1,4 +1,5 @@
 # coding=utf-8
+from django.db.models import Q
 from django.template import loader
 from stationmanager.models import Station, ChargingPile, ChargingGun
 from xadmin.plugins.utils import get_context_dict
@@ -20,13 +21,13 @@ class DashBoardPlugin(BaseAdminPlugin):
     def get_context(self, context):
         if self.request.user.is_superuser:
             stations = Station.objects.all()
-            fault_guns = ChargingGun.objects.all()
+            fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9))
         elif self.request.user.station:
             stations = Station.objects.filter(id=self.request.user.station.id)
-            fault_guns = ChargingGun.objects.filter(charg_pile__station=self.request.user.station)
+            fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             stations = Station.objects.filter(seller=self.request.user.seller)
-            fault_guns = ChargingGun.objects.filter(charg_pile__station__seller=self.uest.user.seller)
+            fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station__seller=self.uest.user.seller)
         else:
             stations = None
             fault_guns = None
