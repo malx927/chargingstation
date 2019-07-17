@@ -727,7 +727,7 @@ def pile_charging_status_handler(topic, byte_msg):
 
     # save data to table OrderRecord in database
     charg_time = datetime.datetime.strptime(charg_time, '%Y-%m-%d %H:%M:%S')
-
+    
     order_count = Order.objects.filter(out_trade_no=out_trade_no, status__lt=2).count()
     if order_count == 0:
         logging.warning("{}订单不存在".format(out_trade_no))
