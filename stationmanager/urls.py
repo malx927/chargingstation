@@ -18,8 +18,9 @@ from django.conf.urls.static import static
 from django.conf import settings
 # from django.contrib import admin
 from django.views.generic import TemplateView
-from .views import StationListView
+from .views import StationListView, StationDetailView
 
 urlpatterns = [
    url(r'^$', StationListView.as_view(), name='station-index'),
+   url(r'^detail/(?P<stationid>\d+)/$', StationDetailView.as_view(), name='station-detail'),
 ]

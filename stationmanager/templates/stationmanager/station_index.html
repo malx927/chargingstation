@@ -28,7 +28,7 @@
         <p class="right-align  address">空闲充电枪:{{ station.get_gun_totals }}</p>
       </div>
       <div class="card-action">
-            <a href="#!" class="white-text">详细情况</a>
+            <a href="{% url 'station-detail' station.id %}" class="white-text">详细情况</a>
           <a href="javascript:void(0)" class="waves-effect waves-light btn gradient-45deg-red-pink navigation"
              data-longitude="{{ station.longitude }}"  data-latitude="{{ station.latitude }}"
              data-name="{{ station.name }}" data-address="{{ station.address }}">

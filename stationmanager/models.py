@@ -99,6 +99,34 @@ class Station(models.Model):
         print(counts, free_counts)
         return '{}/{}'.format(free_counts, counts)
 
+    def get_gun_totals_by_type(self):
+        dc_counts = ChargingGun.objects.filter(charg_pile__station=self, charg_pile__pile_type_id__in=[1, 2]).count()  # 直流
+        ac_counts = ChargingGun.objects.filter(charg_pile__station=self,  charg_pile__pile_type_id__in=[5, 6]).count()  # 交流
+        data = {
+            "dc_counts": dc_counts,
+            "ac_counts": ac_counts,
+        }
+        return data
+
+    def get_gun_totals_by_status(self):
+        data = ChargingGun.objects.filter(charg_pile__station=self).values("work_status").annotate(counts=Count("id"))
+        ret_data = {
+            "free": 0,
+            "charging": 0,
+            "fault": 0,
+            "offline": 0,
+        }
+        for d in data:
+            if d["work_status"] == 0:
+                ret_data["free"] = d["counts"]
+            elif d["work_status"] == 1 or d["work_status"] == 3:
+                ret_data["charging"] += d["counts"]
+            elif d["work_status"] == 2:
+                ret_data["fault"] = d["counts"]
+            elif d["work_status"] == 9:
+                ret_data["offline"] = d["counts"]
+        return ret_data
+
 
 class StationImage(models.Model):
     """电站图片"""
@@ -263,6 +291,7 @@ class ChargingPrice(models.Model):
     )
     station = models.ForeignKey(Station, verbose_name='充电站', null=True, on_delete=models.SET_NULL)
     type = models.IntegerField(verbose_name='收费类型', choices=CHARGING_PRICE_TYPE)
+    parking_fee = models.DecimalField(verbose_name='停车费', max_digits=5, decimal_places=2, default=0)
     default_flag = models.IntegerField(verbose_name='默认价格策略', default=0, choices=flags, help_text='每个电站设置一个默认策略')
 
     def __str__(self):

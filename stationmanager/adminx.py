@@ -490,14 +490,14 @@ class ChargingPriceAdmin(object):
     """
     充电价格表
     """
-    list_display = ['station', 'type', 'default_flag']
+    list_display = ['station', 'type', 'parking_fee', 'default_flag']
     model_icon = 'fa fa-sliders'
 
     form_layout = (
         Fieldset(
             '基础信息',
-            Row('station', None),
-            Row('type', 'default_flag'),
+            Row('station', 'type'),
+            Row('parking_fee', 'default_flag'),
         ),
     )
 
