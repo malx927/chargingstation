@@ -243,7 +243,7 @@ def pile_status_handler_v12(topic, byte_msg):
     except ChargingPile.DoesNotExist as ex:
         logging.warning("Illegal Pile:{}".format(ex))
         return
-
+    logging.info("{}----{}", gun1, gun2)
     pile_type = charg_pile.pile_type.id
 
     fireware = charg_pile.fireware
@@ -1265,7 +1265,7 @@ if __name__ == "__main__":
         client.on_connect = on_connect
         client.on_subscribe = on_subscribe
         client.on_disconnect = on_disconnect
-        client.on_log = on_log
+        # client.on_log = on_log
         ret = client.connect(settings.MQTT_HOST, port, 60)
     except Exception as ex:
         logging.warning("connect to mqtt server fail:{}".format(ex))

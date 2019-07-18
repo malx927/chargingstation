@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from codingmanager.models import AreaCode
 
 from .paginations import PagePagination
-from .serializers import ChargingPileSerializer, AreaCodeSerializer
+# from .serializers import ChargingPileSerializer, AreaCodeSerializer
 from stationmanager.models import ChargingPile
 
 __author__ = 'malixin'

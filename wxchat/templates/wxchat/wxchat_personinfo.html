@@ -11,7 +11,7 @@
     <div class="row">
         <div  class="card" id="personinfo">
             <div class="card-image">
-                <img src="{% static 'wxchat/images/3.png' %}" >
+                <img src="{% static 'wxchat/images/header.jpg' %}" >
                 <div class="card-title">
                     {% if request.session.username %}
                          <span>{{ request.session.username|default:'' }}</span>
@@ -33,7 +33,7 @@
                 <div class="row margin_top_10">
                     <div class="col s12 center-align">
                         <a id="recharge" class="btn waves-effect waves-light pink">
-                          扫描充电<i class="material-icons left">battery_charging_full</i>
+                          扫码充电<i class="material-icons left">battery_charging_full</i>
                         </a>
                     </div>
                 </div>
@@ -53,11 +53,11 @@
                       <span class="title">用户信息</span>
                       <span  class="secondary-content"><i class="material-icons">grade</i></span>
                     </a>
-                    <a class="collection-item avatar" href="{% url 'wxchat-scanqrcode' %}">
-                      <i class="material-icons circle red">play_arrow</i>
-                      <span class="title">扫描</span>
-                      <span  class="secondary-content"><i class="material-icons">grade</i></span>
-                    </a>
+{#                    <a class="collection-item avatar" href="{% url 'wxchat-scanqrcode' %}">#}
+{#                      <i class="material-icons circle red">play_arrow</i>#}
+{#                      <span class="title">扫描</span>#}
+{#                      <span  class="secondary-content"><i class="material-icons">grade</i></span>#}
+{#                    </a>#}
                </div>
         </div>
     </div>
