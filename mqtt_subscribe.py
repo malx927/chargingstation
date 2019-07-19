@@ -226,6 +226,7 @@ def pile_status_handler_v12(topic, byte_msg):
         "return_code": "success",
         "cmd": "01",  # 电桩状态
     }
+    logging.info("{}----{}", gun1, gun2)
     if gun1:
         send_data["work_status"] = gun1.get_work_status_display()
         send_data["charg_status"] = gun1.charg_status.name
@@ -422,12 +423,15 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
 def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=None):
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
-
-        if charg_status is not None:
+        logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
+        if charg_status:
             fault_code = FaultCode.objects.get(id=charg_status)
+            logging.info("2、{}--{}".format(fault_code, charg_status))
             gun.charg_status = fault_code
-        if work_status is not None:
+        if work_status:
             gun.work_status = work_status
+            logging.info("3、{}--{}".format(gun, charg_status))
+        logging.info("4、{}--{}".format(charg_status, work_status))
         gun.save()
     except ChargingGun.DoesNotExist as ex:
         logging.warning(ex)
@@ -1265,7 +1269,7 @@ if __name__ == "__main__":
         client.on_connect = on_connect
         client.on_subscribe = on_subscribe
         client.on_disconnect = on_disconnect
-        # client.on_log = on_log
+        client.on_log = on_log
         ret = client.connect(settings.MQTT_HOST, port, 60)
     except Exception as ex:
         logging.warning("connect to mqtt server fail:{}".format(ex))
