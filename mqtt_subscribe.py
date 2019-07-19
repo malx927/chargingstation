@@ -424,11 +424,11 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
         logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
-        if charg_status:
+        if charg_status is not None:
             fault_code = FaultCode.objects.get(id=charg_status)
             logging.info("2、{}--{}".format(fault_code, charg_status))
             gun.charg_status = fault_code
-        if work_status:
+        if work_status is not None:
             gun.work_status = work_status
             logging.info("3、{}--{}".format(gun, charg_status))
         logging.info("4、{}--{}".format(charg_status, work_status))
