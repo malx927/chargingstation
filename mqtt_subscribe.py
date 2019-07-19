@@ -226,7 +226,7 @@ def pile_status_handler_v12(topic, byte_msg):
         "return_code": "success",
         "cmd": "01",  # 电桩状态
     }
-    logging.info("{}----{}", gun1, gun2)
+    logging.info("{}----{}".format(gun1, gun2))
     if gun1:
         send_data["work_status"] = gun1.get_work_status_display()
         send_data["charg_status"] = gun1.charg_status.name
@@ -244,7 +244,7 @@ def pile_status_handler_v12(topic, byte_msg):
     except ChargingPile.DoesNotExist as ex:
         logging.warning("Illegal Pile:{}".format(ex))
         return
-    logging.info("{}----{}", gun1, gun2)
+    logging.info("{}----{}".format(gun1, gun2))
     pile_type = charg_pile.pile_type.id
 
     fireware = charg_pile.fireware
