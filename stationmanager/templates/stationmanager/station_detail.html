@@ -1,0 +1,63 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block js %}
+{% include 'wxchat/include/jssdk.html' %}
+{% endblock js %}
+{% block extra %}
+<style>
+.container{
+    width: 100%;
+}
+.card .card-title{
+    font-size:18px;
+}
+.card .card-content{
+    padding-bottom:10px;
+}
+.address{
+    color: #e6e0e0;
+}
+</style>
+{% endblock extra%}
+{% block container %}
+<div class="col s12 m6 l6">
+{% if station %}
+    <div class="card gradient-45deg-light-blue-cyan gradient-shadow">
+      {% for station_image in station.stationimage_set.all %}
+          <img src="{{ station_image.image.url }}" alt="">
+      {% endfor %}
+       <p>{{ station.name }}</p>
+       <p>{{ station.address }}</p>
+       <p>空闲充电枪:{{ station.get_gun_totals }}</p>
+       <p>直流枪:{{ station.get_gun_totals_by_type.dc_counts }}</p>
+       <p>交流枪:{{ station.get_gun_totals_by_type.ac_counts }}</p>
+       <p>充电中:{{ station.get_gun_totals_by_status.charging }}</p>
+       <p>离线中:{{ station.get_gun_totals_by_status.offline }}</p>
+       <p>空闲中:{{ station.get_gun_totals_by_status.free }}</p>
+       <p>故障中:{{ station.get_gun_totals_by_status.fault }}</p>
+
+    </div>
+{% endif %}
+</div>
+{% endblock container %}
+{% block bottomjs %}
+<script>
+ wx.ready(function () {
+    $(".navigation").on('click',function(){
+        var longitude = $(this).attr("data-longitude");
+        var latitude = $(this).attr("data-latitude");
+        var name = $(this).attr("data-name");
+        var address = $(this).attr("data-address");
+        console.log(longitude, latitude, name , address);
+         wx.openLocation({
+            latitude: latitude,
+            longitude: longitude,
+              name: name,
+              address: address,
+              scale: 13,
+              infoUrl: ''
+        });
+    });
+
+});
+</script>
+{% endblock bottomjs %}
