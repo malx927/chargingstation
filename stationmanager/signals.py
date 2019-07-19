@@ -1,4 +1,6 @@
 # coding=utf-8
+import logging
+
 from django.db.models.signals import post_init, post_save, post_delete
 from django.dispatch import receiver
 
@@ -140,10 +142,10 @@ def update_connector_info(sender, instance, created, **kwargs):
                 "Status": connector_type,
             }
 
-            ConnectorInfo.objects.update_or_create(ID=str(ID), defaults=defaults)
-
+            ret = ConnectorInfo.objects.update_or_create(ID=str(ID), defaults=defaults)
+            logging.info(ret)
         except EquipmentInfo.DoesNotExist as ex:
-            pass
+            logging.warning(ex)
 
 
 @receiver(post_delete, sender=ChargingGun)
