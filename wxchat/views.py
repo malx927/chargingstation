@@ -149,7 +149,8 @@ def unSubUserinfo(openid):
         user = UserInfo.objects.get(openid=openid)
         if user:
             # 是否应该保存历史信息
-            user.delete()
+            user.subscribe = 0
+            user.save()
     except UserInfo.DoesNotExist:
         pass
 
@@ -383,7 +384,10 @@ class RegisterView(View):
             openid = form.cleaned_data["openid"]
             user_name = form.cleaned_data["user_name"]
             telephone = form.cleaned_data["telephone"]
-            UserInfo.objects.filter(openid=openid).update(name=user_name, telephone=telephone)
+            car_number = form.cleaned_data["car_number"]
+            car_type = form.cleaned_data["car_type"]
+            print(user_name, telephone, car_number, car_type,openid)
+            UserInfo.objects.filter(openid=openid).update(name=user_name, telephone=telephone, car_number=car_number, car_type=car_type)
             request.session["created"] = False
             request.session["username"] = user_name
         else:
