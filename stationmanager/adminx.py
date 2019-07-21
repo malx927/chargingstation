@@ -376,7 +376,6 @@ xadmin.site.register(ChargingPile, ChargingPileAdmin)
 class ChargingGunAdmin(object):
     list_display = ['charg_pile', 'charging_pile_sn', 'gun_num', 'work_status', 'charg_status', 'cc_status', 'cp_status', 'gun_temp_status', 'elec_lock_status', 'relay_status',]
     search_fields = ['gun_num', 'charg_pile__pile_sn']
-    exclude = ['out_trade_no']
     list_display_links = ['gun_num', 'charg_pile']
     list_filter = ['charg_pile', 'work_status', 'cc_status', 'cp_status']
     model_icon = 'fa fa-random'
@@ -409,7 +408,10 @@ class ChargingGunAdmin(object):
             Row('recharge_min', "qrcode"),
 
         ),
-
+        Fieldset(
+            '最近订单',
+            Row('out_trade_no', 'order_time', ),
+        ),
     )
 
     def queryset(self):

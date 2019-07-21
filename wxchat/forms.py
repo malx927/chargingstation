@@ -10,4 +10,6 @@ class RegisterForm(forms.Form):
     user_name = forms.CharField()
     telephone = forms.CharField()
     openid = forms.CharField()
+    car_number = forms.CharField()
+    car_type = forms.CharField()
 

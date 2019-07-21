@@ -977,13 +977,14 @@ def calculate_order(**kwargs):
     order.end_time = currRec.end_time
     order.prev_reading = order.end_reading
     order.end_reading = currRec.end_reading
+    order.total_readings = order.end_reading - order.begin_reading
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
     order.consum_money = order.power_fee + order.service_fee
     order.end_soc = currRec.current_soc
     order.charg_status = gun.charg_status
     order.status = order_status
-    order.save(update_fields=['end_time', 'prev_reading', 'end_reading', 'power_fee', 'service_fee', 'consum_money', 'end_soc', 'charg_status', 'status'])
+    order.save(update_fields=['end_time', 'prev_reading', 'end_reading', 'total_readings', 'power_fee', 'service_fee', 'consum_money', 'end_soc', 'charg_status', 'status'])
     return order
 
 

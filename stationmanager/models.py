@@ -235,6 +235,7 @@ class ChargingGun(models.Model):
     qrcode = models.ImageField(verbose_name='二维码', upload_to='qrcode/', blank=True, null=True) # pile_sn + gun_num
     add_time = models.DateTimeField(verbose_name='时间', auto_now=True)
     out_trade_no = models.CharField(verbose_name="最新订单号", max_length=32, blank=True, null=True)
+    order_time = models.DateTimeField(verbose_name='订单时间', blank=True, null=True)
 
     def __str__(self):
         return '{0}-{1}'.format(self.charg_pile.pile_sn, self.gun_num)

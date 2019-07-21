@@ -21,6 +21,18 @@
             <label for="telephone">手机</label>
             {% if errors.telephone.0 %}<span>{{ errors.telephone.0 }}</span>{% endif %}
         </div>
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">directions_car</i>
+            <input id="car_number" name="car_number" type="text">
+            <label for="car_number">车牌号</label>
+            {% if errors.car_number.0 %}<span>{{ errors.car_number.0 }}</span>{% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">local_taxi</i>
+            <input id="car_type" name="car_type" type="text">
+            <label for="car_type">车型</label>
+            {% if errors.car_type.0 %}<span>{{ errors.car_type.0 }}</span>{% endif %}
+        </div>
     </div>
     <div class="row">
         <p class="center-align">

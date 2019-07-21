@@ -121,6 +121,9 @@ class RechargeView(View):
                 "errmsg": "充电设备不存在",
             }
             return JsonResponse(data)
+        cur_time = datetime.now()
+        if gun.order_time and (cur_time - gun.order_time).seconds < 10:
+            return render(request, template_name="chargingorder/charging_pile_status.html", context={"pile_gun": gun})
 
         charg_mode = request.POST.get('charg_mode', "0")  # 用户选择的充电方式
 
@@ -207,7 +210,8 @@ class RechargeView(View):
         gun = kwargs.pop("gun")
         order = Order.objects.create(**kwargs)
         gun.out_trade_no = order.out_trade_no
-        gun.save(update_fields={"out_trade_no"})
+        gun.order_time = datetime.now()
+        gun.save(update_fields={"out_trade_no", "order_time"})
 
         openid = kwargs.get("openid", None)
         # 添加到用户信息里

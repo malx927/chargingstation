@@ -71,6 +71,8 @@ class UserInfo(models.Model):
     subscribe_time = models.DateTimeField(verbose_name='注册时间', null=True, blank=True)
     subscribe_scene = models.CharField(verbose_name='渠道来源', max_length=64, blank=True, null=True)
     qr_scene = models.IntegerField(verbose_name='扫码场景', default=0, blank=True, null=True)
+    car_number = models.CharField(verbose_name="车牌号", max_length=32, blank=True, null=True)
+    car_type = models.CharField(verbose_name="车型", max_length=32, blank=True, null=True)
     last_charg_time = models.DateTimeField(verbose_name='最后充电时间', blank=True, null=True)
     is_freeze = models.IntegerField(verbose_name='是否冻结', default=0, choices=((0, '正常'), (1, '冻结')))  # 1、退款申请 2、反复充停电操作
     freeze_time = models.DateTimeField(verbose_name='冻结时间', blank=True, null=True)     # 1、退款后确认解冻，2、10分钟，3主动停充后，3-5分内停充

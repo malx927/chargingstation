@@ -30,14 +30,15 @@ class Order(models.Model):
     end_time = models.DateTimeField(verbose_name='结束时间', blank=True, null=True)
     begin_reading = models.DecimalField(verbose_name='初始电表数', blank=True, default=0, max_digits=9, decimal_places=2)
     end_reading = models.DecimalField(verbose_name='结束电表数', blank=True, default=0, max_digits=9, decimal_places=2)
+    total_readings = models.DecimalField(verbose_name='充电量(KWH)', blank=True, default=0, max_digits=9, decimal_places=2)
     prev_reading = models.DecimalField(verbose_name='上次电表读数', blank=True, default=0, max_digits=9, decimal_places=2)
     # 按分钟，SOC， 电量支付
     charg_min_val = models.IntegerField(verbose_name='按分钟充电', blank=True, default=0)   # 按分钟充电取此值判断
     charg_soc_val = models.IntegerField(verbose_name='按SOC充电', blank=True, default=0)   # 按SOC充电取此值判断
     charg_reading_val = models.IntegerField(verbose_name='按电量充电', blank=True, default=0)   # 按电量充电取此值判断
     # 微信支付
-    total_fee = models.DecimalField(verbose_name='充值金额',  max_digits=10, decimal_places=2, blank=True, default=0)
-    cash_fee = models.DecimalField(verbose_name='实际支付金额',  max_digits=10, decimal_places=2, blank=True, default=0)
+    total_fee = models.DecimalField(verbose_name='充值金额(元)',  max_digits=10, decimal_places=2, blank=True, default=0)
+    cash_fee = models.DecimalField(verbose_name='实际支付金额(元)',  max_digits=10, decimal_places=2, blank=True, default=0)
     pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
     transaction_id = models.CharField(verbose_name='微信订单号', max_length=32, null=True, blank=True)
     consum_money = models.DecimalField(verbose_name='消费总金额',  max_digits=10, decimal_places=2, blank=True, default=0)

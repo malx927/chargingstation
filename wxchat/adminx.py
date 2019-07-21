@@ -65,6 +65,7 @@ class UserInfoAdmin(object):
                 Row('user_type', 'telephone'),
                 Row('seller', 'group_client'),
                 Row('id_card', 'openid'),
+                Row('car_number', 'car_type'),
                 css_class='unsort no_title'
             ),
             Fieldset(
