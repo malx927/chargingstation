@@ -71,7 +71,7 @@ class Order(models.Model):
             return mins.quantize(Decimal('0.01'))
         else:
             return 0
-    total_minutes.short_description = '充电时长'
+    total_minutes.short_description = '充电时长(min)'
 
     def total_seconds(self):
         if self.end_time and self.begin_time:

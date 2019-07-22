@@ -1,11 +1,15 @@
 #-*-coding:utf-8-*-
+import datetime
 
+from django.db.models import Sum, Count, Q, F
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
+
+from chargingorder.models import Order
 from codingmanager.models import AreaCode
 
 from .paginations import PagePagination
@@ -13,6 +17,40 @@ from .paginations import PagePagination
 from stationmanager.models import ChargingPile
 
 __author__ = 'malixin'
+
+
+class OrderDayStats(APIView):
+    """订单日统计"""
+    def get(self, request, *args, **kwargs):
+        flag = request.GET.get("flag", None)
+        results = {
+            "readings": 0,
+            "counts": 0,
+            "total_fees": 0,
+            "times": 0,
+        }
+        if flag is None:    # 当天
+            cur_time = datetime.datetime.now().date()
+            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__gte=cur_time)\
+                .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                           times=Sum((F("end_time") - F("begin_time"))/(1000000*60)))
+        elif flag == "1":   # 昨天
+            yesterday = datetime.datetime.now() + datetime.timedelta(days=-1)
+            yesterday = yesterday.date()
+            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=yesterday) \
+                .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60)))
+
+        elif flag == "2":   # 任意天
+            sdate = request.GET.get("sdate", None)
+            if sdate:
+                search_date = datetime.datetime.strptime(sdate, "%Y-%m-%d")
+                s_date = search_date.date()
+                results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=s_date) \
+                    .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                               times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60)))
+
+        return Response(results)
 
 
 # class ChargingPileListAPIView(ListAPIView):
