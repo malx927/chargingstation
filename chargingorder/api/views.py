@@ -1,7 +1,7 @@
 #-*-coding:utf-8-*-
 import datetime
 
-from django.db.models import Sum, Count, Q, F
+from django.db.models import Sum, Count, Q, F, DecimalField, FloatField, IntegerField
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -31,16 +31,15 @@ class OrderDayStats(APIView):
         }
         if flag is None:    # 当天
             cur_time = datetime.datetime.now().date()
-            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__gte=cur_time)\
+            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_time)\
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time"))/(1000000*60)))
+                           times=Sum((F("end_time") - F("begin_time"))/(1000000*60), output_field=IntegerField()))
         elif flag == "1":   # 昨天
             yesterday = datetime.datetime.now() + datetime.timedelta(days=-1)
             yesterday = yesterday.date()
             results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=yesterday) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60)))
-
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
         elif flag == "2":   # 任意天
             sdate = request.GET.get("sdate", None)
             if sdate:
@@ -48,10 +47,47 @@ class OrderDayStats(APIView):
                 s_date = search_date.date()
                 results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=s_date) \
                     .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                               times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60)))
+                               times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
+        return Response(results)
+
+
+class OrderMonthStats(APIView):
+    """月统计"""
+    def get(self, request, *args, **kwargs):
+        month = request.GET.get("month", None)
+
+        if month is None:  # 当月
+            cur_time = datetime.datetime.now()
+            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=cur_time.year, begin_time__month=cur_time.month) \
+                .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
+        else:  # 任意月
+            s_date = datetime.datetime.strptime(month, "%Y-%m")
+            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=s_date.year, begin_time__month=s_date.month) \
+                .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
 
         return Response(results)
 
+
+class OrderYearStats(APIView):
+    """年统计"""
+    def get(self, request, *args, **kwargs):
+        year = request.GET.get("year", None)
+
+        if year is None:  # 当年
+            cur_time = datetime.datetime.now()
+            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=cur_time.year) \
+                .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
+            print(results)
+        else:  # 任意年
+
+            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=int(year)) \
+                .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
+
+        return Response(results)
 
 # class ChargingPileListAPIView(ListAPIView):
 #     """

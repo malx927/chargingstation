@@ -43,7 +43,10 @@ class DashBoardPlugin(BaseAdminPlugin):
                 loader.render_to_string('stationmanager/dashboard.model_list.html', context=get_context_dict(context))
             )
 
-        # return "<div class='info'>Hello %s</div>" % context['hello_target']
+        # Media
+    def get_media(self, media):
+        media.add_css({'screen': [self.static('stationmanager/css/dashboard.css'), ]})
+        return media
 
 
 
