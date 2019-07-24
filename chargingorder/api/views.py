@@ -10,11 +10,6 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
 from chargingorder.models import Order
-from codingmanager.models import AreaCode
-
-from .paginations import PagePagination
-# from .serializers import ChargingPileSerializer, AreaCodeSerializer
-from stationmanager.models import ChargingPile
 
 __author__ = 'malixin'
 
@@ -29,27 +24,38 @@ class OrderDayStats(APIView):
             "total_fees": 0,
             "times": 0,
         }
+
+        if self.request.user.is_superuser:
+            queryset = Order.objects.all()
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.station.seller)
+        else:
+            queryset = Order.objects.none()
+
         if flag is None:    # 当天
             cur_time = datetime.datetime.now().date()
-            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_time)\
+            results = queryset.filter(status=2, pay_time__isnull=False, begin_time__date=cur_time)\
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time"))/(1000000*60), output_field=IntegerField()))
+                           times=Sum((F("end_time") - F("begin_time"))/(1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
         elif flag == "1":   # 昨天
             yesterday = datetime.datetime.now() + datetime.timedelta(days=-1)
             yesterday = yesterday.date()
-            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=yesterday) \
+            results = queryset.filter(status=2, pay_time__isnull=False, begin_time__date=yesterday) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
-
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
         elif flag == "2":   # 任意天
             sdate = request.GET.get("sdate", None)
             if sdate:
                 search_date = datetime.datetime.strptime(sdate, "%Y-%m-%d")
                 s_date = search_date.date()
-                results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=s_date) \
+                results = queryset.filter(status=2, pay_time__isnull=False, begin_time__date=s_date) \
                     .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                               times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
-
+                               times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
+        results["readings"] = 0.00 if results["readings"] is None else results["readings"]
+        results["total_fees"] = 0.00 if results["total_fees"] is None else results["total_fees"]
+        results["times"] = 0.00 if results["times"] is None else results["times"]
         return Response(results)
 
 
@@ -57,18 +63,29 @@ class OrderMonthStats(APIView):
     """月统计"""
     def get(self, request, *args, **kwargs):
         month = request.GET.get("month", None)
+        if self.request.user.is_superuser:
+            queryset = Order.objects.all()
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.station.seller)
+        else:
+            queryset = Order.objects.none()
 
         if month is None:  # 当月
             cur_time = datetime.datetime.now()
-            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=cur_time.year, begin_time__month=cur_time.month) \
+            results = queryset.filter(status=2, pay_time__isnull=False, begin_time__year=cur_time.year, begin_time__month=cur_time.month) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
         else:  # 任意月
             s_date = datetime.datetime.strptime(month, "%Y-%m")
-            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=s_date.year, begin_time__month=s_date.month) \
+            results = queryset.filter(status=2, pay_time__isnull=False, begin_time__year=s_date.year, begin_time__month=s_date.month) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
 
+        results["readings"] = 0.00 if results["readings"] is None else results["readings"]
+        results["total_fees"] = 0.00 if results["total_fees"] is None else results["total_fees"]
+        results["times"] = 0.00 if results["times"] is None else results["times"]
         return Response(results)
 
 
@@ -76,19 +93,29 @@ class OrderYearStats(APIView):
     """年统计"""
     def get(self, request, *args, **kwargs):
         year = request.GET.get("year", None)
+        if self.request.user.is_superuser:
+            queryset = Order.objects.all()
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.station.seller)
+        else:
+            queryset = Order.objects.none()
 
         if year is None:  # 当年
             cur_time = datetime.datetime.now()
-            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=cur_time.year) \
+            results = queryset.filter(status=2, pay_time__isnull=False, begin_time__year=cur_time.year) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
-            print(results)
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
         else:  # 任意年
 
-            results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__year=int(year)) \
+            results = queryset.filter(status=2, pay_time__isnull=False, begin_time__year=int(year)) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60), output_field=IntegerField()))
+                           times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
 
+        results["readings"] = 0.00 if results["readings"] is None else results["readings"]
+        results["total_fees"] = 0.00 if results["total_fees"] is None else results["total_fees"]
+        results["times"] = 0.00 if results["times"] is None else results["times"]
         return Response(results)
 
 # class ChargingPileListAPIView(ListAPIView):

@@ -10,7 +10,7 @@ from codingmanager.models import AreaCode
 
 from .paginations import PagePagination
 from .serializers import ChargingPileSerializer, AreaCodeSerializer
-from stationmanager.models import ChargingPile
+from stationmanager.models import ChargingPile, ChargingGun
 
 __author__ = 'malixin'
 
@@ -53,19 +53,32 @@ class AreaCodeListAPIView(ListAPIView):
         else:
             return AreaCode.objects.extra(where=['length(code)=2'])
 
-# #狗配种
-# class DogbreedListAPIView(ListAPIView):
-#     permission_classes = [AllowAny]
-#     queryset = DogBreed.objects.all()
-#     serializer_class = DogbreedListSerializer
-#     def get_queryset(self):
-#         return  DogBreed.objects.filter(is_show=1)
-#
-# class DogBreedDetailAPIView(RetrieveAPIView):
-#     queryset = DogBreed.objects.all()
-#     serializer_class = DogBreedDetailSerializer
-#     permission_classes = [AllowAny]
-#
+
+class StationStatsView(APIView):
+    """电桩统计"""
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_superuser:
+            pile_counts = ChargingPile.objects.all().count()
+            gun_counts = ChargingGun.objects.all().count()
+        elif self.request.user.station:
+            pile_counts = ChargingPile.objects.filter(station=self.request.user.station).count()
+            gun_counts = ChargingGun.objects.filter(charg_pile__station=self.request.user.station).count()
+        elif self.request.user.seller:
+            pile_counts = ChargingPile.objects.filter(station__seller=self.request.user.seller).count()
+            gun_counts = ChargingGun.objects.filter(charg_pile__station__seller=self.request.user.seller).count()
+        else:
+            pile_counts = 0
+            gun_counts = 0
+
+        data = {
+            "piles_counts": pile_counts,
+            "gun_counts": gun_counts,
+        }
+        return Response(data)
+
+
 #
 # class DogLossDetailAPIView(RetrieveAPIView):
 #     queryset = DogLoss.objects.all()

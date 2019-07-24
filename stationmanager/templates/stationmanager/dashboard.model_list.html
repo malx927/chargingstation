@@ -1,50 +1,60 @@
-    <div class="col-xl-12 col-md-2 mb-4">
-      <div class="card gradient-45deg-light-blue-cyan text-white shadow min-height-100">
-        <div class="card-body">
-          电桩数量
-          <div class="small"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span></div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-12 col-md-2 mb-4">
-      <div class="card gradient-45deg-deep-orange-orange text-white shadow min-height-100">
-        <div class="card-body">
-          Primary
-          <div class="small">#4e73df</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-12 col-md-2 mb-4">
+
+    <div class="col-xl-12 col-md-3  mb-4">
       <div class="card gradient-45deg-blue-indigo text-white shadow min-height-100">
         <div class="card-body">
-          Primary
-          <div class="small">#4e73df</div>
+            <div>今日充电总量:<span class="pull-right"><em id="today_readings">0.00</em> KWH</span></div>
+          <div>今日充电次数:<span class="pull-right"><em id="today_counts">0.00</em> 次</span></div>
+          <div>今日充电收入:<span class="pull-right"><em id="today_total_fees">0.00</em> 元</span></div>
+          <div>今日充电时长:<span class="pull-right"><em id="today_times">0.00</em> 小时</span></div>
         </div>
       </div>
     </div>
-    <div class="col-xl-12 col-md-2 mb-4">
+    <div class="col-xl-12 col-md-3 mb-4">
       <div class="card gradient-45deg-red-pink text-white shadow min-height-100">
         <div class="card-body">
-          <div>#1cc88a</div>
+          <div>昨日充电总量:<span class="pull-right"><em id="yesterday_readings">0.00</em> KWH</span></div>
+          <div>昨日充电次数:<span class="pull-right"><em id="yesterday_counts">0.00</em> 次</span></div>
+          <div>昨日充电收入:<span class="pull-right"><em id="yesterday_total_fees">0.00</em> 元</span></div>
+          <div>昨日充电时长:<span class="pull-right"><em id="yesterday_times">0.00</em> 小时</span></div>
         </div>
       </div>
     </div>
-    <div class="col-xl-12 col-md-2 mb-4">
+    <div class="col-xl-12 col-md-3 mb-4">
       <div class="card  gradient-45deg-amber-amber text-white min-height-100 shadow">
         <div class="card-body">
-          Info
-          <div class=" small">#36b9cc</div>
+          <div>本月充电总量:<span class="pull-right"><em id="month_readings">0.00</em> KWH</span></div>
+          <div>本月充电次数:<span class="pull-right"><em id="month_counts">0.00</em> 次</span></div>
+          <div>本月充电收入:<span class="pull-right"><em id="month_total_fees">0.00</em> 元</span></div>
+          <div>本月充电时长:<span class="pull-right"><em id="month_times">0.00</em> 小时</span></div>
         </div>
       </div>
     </div>
-    <div class="col-xl-12 col-md-2 mb-4">
+    <div class="col-xl-12 col-md-3 mb-4">
       <div class="card gradient-45deg-green-teal text-white min-height-100 shadow">
         <div class="card-body">
-          Warning
-          <div class=" small">#f6c23e</div>
+          <div>今年充电总量:<span class="pull-right"><em id="year_readings">0.00</em> KWH</span></div>
+          <div>今年充电次数:<span class="pull-right"><em id="year_counts">0.00</em> 次</span></div>
+          <div>今年充电收入:<span class="pull-right"><em id="year_total_fees">0.00</em> 元</span></div>
+          <div>今年充电时长:<span class="pull-right"><em id="year_times">0.00</em> 小时</span></div>
         </div>
       </div>
     </div>
+{#    <div class="col-xl-12 col-md-2 mb-4">#}
+{#      <div class="card gradient-45deg-light-blue-cyan text-white shadow min-height-100">#}
+{#        <div class="card-body text-center">#}
+{#          电桩数量#}
+{#          <h4 class="text-center">123</h4>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#    <div class="col-xl-12 col-md-2 mb-4">#}
+{#      <div class="card gradient-45deg-deep-orange-orange text-white shadow min-height-100">#}
+{#        <div class="card-body text-center">#}
+{#          充电枪数量#}
+{#          <h4 class="text-center">345</h4>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
 <div class="col-sm-12 column ui-sortable">
     <nav class="navbar navbar-default">
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -149,6 +159,11 @@
 </div>
 <script>
     $(function(){
+        getTodayStatsData();
+        getYesterdayStatsData();
+        getMonthStatsData();
+        getYearStatsData();
+
         $("#btn_search").on("click", function(event){
             var pile_sn = $("#pile_sn").val();
             params = {
@@ -160,7 +175,7 @@
         })
 
         $("a[id^='station']").on("click", function(event){
-             params ={
+            var params ={
                  "station_id": $(this).attr("data-item"),
              }
              $("#stations").addClass("hidden");
@@ -169,7 +184,7 @@
         })
 
         $("a[id^='sta_']").on("click", function(event){
-             params ={
+            var params ={
                  "station_id": $(this).attr("data-item"),
              }
              $("#stations").addClass("hidden");
@@ -217,4 +232,80 @@
         })
     }
 
+    function getTodayStatsData(){
+        $.ajax({
+              type: 'GET',
+              url: '{% url "order-day-stats" %}',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                  console.log(JSON.stringify(data));
+                $("#today_readings").text(data.readings.toFixed(2))
+                $("#today_counts").text(data.counts)
+                $("#today_total_fees").text(data.total_fees.toFixed(2))
+                $("#today_times").text(data.times.toFixed(2))
+              },
+              error: function(error){
+                    console.log(error);
+              }
+        });
+    }
+    function getYesterdayStatsData(){
+       var params = {
+            "flag": 1
+        }
+        $.ajax({
+              type: 'GET',
+              url: '{% url "order-day-stats" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  console.log(JSON.stringify(data));
+                $("#yesterday_readings").text(data.readings.toFixed(2))
+                $("#yesterday_counts").text(data.counts)
+                $("#yesterday_total_fees").text(data.total_fees.toFixed(2))
+                $("#yesterday_times").text(data.times.toFixed(2))
+              },
+              error: function(error){
+                    console.log(error);
+              }
+        });
+    }
+    function getMonthStatsData(){
+        $.ajax({
+              type: 'GET',
+              url: '{% url "order-month-stats" %}',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                  console.log(JSON.stringify(data));
+                $("#month_readings").text(data.readings.toFixed(2))
+                $("#month_counts").text(data.counts)
+                $("#month_total_fees").text(data.total_fees.toFixed(2))
+                $("#month_times").text(data.times.toFixed(2))
+              },
+              error: function(error){
+                    console.log(error);
+              }
+        });
+    }
+    function getYearStatsData(){
+        $.ajax({
+              type: 'GET',
+              url: '{% url "order-year-stats" %}',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                console.log(JSON.stringify(data));
+                $("#year_readings").text(data.readings.toFixed(2))
+                $("#year_counts").text(data.counts)
+                $("#year_total_fees").text(data.total_fees.toFixed(2))
+                $("#year_times").text(data.times.toFixed(2))
+              },
+              error: function(error){
+                    console.log(error);
+              }
+        });
+    }
 </script>
