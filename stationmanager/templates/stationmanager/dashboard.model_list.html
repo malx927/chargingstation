@@ -1,14 +1,15 @@
-    <div class="col-xl-12 col-md-3  mb-4">
-      <div class="card gradient-45deg-blue-indigo text-white shadow min-height-100">
-        <div class="card-body">
-            <div>今日充电总量:<span class="pull-right"><em id="today_readings">0.00</em> KWH</span></div>
-          <div>今日充电次数:<span class="pull-right"><em id="today_counts">0.00</em> 次</span></div>
-          <div>今日充电收入:<span class="pull-right"><em id="today_total_fees">0.00</em> 元</span></div>
-          <div>今日充电时长:<span class="pull-right"><em id="today_times">0.00</em> 小时</span></div>
-        </div>
-      </div>
+<div class="row">
+    <div class="col-sm-12 col-md-3  col-lg-3 mb-4">
+          <div class="card gradient-45deg-blue-indigo text-white shadow min-height-100">
+            <div class="card-body">
+                <div>今日充电总量:<span class="pull-right"><em id="today_readings">0.00</em> KWH</span></div>
+              <div>今日充电次数:<span class="pull-right"><em id="today_counts">0.00</em> 次</span></div>
+              <div>今日充电收入:<span class="pull-right"><em id="today_total_fees">0.00</em> 元</span></div>
+              <div>今日充电时长:<span class="pull-right"><em id="today_times">0.00</em> 小时</span></div>
+            </div>
+          </div>
     </div>
-    <div class="col-xl-12 col-md-3 mb-4">
+        <div class="col-sm-12 col-md-3 mb-4">
       <div class="card gradient-45deg-red-pink text-white shadow min-height-100">
         <div class="card-body">
           <div>昨日充电总量:<span class="pull-right"><em id="yesterday_readings">0.00</em> KWH</span></div>
@@ -18,7 +19,7 @@
         </div>
       </div>
     </div>
-    <div class="col-xl-12 col-md-3 mb-4">
+    <div class="col-sm-12 col-md-3 mb-4">
       <div class="card  gradient-45deg-amber-amber text-white min-height-100 shadow">
         <div class="card-body">
           <div>本月充电总量:<span class="pull-right"><em id="month_readings">0.00</em> KWH</span></div>
@@ -28,7 +29,7 @@
         </div>
       </div>
     </div>
-    <div class="col-xl-12 col-md-3 mb-4">
+    <div class="col-sm-12 col-md-3 mb-4">
       <div class="card gradient-45deg-green-teal text-white min-height-100 shadow">
         <div class="card-body">
           <div>今年充电总量:<span class="pull-right"><em id="year_readings">0.00</em> KWH</span></div>
@@ -38,47 +39,9 @@
         </div>
       </div>
     </div>
-{#    <div class="col-xl-12 col-md-2 mb-4">#}
-{#      <div class="card gradient-45deg-light-blue-cyan text-white shadow min-height-100">#}
-{#        <div class="card-body text-center">#}
-{#          电桩数量#}
-{#          <h4 class="text-center">123</h4>#}
-{#        </div>#}
-{#      </div>#}
-{#    </div>#}
-{#    <div class="col-xl-12 col-md-2 mb-4">#}
-{#      <div class="card gradient-45deg-deep-orange-orange text-white shadow min-height-100">#}
-{#        <div class="card-body text-center">#}
-{#          充电枪数量#}
-{#          <h4 class="text-center">345</h4>#}
-{#        </div>#}
-{#      </div>#}
-{#    </div>#}
-<div class="col-sm-12 column ui-sortable">
-    <nav class="navbar navbar-default">
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">选择充电站 <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                {% for station in stations  %}
-                {% if forloop.counter > 1 %}
-                <li role="separator" class="divider"></li>
-                {% endif %}
-                <li><a href="javascript:;" id="station_{{ station.id }}" data-item="{{ station.id }}">{{ station.name }}</a></li>
-                {% endfor %}
-              </ul>
-            </li>
-          </ul>
-          <form class="navbar-form navbar-left">
-            <div class="form-group">
-              <input type="text" id="pile_sn" class="form-control" placeholder="输入电桩编号">
-            </div>
-            <button type="button" id="btn_search" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>  查 询</button>
-          </form>
-        </div><!-- /.navbar-collapse -->
-    </nav>
+</div>
+<div class="row">
+<div class="col-sm-12 column">
     <!--故障枪口-->
     {% if fault_guns %}
     <div class="panel panel-default widget list" id="fault_gun">
@@ -109,6 +72,30 @@
     </div>
     {% endif %}
  <!--故障枪口结束-->
+    <nav class="navbar navbar-default">
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">选择充电站 <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                {% for station in stations  %}
+                {% if forloop.counter > 1 %}
+                <li role="separator" class="divider"></li>
+                {% endif %}
+                <li><a href="javascript:;" id="station_{{ station.id }}" data-item="{{ station.id }}">{{ station.name }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+          </ul>
+          <form class="navbar-form navbar-left">
+            <div class="form-group">
+              <input type="text" id="pile_sn" class="form-control" placeholder="输入电桩编号">
+            </div>
+            <button type="button" id="btn_search" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>  查 询</button>
+          </form>
+        </div><!-- /.navbar-collapse -->
+    </nav>
     <div class="panel panel-default widget list" id="stations">
         <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
             <h3 class="panel-title"><i class="fa fa-align-justify"></i>充电站列表</h3>
@@ -156,6 +143,7 @@
       </div>
     </div>  
 </div>
+</div>
 <script>
     $(function(){
         getTodayStatsData();
@@ -191,8 +179,6 @@
              getPileList(params);
         })
 
-
-{#         getPileList({});#}
 
     })
 
