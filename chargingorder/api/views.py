@@ -118,6 +118,41 @@ class OrderYearStats(APIView):
         results["times"] = 0.00 if results["times"] is None else results["times"]
         return Response(results)
 
+
+class OrderCategoryStats(APIView):
+    """分类统计"""
+    def get(self, request, *args, **kwargs):
+        category = request.GET.get("category", None)
+        begin_time = request.GET.get("begin_time", None)
+        end_time = request.GET.get("end_time", None)
+        if category is None or category == "":
+            category = "1"
+        if self.request.user.is_superuser:
+            queryset = Order.objects.all()
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.station.seller)
+
+        if begin_time and end_time:
+            b_date = datetime.datetime.strptime(begin_time, "%Y-%m-%d")
+            e_date = datetime.datetime.strptime(end_time, "%Y-%m-%d")
+            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__date__lte=b_date, end_time__date__lte=e_date)
+        else:
+            queryset = queryset.filter(status=2, pay_time__isnull=False)
+
+        if category == "1":     # 按运营商统计
+            result = queryset.values("charg_pile").\
+                annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee")).query
+            print(result)
+        elif category == 2:     # 按充电站统计
+            pass
+        elif category == 3:     # 按充电桩统计
+            pass
+
+        return Response({})
+
+
 # class ChargingPileListAPIView(ListAPIView):
 #     """
 #     电桩列表

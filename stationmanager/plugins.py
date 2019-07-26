@@ -46,6 +46,12 @@ class DashBoardPlugin(BaseAdminPlugin):
         # Media
     def get_media(self, media):
         media.add_css({'screen': [self.static('stationmanager/css/dashboard.css'), ]})
+        media.add_css({'screen': [self.static('xadmin/vendor/bootstrap-datepicker/css/datepicker.css'), ]})
+        media.add_css({'screen': [self.static('xadmin/vendor/select2/select2.css'), ]})
+        media.add_css({'screen': [self.static('xadmin/vendor/selectize/selectize.css'), ]})
+        media.add_css({'screen': [self.static('xadmin/vendor/selectize/selectize.bootstrap3.css'), ]})
+        media.add_js([self.static('xadmin/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js')])
+        media.add_js([self.static('xadmin/vendor/bootstrap-datepicker/js/locales/bootstrap-datepicker.zh-CN.js')])
         return media
 
 
