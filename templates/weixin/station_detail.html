@@ -1,0 +1,244 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block js %}
+{% include 'wxchat/include/jssdk.html' %}
+     <script type="text/javascript" src="{% static 'weixin/js/jquery-3.3.1.min.js' %}"></script>
+     <script type="text/javascript" src="{% static 'weixin/js/touch.js' %}"></script>
+{% endblock js %}
+{% block extra %}
+     <link rel="stylesheet" onerror="_cdnFallback(this)" href="{% static 'weixin/css/member.css' %}" media="screen">
+{% endblock extra%}
+{% block title %}充电站详情{% endblock %}
+
+{% block body_class %} class="pink-theme body-fixed-bottom" {% endblock %}
+{% block content %}
+    {% if station %}
+    <div class="content">
+		<div class="page-goods content">
+			<section class="ap oh carouselBox" id="carouselBox" ontouchstart="touchStart(event)" ontouchmove="touchMove(event);" ontouchend="touchEnd(event);" style="overflow: hidden;">
+				<ul class="oh ab carouselPics startpos" id="carouselPics">
+                  {% for station_image in station.stationimage_set.all %}
+                      <li><a href="javascript:void(0)"><img src="{{ station_image.image.url }}" alt=""></a></li>
+                  {% endfor %}
+				</ul>
+				<ul class="ab tc carouselBtns" id="carouselBtns"></ul>
+				<div class="ab carouselBtnsBg"></div>
+			</section>
+			<div class="goods-header" type="base-info-block">
+				<div class="goods-title" style="padding-right: 44px; position: relative;">
+					<div class="goods-title__main"><span> {{ station.name }}</span></div>
+					<div class="goods-title__more">
+						<div class="js-open-share goods-title__more-item">
+							<i class="van-icon van-icon-share" style="color: rgb(255, 68, 68); font-size: 18px;"></i>
+							<div class="goods-title__more-item-word">收藏</div>
+						</div>
+					</div>
+				</div>
+				<div class="goods-price">
+					<div class="goods-price__current">
+						<i class="goods-price__current-price-text">地址：{{ station.address }}</i>
+					</div>
+				</div>
+
+				<div class="member-center__order" type="v-order">
+					<div class="van-cell van-cell--clickable" style="border:0px;">
+						<div class="van-cell__title"><span>{{ station.get_gun_totals }}</span></div>
+					</div>
+					<div class="van-cell van-cell--clickable">
+						<div class="van-cell__value"><span>空闲充电枪</span></div>
+					</div>
+					<div class="van-hairline--top-bottom van-tabbar van-tabbar--fixed" style="z-index: 1;">
+						<div class="van-tabbar-item van-tabbar-item--active">
+							<div class="van-tabbar-item__icon">
+								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A3.gif" %}"></i>
+								<div class="van-info"></div>
+							</div>
+							<div class="van-tabbar-item__text" style="text-align:center; line-height:160%;">
+								<span class="blue">{{ station.get_station_price.parking_fee }}元/小时</span><br>停车费
+							</div>
+						</div>
+						<div class="van-tabbar-item">
+							<div class="van-tabbar-item__icon">
+								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A1.gif" %}"></i>
+								<div class="van-info"></div>
+							</div>
+							<div class="van-tabbar-item__text" style="text-align:center; line-height:160%;">
+							  <span class="blue">{{ station.get_station_price.get_current_serice_price }}元/度</span><br>服务费
+							</div>
+						</div>
+						<a class="van-tabbar-item" href="#">
+							<div class="van-tabbar-item__icon">
+								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A2.gif" %}"></i>
+								<div class="van-info"></div>
+							</div>
+							<div class="van-tabbar-item__text" style="text-align:center; line-height:160%;">
+							  <span class="blue">电费</span><br>查看详情
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="activity-block" type="activity-block"><!----><!----></div>
+			<div class="block" type="goods-review">
+				<div class="goods-review-cell van-cell van-cell--borderless">
+					<div class="van-cell__title"><span>交流枪（{{ station.get_gun_totals_by_type.ac_counts }}）</span></div>
+					<div class="van-cell__title"><span>直流枪（{{ station.get_gun_totals_by_type.dc_counts }}）</span></div>
+				</div>
+				<div class="goods-review-cell van-cell van-cell--borderless">
+					<div class="van-cell__title"><span>充电中（{{ station.get_gun_totals_by_status.charging }}）</span></div>
+					<div class="van-cell__title"><span>离线中（{{ station.get_gun_totals_by_status.offline }}）</span></div>
+				</div>
+				<div class="goods-review-cell van-cell van-cell--borderless">
+					<div class="van-cell__title"><span>空闲中（{{ station.get_gun_totals_by_status.free }}）</span></div>
+					<div class="van-cell__title"><span>故障中（{{ station.get_gun_totals_by_status.fault }}）</span></div>
+				</div>
+			</div>
+{#             {% for p in station.get_station_price.prices.all %}#}
+{#                <p>{{ p.begin_time }},{{ p.end_time }},{{ p.price }}</p>#}
+{#             {% endfor %}#}
+			<div class="goods-detail" type="detail-block">
+				<div class="goods-detail-tab">
+					<div>
+						<div class="showcase-components-container"></div>
+					</div>
+				</div>
+			</div>
+			<div type="submit-block">
+				<div class="goods-bottom content">
+					<div></div>
+					<div class="goods-buttons van-goods-action">
+						<button class="van-button van-button--warning van-button--large van-button--square van-goods-action-big-btn theme__button--vice">
+							<span class="van-button__text">立即预约</span>
+						</button>
+						<button id="navigation" data-longitude="{{ station.longitude }}"  data-latitude="{{ station.latitude }}" data-name="{{ station.name }}" data-address="{{ station.address }}" class="van-button van-button--danger van-button--large van-button--square van-goods-action-big-btn theme__button--main">
+							<span class="van-button__text">导航前往</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+  {% endif %}
+{% endblock content %}
+{% block bottomjs %}
+<script type="text/javascript">
+var _initX = 0;
+var _finishX = 0;
+var _startX = 0;
+var _startY = 0;
+function touchStart(event) {
+  _startX = event.touches[0].clientX;
+  _startY = event.touches[0].clientY;
+  _initX = _startX;
+}
+function touchMove(event) {
+  var touches = event.touches;
+  var _endX = event.touches[0].clientX;
+  var _endY = event.touches[0].clientY;
+  if(Math.abs(_endY-_startY)>Math.abs(_endX-_startX)){
+    return;    
+  }
+  event.preventDefault();
+  _finishX = _endX;
+  var _absX = Math.abs(_endX-_startX);
+  var lastX = $('#carouselPics').css('left').replace('px','');
+  if(_startX>_endX){
+    st.Stop();
+    $('#carouselPics').css('left',(parseInt(lastX)-_absX)+'px');
+  }else{
+    st.Stop();
+    $('#carouselPics').css('left',(parseInt(lastX)+_absX)+'px');
+  } 
+  _startX = _endX;
+}
+function touchEnd(event) {
+  if(_finishX==0){
+    return;
+  }
+  if(_initX>_finishX){
+    bindEvent(_initX,_finishX);
+  }else if(_initX<_finishX){
+    bindEvent(_initX,_finishX);
+  }
+  _initX = 0;
+  _finishX = 0;
+}
+
+var picCount = $("#carouselPics li").length;
+  
+$("#carouselPics").css('width',picCount+'00%');
+
+var st = createPicMove("carouselBox", "carouselPics", picCount);
+
+var forEach = function(array, callback){
+  for (var i = 0, len = array.length; i < len; i++) { callback.call(this, array[i], i); }
+}
+
+var nums = [];
+
+for(var i = 0, n = st._count - 1; i <= n;i++){
+  var li = document.createElement("li");
+  nums[i] = document.getElementById("carouselBtns").appendChild(li);
+}
+
+st.onStart = function(){
+  forEach(nums, function(o, i){ o.className = st.Index == i ? "current" : ""; })
+}  
+
+function bindEvent(start,end){
+  if (start >= end) {
+    st.Next();
+  } else {
+    st.Previous();
+  }
+}
+
+st.Run();
+
+var resetScrollEle = function(){
+  var slider2Li = $("#carouselPics li");
+  slider2Li.css("width",$(".carouselBox").width()+"px");
+  
+  var oHeight1 = $(window).height();
+  var oHeight2 = $('body').height();
+  var oFooterHeight = $('#footer').outerHeight();
+  if(oHeight1>oHeight2){
+    $('#container').css('min-height',(oHeight1-oFooterHeight));  
+  }
+};
+
+resetScrollEle();
+
+window.addEventListener("orientationchange",function(){
+  st.Change = st._slider.offsetWidth/st._count;
+  st.Next();
+  resetScrollEle();
+});
+
+window.addEventListener("resize",function(){
+  st.Change = st._slider.offsetWidth/st._count;
+  st.Next();
+  resetScrollEle();
+});
+
+ wx.ready(function () {
+    $("#navigation").on('click',function(){
+        var longitude = $(this).attr("data-longitude");
+        var latitude = $(this).attr("data-latitude");
+        var name = $(this).attr("data-name");
+        var address = $(this).attr("data-address");
+        console.log(longitude, latitude, name , address);
+         wx.openLocation({
+            latitude: latitude,
+            longitude: longitude,
+              name: name,
+              address: address,
+              scale: 13,
+              infoUrl: ''
+        });
+    });
+
+});
+
+</script>
+{% endblock %}
