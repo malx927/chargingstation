@@ -1,7 +1,8 @@
 {% extends 'weixin/wx_base.html' %}{% load static %}
 {% block js %}
 {% include 'wxchat/include/jssdk.html' %}
-    <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=TOLBZ-NWYLP-A5SD6-VKAJC-UZLHQ-XKB7X"></script>
+  <script type="text/javascript" src="{% static 'weixin/js/jquery-3.3.1.min.js' %}"></script>
+{#    <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=TOLBZ-NWYLP-A5SD6-VKAJC-UZLHQ-XKB7X"></script>#}
 {% endblock js %}
 {% block title %}附近充电站{% endblock %}
 {% block content %}
@@ -52,17 +53,13 @@
             var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
             var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
             var accuracy = res.accuracy; // 位置精度
-            alert(latitude);
-            alert(longitude);
             geocoder(latitude, longitude);
         },
         cancel : function(res) {
             alert("未能获取地理位置");
         }
     });
-
     $(".store__phone").on('click',function(){
-
         var longitude = $(this).attr("data-longitude");
         var latitude = $(this).attr("data-latitude");
         var name = $(this).attr("data-name");
@@ -84,17 +81,14 @@ function geocoder(latitude,longitude) {
     $.ajax({
         type: 'get',
         url: 'https://apis.map.qq.com/ws/geocoder/v1/',
-        dataType: 'json',
+        dataType: 'jsonp',
         data : {
             key:"TOLBZ-NWYLP-A5SD6-VKAJC-UZLHQ-XKB7X",  //开发密钥
             location:ll,
-            //位置坐标
             get_poi:"1",//是否返回周边POI列表：1.返回；0不返回(默认)
-            coord_type:"1",//输入的locations的坐标类型,1 GPS坐标
-            parameter:{"scene_type":"tohome","poi_num":20},//附加控制功能
-            output:"json"
+            output:"jsonp"
         },
-        success: function(data, textStatus) {
+        success: function(data, textStatus){
             if(data.status == 0){
                 var address = data.result.address;
                 var city = data.result.address_component.city;
@@ -104,8 +98,8 @@ function geocoder(latitude,longitude) {
                 alert("系统错误，请联系客服！")
             }
         },
-        error: function(){
-            alert("系统错误，请联系客服！")
+        error: function(err){
+            alert("系统错误，请联系客服！");
         }
     });
  }
