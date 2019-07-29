@@ -52,7 +52,7 @@ class Order(models.Model):
     service_fee = models.DecimalField(verbose_name='服务费', blank=True, default=0, max_digits=10, decimal_places=2)
     status = models.IntegerField(verbose_name='订单状态', choices=ORDER_STATUS, default=0)
     start_charge_seq = models.CharField(verbose_name='e充电订单号', max_length=32, blank=True, null=True,)
-    create_time = models.DateTimeField(verbose_name="创建时间", default=datetime.now)
+    create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     report_result = models.IntegerField(verbose_name='上报确认', blank=True, null=True)
     report_time = models.DateTimeField(verbose_name='上报确认时间', blank=True, null=True)
 

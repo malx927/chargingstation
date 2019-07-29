@@ -893,6 +893,7 @@ def calculate_order(**kwargs):
     pile_sn = kwargs.get("pile_sn", None)
     gun_num = kwargs.get("gun_num", None)
     end_time = kwargs.get("end_time", datetime.datetime.now())
+    charg_status = kwargs.pop("charg_status", None)
     order_status = kwargs.pop("status", 0)
     logging.info(kwargs)
     try:
@@ -982,7 +983,7 @@ def calculate_order(**kwargs):
     order.service_fee = accumulated_service_amount
     order.consum_money = order.power_fee + order.service_fee
     order.end_soc = currRec.current_soc
-    order.charg_status = gun.charg_status
+    order.charg_status = charg_status if charg_status is not None else gun.charg_status
     order.status = order_status
     order.save(update_fields=['end_time', 'prev_reading', 'end_reading', 'total_readings', 'power_fee', 'service_fee', 'consum_money', 'end_soc', 'charg_status', 'status'])
     return order
@@ -1097,6 +1098,7 @@ def pile_charging_stop_handler(topic, byte_msg):
         "end_time": datetime.datetime.now(),
         "end_reading": decimal.Decimal(current_reading * settings.FACTOR_READINGS),
         "current_soc": current_soc,
+        "charg_status": faultCode,
         "status": 2,        # 订单结账
     }
     logging.info(data)
