@@ -127,6 +127,10 @@ class Station(models.Model):
                 ret_data["offline"] = d["counts"]
         return ret_data
 
+    def get_station_price(self):
+        staiton_price = self.chargingprice_set.filter(default_flag=1).first()
+        return staiton_price
+
 
 class StationImage(models.Model):
     """电站图片"""
@@ -292,7 +296,7 @@ class ChargingPrice(models.Model):
     )
     station = models.ForeignKey(Station, verbose_name='充电站', null=True, on_delete=models.SET_NULL)
     type = models.IntegerField(verbose_name='收费类型', choices=CHARGING_PRICE_TYPE)
-    parking_fee = models.DecimalField(verbose_name='停车费', max_digits=5, decimal_places=2, default=0)
+    parking_fee = models.DecimalField(verbose_name='停车费(元/小时)', max_digits=5, decimal_places=2, default=0)
     default_flag = models.IntegerField(verbose_name='默认价格策略', default=0, choices=flags, help_text='每个电站设置一个默认策略')
 
     def __str__(self):
@@ -301,6 +305,15 @@ class ChargingPrice(models.Model):
     class Meta:
         verbose_name = '价格策略管理'
         verbose_name_plural = verbose_name
+
+    def get_current_serice_price(self):
+        cur_time = datetime.now().time()
+        price_detail = self.prices.filter(begin_time__lte=cur_time, end_time__gte=cur_time).first()
+        print("get_current_serice_price", price_detail)
+        if price_detail:
+            return price_detail.service_price
+        else:
+            return 0
 
 
 class ChargingPriceDetail(models.Model):

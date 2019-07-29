@@ -1,67 +1,33 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html class="" lang="zh-cmn-Hans">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="renderer" content="webkit">
     <meta name="referrer" content="always">
-    
-      <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="Baiduspider" content="noarchive">
     <meta name="format-detection" content="telephone=no">
-    
-    
     <meta http-equiv="cleartype" content="on">
-    <meta name="keywords" content="">
-    <meta name="description" content="">
-    <title>附近充电站</title>
-    
-  <link rel="stylesheet" onerror="_cdnFallback(this)" href="css/base.css" media="screen">
-
-
+    <meta name="keywords" content="亚电电气充">
+    <meta name="description" content="亚电电气充电桩系统">
+    <title>{% block title %}亚电电气充电桩系统{% endblock %}</title>
+    {% block css %}
+    <link rel="stylesheet" onerror="_cdnFallback(this)" href="{% static 'weixin/css/base.css' %}" media="screen">
+    {% endblock css %}
+    {% block js %}
+    {% endblock js %}
+    {% block extra %}{% endblock extra%}
   </head>
-  <body ontouchstart="ontouchstart" class="">
-    
-      <div class="page"><div><form action="#"><div class="van-search van-search--show-action" style="background: rgb(255, 255, 255);"><div class="van-search__content van-search__content--square"><div class="van-cell van-cell--borderless van-field"><div class="van-field__left-icon"><i class="van-icon van-icon-search"><!----></i></div><div class="van-cell__value van-cell__value--alone"><div class="van-field__body"><input type="search" finished-text="没有更多了" placeholder="请输入充电站名称或地点" class="van-field__control"></div></div></div></div><div class="van-search__action"><div>
-        搜索
-      </div></div></div></form>
-	  
-	  <div class="physicalstore_list van-list"><div class="store"><div class="store__header">
-    北京顺义1号充电站<p>367km</p>
-  </div><div class="store__info"><div class="store__thumb"><img src="images/1.jpg"></div><a href="#" class="store__detail"><h3 class="store__detail__address">北京市顺义区马坡亚电充电站</h3><p class="store__detail__time">
-        空闲充电枪 9/12
-      </p><!----></a><a href="#" class="store__phone"><i class="van-icon van-icon-map-marked"><!----></i></a></div></div><div class="store"><div class="store__header">
-    京东顺义分拣中心充电站<p>667km</p>
-  </div><div class="store__info"><div class="store__thumb"><img src="images/2.jpg"></div><a href="#" class="store__detail"><h3 class="store__detail__address">北京顺义区工业区京东顺义分拣中心</h3><p class="store__detail__time">
-        空闲充电枪 9/12
-      </p><!----></a><a href="#" class="store__phone"><i class="van-icon van-icon-map-marked"><!----></i></a></div></div><div class="store"><div class="store__header">
-    北京亚电新能源充电站顺义二号站<p class="after">673km</p>
-  </div><div class="store__info"><div class="store__thumb"><img src="images/4.jpg"></div><a href="#" class="store__detail"><h3 class="store__detail__address">北京市顺义区府前中街2号</h3><p class="store__detail__time">
-        空闲充电枪 9/12
-      </p><!----></a><a href="#" class="store__phone"><i class="van-icon van-icon-map-marked"><!----></i></a></div></div><div class="van-list__finished-text">没有更多了</div></div></div></div>
-    
-    
-    
-  
-    <div class="footer">
-  <div class="copyright">
+  <body ontouchstart="ontouchstart" {% block body_class %}class="" {% endblock %}>
+    {% block content %}
 
-      <div class="ft-links">
-          <a href="#" class="">主页</a>
-          <a href="#" class="js-open-follow">充电站</a>
-          <a href="#" class="">用户中心</a>
-          <a href="javascript:;" class="">关注我们</a>
-      </div>
-
-      <div class="ft-copyright">
-      </div>
-    
-  </div>
-</div>
-  
-
-
-</body></html>
+    {% endblock content %}
+    {% block footer %}
+     {% include "weixin/include/footer.html" %}
+    {% endblock footer %}
+  {% block bottomjs %}{% endblock bottomjs %}
+</body>
+</html>

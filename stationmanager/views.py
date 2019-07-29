@@ -15,7 +15,7 @@ class StationListView(View):
             "sign": sign,
             "stations": stations,
         }
-        return render(request, template_name='stationmanager/station_index.html', context=context)
+        return render(request, template_name='weixin/station_index.html', context=context)
 
 
 class StationDetailView(View):
@@ -35,23 +35,17 @@ class StationDetailView(View):
             "sign": sign,
             "station": station,
         }
-        return render(request, template_name='stationmanager/station_detail.html', context=context)
+        return render(request, template_name='weixin/station_detail.html', context=context)
 
 
-# class RechargeView(View):
+# class StationPricesDetailView(View):
 #     def get(self, request, *args, **kwargs):
-#         pile_sn = kwargs.get('sn', None)
-#         gun_num = kwargs.get('num', None)
-#         print(pile_sn, gun_num)
 #         if pile_sn and gun_num:
 #             return render(request, template_name='stationmanager/recharge.html', context={"pile_sn": pile_sn})
 #         else:
 #             piles = ChargingPile.objects.all()
 #             return render(request, template_name='stationmanager/station_index.html', context={"piles": piles})
-#
-#     def post(self, request, *args, **kwargs):
-#         # 生产订单
-#         pass
+
 
 
 # class DashboardListView(View):

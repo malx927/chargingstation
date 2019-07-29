@@ -137,7 +137,7 @@ class OrderCategoryStats(APIView):
         if begin_time and end_time:
             b_date = datetime.datetime.strptime(begin_time, "%Y-%m-%d")
             e_date = datetime.datetime.strptime(end_time, "%Y-%m-%d")
-            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__date__lte=b_date, end_time__date__lte=e_date)
+            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__date__gte=b_date, end_time__date__lte=e_date)
         else:
             queryset = queryset.filter(status=2, pay_time__isnull=False)
 
