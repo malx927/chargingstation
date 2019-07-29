@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="22px" viewBox="0 0 24 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.4 (67378) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/待评价 copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="-13.5635084%" x2="50%" y2="45.7874419%" id="linearGradient-1">
+            <stop stop-color="#898989" offset="0%"></stop>
+            <stop stop-color="#333333" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/待评价-copy" transform="translate(-2.000000, -3.000000)">
+            <g id="icon/待付款">
+                <rect id="Rectangle-1627-Copy-2" x="0" y="0" width="28" height="28"></rect>
+                <g id="Group-24" transform="translate(1.500000, 3.000000)" fill="url(#linearGradient-1)" fill-rule="nonzero">
+                    <path d="M2,2 L2,17.5 L9.0016247,17.5 L9.62271588,17.5 L12.0027527,19.8787956 L14.3808273,17.5 L22.5,17.5 L22.5,2 L2,2 Z M1.5,0.5 L23,0.5 C23.5522847,0.5 24,0.94771525 24,1.5 L24,18 C24,18.5522847 23.5522847,19 23,19 L15.0022808,19 L12.1445745,21.8585418 C12.0664875,21.9366524 11.9398664,21.9366785 11.8617472,21.8586001 L9.0016247,19 L1.5,19 C0.94771525,19 0.5,18.5522847 0.5,18 L0.5,1.5 C0.5,0.94771525 0.94771525,0.5 1.5,0.5 Z M6.5,10.3 L6.5,9.2 C6.5,9.08954305 6.58954305,9 6.7,9 L18.3,9 C18.4104569,9 18.5,9.08954305 18.5,9.2 L18.5,10.3 C18.5,10.4104569 18.4104569,10.5 18.3,10.5 L6.7,10.5 C6.58954305,10.5 6.5,10.4104569 6.5,10.3 Z" id="Combined-Shape"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

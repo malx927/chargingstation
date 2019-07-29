@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="22px" viewBox="0 0 24 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.4 (67378) - http://www.bohemiancoding.com/sketch -->
+    <title>icon/待发货 copy</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="-13.5635084%" x2="50%" y2="45.7874419%" id="linearGradient-1">
+            <stop stop-color="#898989" offset="0%"></stop>
+            <stop stop-color="#333333" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon/待发货-copy" transform="translate(-2.000000, -2.000000)">
+            <g id="icon/待付款">
+                <rect id="Rectangle-1627-Copy-2" x="0" y="0" width="28" height="28"></rect>
+                <path d="M10.75,9.5 L3.5,9.5 L3.5,22.5 L24.5,22.5 L24.5,9.5 L17.2526768,9.5 L17.2526768,16.2414313 C17.2526768,16.3518883 17.1631338,16.4414313 17.0526768,16.4414313 C17.0321596,16.4414313 17.0117646,16.4382743 16.9922077,16.432071 L13.9452843,15.4656154 L11.0132325,16.4427415 C10.9084414,16.4776639 10.7951813,16.4210241 10.760259,16.316233 C10.7534641,16.2958436 10.75,16.2744923 10.75,16.2530005 L10.75,9.5 Z M12.25,9.5 L12.25,14.4494779 L13.9338258,13.8883315 L15.7526768,14.465254 L15.7526768,9.5 L12.25,9.5 Z M2.00187237,8 C2.02797035,7.84058338 2.26661004,6.28403297 2.71779142,3.33034878 C2.800382,2.85057996 3.21646983,2.5 3.70329559,2.5 L24.1801961,2.5 C24.6568771,2.5 25.0672919,2.83645967 25.1607768,3.30388386 L25.993485,7.99990612 L26,8 L26,23 C26,23.5522847 25.5522847,24 25,24 L3,24 C2.44771525,24 2,23.5522847 2,23 L2,8 L2.00187237,8 Z M3.52395637,8 L24.4639102,8 L23.7702941,4 L4.1245768,4 L3.52395637,8 Z" id="Combined-Shape" fill="url(#linearGradient-1)" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>
