@@ -10,6 +10,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
 from chargingorder.models import Order
+from stationmanager.models import ChargingPile, Station, Seller
 
 __author__ = 'malixin'
 
@@ -142,15 +143,19 @@ class OrderCategoryStats(APIView):
             queryset = queryset.filter(status=2, pay_time__isnull=False)
 
         if category == "1":     # 按运营商统计
-            result = queryset.values("charg_pile").\
-                annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee")).query
+            seller_stats = Station.objects.annotate(seller_count = Count("seller", distinct=True), pile_counts = Count("chargingpile"))
+            for s in seller_stats:
+                print(s.seller_count, s.pile_counts)
+            result = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name").order_by("charg_pile__station__seller").\
+                annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                         times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
             print(result)
         elif category == 2:     # 按充电站统计
             pass
         elif category == 3:     # 按充电桩统计
             pass
 
-        return Response({})
+        return Response(result)
 
 
 # class ChargingPileListAPIView(ListAPIView):
