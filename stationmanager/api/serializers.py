@@ -44,25 +44,22 @@ class AreaCodeSerializer(serializers.ModelSerializer):
 
 
 class StationSerializer(serializers.ModelSerializer):
+    gun_stats = SerializerMethodField()
+    detail_address = SerializerMethodField()
 
     class Meta:
         model = Station
         fields = [
-            'name'
-            'province'
-            'city'
-            'district'
-            'address'
-            'longitude'
-            'latitude'
-            'altitude '
-            'seller'
-            'telephone'
+            'name', 'province', 'city', 'district', 'address',  'longitude', 'latitude',
+            'seller', 'telephone', "gun_stats", "detail_address"
         ]
 
-    # def get_label(self,obj):
-    #     return obj.name
-    #
+    def get_gun_stats(self, obj):
+        return obj.get_gun_totals()
+
+    def get_detail_address(self, obj):
+        return obj.get_detail_address()
+
     # def get_value(self,obj):
     #     return  obj.code
     #

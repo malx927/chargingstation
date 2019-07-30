@@ -91,6 +91,9 @@ class Station(models.Model):
         return '{}{}{}'.format(province, city, district)
     province_city_district.short_description = '省市县区'
 
+    # def get_detail_address(self):
+    #     return "{}{}{}{}".format(self.province.name, self.city.name, self.district.name, self.address)
+
     def pile_totals(self):
         return self.chargingpile_set.all().count()
 
