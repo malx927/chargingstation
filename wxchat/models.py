@@ -61,6 +61,7 @@ class UserInfo(models.Model):
     total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2)
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
     binding_amount = models.DecimalField(verbose_name='绑定金额', default=0, blank=True, max_digits=6, decimal_places=2)
+    # account_balances = models.DecimalField(verbose_name='账户余额', default=0, blank=True, max_digits=8, decimal_places=2)
     subscribe = models.NullBooleanField(verbose_name='是否订阅', default=0)
     sex = models.IntegerField(verbose_name='性别', choices=SEX_CHOICE)            # 值为1时是男性，值为2时是女性，值为0时是未知
     province = models.CharField(verbose_name='省份', max_length=64, blank=True, null=True)
@@ -78,6 +79,8 @@ class UserInfo(models.Model):
     freeze_time = models.DateTimeField(verbose_name='冻结时间', blank=True, null=True)     # 1、退款后确认解冻，2、10分钟，3主动停充后，3-5分内停充
     freeze_reason = models.CharField(verbose_name='冻结原因', max_length=128, blank=True, null=True)
     out_trade_no = models.CharField(verbose_name='最近一次订单编号', max_length=32, blank=True, null=True)
+    visit_city = models.CharField(verbose_name="最后访问地点", max_length=120, blank=True, null=True)
+    visit_time = models.DateTimeField(verbose_name="最后访问时间",  blank=True, null=True)
     # 反复一分钟之内充电,停止充电(短时间内做充停操作)
     # 充电开启后,不是桩的原因停止充电, 三分钟或是五分钟之内不允许停止充电
 

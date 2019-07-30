@@ -367,4 +367,3 @@ class OrderDetailView(DetailView):
     model = Order
     template_name = 'chargingorder/user_order_detail.html'
 
-

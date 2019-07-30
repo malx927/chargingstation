@@ -74,7 +74,8 @@ class Station(models.Model):
     offline_occupy_fee = models.DecimalField(verbose_name='离线占位费', max_digits=6, decimal_places=2, default=0.0, blank=True)
     offline_low_fee = models.DecimalField(verbose_name='离线小电流补偿费', max_digits=6, decimal_places=2, default=0.0, blank=True)
     offline_low_restrict = models.DecimalField(verbose_name='离线启用小电流限制', max_digits=6, decimal_places=2, default=0.0, blank=True)
-    add_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+    update_time = models.DateTimeField(verbose_name='修改时间', auto_now=True)
+    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 
     class Meta:
         verbose_name = '充电站管理'

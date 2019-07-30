@@ -79,9 +79,9 @@ class UserInfoAdmin(object):
             ),
             Fieldset(
                 "其他信息",
-                'last_charg_time',
-                'is_freeze',
-                'freeze_time',
+                Row('last_charg_time', 'out_trade_no'),
+                Row('visit_city', 'visit_time'),
+                Row('is_freeze', 'freeze_time'),
                 'freeze_reason',
             )
         ),

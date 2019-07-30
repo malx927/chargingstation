@@ -15,6 +15,7 @@ class StationListView(View):
             "sign": sign,
             "stations": stations,
         }
+        print(request.session.get("openid"))
         return render(request, template_name='weixin/station_index.html', context=context)
 
 
@@ -28,8 +29,8 @@ class StationDetailView(View):
         except Station.DoesNotExist as ex:
             station = None
 
-        print(station.get_gun_totals_by_type())
-        print(station.get_gun_totals_by_status())
+        # print(station.get_gun_totals_by_type())
+        # print(station.get_gun_totals_by_status())
 
         context = {
             "sign": sign,

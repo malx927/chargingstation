@@ -439,4 +439,4 @@ class ScanQRCodeView(View):
         context = {
             "sign": signPackage
         }
-        return render(request, template_name="wxchat/wxchat_qrcode.html", context=context)
+        return render(request, template_name="weixin/charging_qrcode.html", context=context)

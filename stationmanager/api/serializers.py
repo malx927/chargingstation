@@ -7,12 +7,11 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework import serializers
 from codingmanager.models import AreaCode
-from stationmanager.models import ChargingPile
+from stationmanager.models import ChargingPile, Station
 
 __author__ = 'malixin'
 
 
-# 宠物丢失
 class ChargingPileSerializer(serializers.ModelSerializer):
     piletype = serializers.CharField(source="pile_type.name")
     station_name = serializers.CharField(source="station.name")
@@ -43,31 +42,35 @@ class AreaCodeSerializer(serializers.ModelSerializer):
             'name',
         ]
 
-#
-# class CodeCitySerializer(serializers.ModelSerializer):
-#     label = serializers.SerializerMethodField()
-#     value = serializers.SerializerMethodField()
-#     children = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = AreaCode
-#         fields = [
-#             'label',
-#             'value',
-#             'children',
-#         ]
-#
-#     def get_label(self,obj):
-#         return obj.name
-#
-#     def get_value(self,obj):
-#         return  obj.code
-#
-#     def get_children(self,obj):
-#         distrSet = AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[obj.code])
-#         serializer = CodeDistrictSerializer(distrSet, many=True)
-#         return serializer.data
-#
+
+class StationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Station
+        fields = [
+            'name'
+            'province'
+            'city'
+            'district'
+            'address'
+            'longitude'
+            'latitude'
+            'altitude '
+            'seller'
+            'telephone'
+        ]
+
+    # def get_label(self,obj):
+    #     return obj.name
+    #
+    # def get_value(self,obj):
+    #     return  obj.code
+    #
+    # def get_children(self,obj):
+    #     distrSet = AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[obj.code])
+    #     serializer = CodeDistrictSerializer(distrSet, many=True)
+    #     return serializer.data
+
 #
 # class CodeProvinceSerializer(serializers.ModelSerializer):
 #     label = serializers.SerializerMethodField()

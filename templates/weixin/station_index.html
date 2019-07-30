@@ -90,9 +90,8 @@ function geocoder(latitude,longitude) {
         },
         success: function(data, textStatus){
             if(data.status == 0){
-                var address = data.result.address;
                 var city = data.result.address_component.city;
-                 alert(address)
+                var openid = '{{ request.session.openid }}';'
                 alert(city)
             }else {
                 alert("系统错误，请联系客服！")

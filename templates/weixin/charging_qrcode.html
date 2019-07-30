@@ -1,0 +1,47 @@
+﻿{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block js %}
+{% include 'wxchat/include/jssdk.html' %}
+{% endblock js %}
+{% block extra %}
+     <link rel="stylesheet"  href="{% static 'weixin/css/coll.css' %}" media="screen">
+{% endblock extra%}
+{% block title %}扫码充电{% endblock %}
+{% block body_class %} id="cate14" {% endblock %}
+{% block content %}
+    <div class="mainbg"><img src="{% static 'weixin/images/bg.jpg' %}"/></div>
+    <div class="mainm">
+        <div class="coupon-list-container">
+            <div class="coupon-list-valid">
+                <div class="coupon-list">
+                    <div>
+                        <div class="coupon__empty">
+                        <div class="coupon__empty-btn" id="qrcode">扫描二维码</div>
+                        <div class="coupon__empty-image"></div>
+                        <div class="coupon__empty-text"></div>
+                        </div>
+                    </div>
+                    <div class="coupon-list__tip invalid-tip">如有问题，请联系充电站详情中的客服电话。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block bottomjs %}
+<script type="text/javascript">
+    wx.ready(function () {
+        $('#qrcode').on('click',function(){
+            wx.scanQRCode({
+                        needResult: 0,
+                        scanType: ["qrCode","barCode"],
+                        success: function (res) {
+                            var result = res.resultStr;
+                            console.log(result);
+                        }
+            });
+        });
+    });
+</script>
+{% endblock bottomjs %}
+
+
+
