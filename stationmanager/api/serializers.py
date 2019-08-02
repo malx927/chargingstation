@@ -52,7 +52,7 @@ class StationSerializer(serializers.ModelSerializer):
         model = Station
         fields = [
             'name', 'province', 'city', 'district', 'address',  'longitude', 'latitude',
-            'seller', 'telephone', "gun_stats", "detail_address", "image_url"
+            'seller', 'telephone', "gun_stats", "detail_address", "image_url", "get_absolute_url"
         ]
 
     def get_gun_stats(self, obj):
