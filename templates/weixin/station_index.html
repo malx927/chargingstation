@@ -20,7 +20,7 @@
                      <div class="van-search__action"><div>搜索</div></div>
                  </div>
              </form>
-              <div class="physicalstore_list van-list">
+              <div class="physicalstore_list van-list" id="stations">
                   {% for station in stations %}
                   <div class="store">
                       <div class="store__header">{{ station.name }}<p>0km</p></div>
@@ -112,7 +112,6 @@ function geocoder(latitude,longitude) {
           timeout: 5000,
           success: function(data){
               alert(JSON.stringify(data));
-              $('#goods p').remove();
           },
           error: function(xhr, type,error){}
      });
