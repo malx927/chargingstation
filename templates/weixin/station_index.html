@@ -45,18 +45,7 @@
 {% endblock content %}
 {% block bottomjs %}
 <script>
-let templateStr = `
-        <div class="store">
-            <div class="store__header">${station.name}<p>0km</p></div>
-            <div class="store__info">
-                <div class="store__thumb"><img src="${station.image_url}"></div>
-                <a href="#" class="store__detail">
-                    <h3 class="store__detail__address">${station.detail_address}</h3>
-                    <p class="store__detail__time">空闲充电枪 ${staion.gun_stats}</p>
-                 </a>
-                 <a href="javascript:void(0)" class="store__phone" data-longitude="${station.longitude}"  data-latitude="${station.latitude}"  data-name="${station.name}" data-address="${station.address}"><i class="van-icon van-icon-map-marked"></i></a>
-            </div>
-       </div>`;
+
  wx.ready(function () {
     wx.getLocation({
         type: 'wgs84',
@@ -102,7 +91,6 @@ function geocoder(latitude,longitude) {
         success: function(data, textStatus){
             if(data.status == 0){
                 var city = data.result.address_component.city;
-                alert(city)
                 station_list(city);
             }else {
                 alert("系统错误，请联系客服！")
@@ -124,6 +112,20 @@ function geocoder(latitude,longitude) {
           timeout: 5000,
           success: function(data){
               alert(JSON.stringify(data));
+              $.each(data, function (index, item) {
+                  let templateStr = `<div class="store">
+                                            <div class="store__header">${item.name}<p>0km</p></div>
+                                            <div class="store__info">
+                                                <div class="store__thumb"><img src="${item.image_url}"></div>
+                                                <a href="#" class="store__detail">
+                                                    <h3 class="store__detail__address">${item.detail_address}</h3>
+                                                    <p class="store__detail__time">空闲充电枪 ${item.gun_stats}</p>
+                                                 </a>
+                                                 <a href="javascript:void(0)" class="store__phone" data-longitude="${item.longitude}"  data-latitude="${item.latitude}"  data-name="${item.name}" data-address="${item.address}"><i class="van-icon van-icon-map-marked"></i></a>
+                                            </div>
+                                       </div>`;
+                  $("#stations").appendChild( templateStr );
+              });
           },
           error: function(xhr, type,error){}
      });
