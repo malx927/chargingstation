@@ -7,6 +7,7 @@ from django.conf import settings
 import time
 
 from django.db.models import Count, Q
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from codingmanager.models import PileType, FaultCode, PriceType, AreaCode
 from codingmanager.constants import *
@@ -134,6 +135,9 @@ class Station(models.Model):
     def get_station_price(self):
         staiton_price = self.chargingprice_set.filter(default_flag=1).first()
         return staiton_price
+
+    def get_absolute_url(self):
+        return reverse('station-detail', kwargs={'stationid': self.id})
 
 
 class StationImage(models.Model):
