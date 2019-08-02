@@ -21,24 +21,7 @@
                  </div>
              </form>
               <div class="physicalstore_list van-list" id="stations">
-                  {% for station in stations %}
-                  <div class="store">
-                      <div class="store__header">{{ station.name }}<p>0km</p></div>
-                      <div class="store__info">
-                          <div class="store__thumb">
-                          {% if station.stationimage_set.count > 0 %}
-                              <img src="{{ station.stationimage_set.first.image.url }}" alt="">
-                          {% endif %}
-                          </div>
-                          <a href="{% url 'station-detail' station.id %}" class="store__detail">
-                              <h3 class="store__detail__address">{{ station.address }}</h3>
-                              <p class="store__detail__time">空闲充电枪 {{ station.get_gun_totals }}</p><!---->
-                          </a>
-                          <a href="javascript:void(0)" class="store__phone" data-longitude="{{ station.longitude }}"  data-latitude="{{ station.latitude }}"  data-name="{{ station.name }}" data-address="{{ station.address }}"><i class="van-icon van-icon-map-marked"><!----></i></a>
-                      </div>
-                  </div>
-                  {% endfor %}
-                  <div class="van-list__finished-text">没有更多了</div>
+
               </div>
          </div>
      </div>
@@ -56,6 +39,7 @@
         },
         cancel : function(res) {
             var city = "北京"
+            alert("cannel.....")
             station_list(city);
         }
     });
@@ -124,8 +108,10 @@ function geocoder(latitude,longitude) {
                                                  <a href="javascript:void(0)" class="store__phone" data-longitude="${item.longitude}"  data-latitude="${item.latitude}"  data-name="${item.name}" data-address="${item.address}"><i class="van-icon van-icon-map-marked"></i></a>
                                             </div>
                                        </div>`;
-                  $("#stations").appendChild( templateStr );
+                  $("#stations").append( templateStr );
               });
+              let tailHtml = '<div class="van-list__finished-text">没有更多了</div>';
+              $("#stations").append(tailHtml);
           },
           error: function(xhr, type,error){}
      });
