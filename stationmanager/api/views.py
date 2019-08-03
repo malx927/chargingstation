@@ -80,9 +80,7 @@ class StationStatsView(APIView):
 
 
 class StationListAPIView(ListAPIView):
-    """
-    地区编码
-    """
+    """电站列表"""
     permission_classes = [AllowAny]
     queryset = Station.objects.all()
     serializer_class = StationSerializer

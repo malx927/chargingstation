@@ -1,7 +1,6 @@
 {% extends 'weixin/wx_base.html' %}{% load static %}
 {% block js %}
 {% include 'wxchat/include/jssdk.html' %}
-  <script type="text/javascript" src="{% static 'weixin/js/jquery-3.3.1.min.js' %}"></script>
 {% endblock js %}
 {% block title %}附近充电站{% endblock %}
 {% block content %}
@@ -20,25 +19,8 @@
                      <div class="van-search__action"><div id="btn_search">搜索</div></div>
                  </div>
              </form>
-              <div class="physicalstore_list van-list">
-                  {% for station in stations %}
-                  <div class="store">
-                      <div class="store__header">{{ station.name }}<p>0km</p></div>
-                      <div class="store__info">
-                          <div class="store__thumb">
-                          {% if station.stationimage_set.count > 0 %}
-                              <img src="{{ station.stationimage_set.first.image.url }}" alt="">
-                          {% endif %}
-                          </div>
-                          <a href="{% url 'station-detail' station.id %}" class="store__detail">
-                              <h3 class="store__detail__address">{{ station.address }}</h3>
-                              <p class="store__detail__time">空闲充电枪 {{ station.get_gun_totals }}</p><!---->
-                          </a>
-                          <a href="javascript:void(0)" class="store__phone" data-longitude="{{ station.longitude }}"  data-latitude="{{ station.latitude }}"  data-name="{{ station.name }}" data-address="{{ station.address }}"><i class="van-icon van-icon-map-marked"><!----></i></a>
-                      </div>
-                  </div>
-                  {% endfor %}
-                  <div class="van-list__finished-text">没有更多了</div>
+              <div class="physicalstore_list van-list" id="stations">
+
               </div>
          </div>
      </div>
@@ -56,23 +38,15 @@
         cancel : function(res) {
             var city = "北京"
             station_list(city);
-        }
+        },
+		fail : function(res) {
+			var city = "北京"
+            station_list(city);
+        },
+		complete: function(res){
+		}
     });
-    $(".store__phone").on('click',function(){
-        var longitude = $(this).attr("data-longitude");
-        var latitude = $(this).attr("data-latitude");
-        var name = $(this).attr("data-name");
-        var address = $(this).attr("data-address");
-        console.log(longitude, latitude, name , address);
-         wx.openLocation({
-            latitude: latitude,
-            longitude: longitude,
-              name: name,
-              address: address,
-              scale: 13,
-              infoUrl: ''
-        });
-    });
+
 });
 
 function geocoder(latitude,longitude) {
@@ -90,7 +64,6 @@ function geocoder(latitude,longitude) {
         success: function(data, textStatus){
             if(data.status == 0){
                 var city = data.result.address_component.city;
-                alert(city)
                 station_list(city);
             }else {
                 alert("系统错误，请联系客服！")
@@ -111,8 +84,39 @@ function geocoder(latitude,longitude) {
           data: {city: city},
           timeout: 5000,
           success: function(data){
-              alert(JSON.stringify(data));
-              $('#goods p').remove();
+              $.each(data, function (index, item) {
+                  let templateStr = `<div class="store">
+                                            <div class="store__header">${item.name}<p>0km</p></div>
+                                            <div class="store__info">
+                                                <div class="store__thumb"><img src="${item.image_url}"></div>
+                                                <a href="${item.get_absolute_url}" class="store__detail">
+                                                    <h3 class="store__detail__address">${item.detail_address}</h3>
+                                                    <p class="store__detail__time">空闲充电枪 ${item.gun_stats}</p>
+                                                 </a>
+                                                 <a href="javascript:void(0)" class="store__phone" data-longitude="${item.longitude}"  data-latitude="${item.latitude}"  data-name="${item.name}" data-address="${item.address}"><i class="van-icon van-icon-map-marked"></i></a>
+                                            </div>
+                                       </div>`;
+                  $("#stations").append( templateStr );
+              });
+              let tailHtml = '<div class="van-list__finished-text">没有更多了</div>';
+              $("#stations").append(tailHtml);
+
+              $(".store__phone").on('click',function(){
+                    var longitude = $(this).attr("data-longitude");
+                    var latitude = $(this).attr("data-latitude");
+                    var name = $(this).attr("data-name");
+                    var address = $(this).attr("data-address");
+                    console.log(longitude, latitude, name , address);
+                     wx.openLocation({
+                        latitude: latitude,
+                        longitude: longitude,
+                          name: name,
+                          address: address,
+                          scale: 13,
+                          infoUrl: ''
+                    });
+                });
+
           },
           error: function(xhr, type,error){}
      });

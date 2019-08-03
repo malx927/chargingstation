@@ -46,12 +46,13 @@ class AreaCodeSerializer(serializers.ModelSerializer):
 class StationSerializer(serializers.ModelSerializer):
     gun_stats = SerializerMethodField()
     detail_address = SerializerMethodField()
+    image_url = SerializerMethodField()
 
     class Meta:
         model = Station
         fields = [
             'name', 'province', 'city', 'district', 'address',  'longitude', 'latitude',
-            'seller', 'telephone', "gun_stats", "detail_address"
+            'seller', 'telephone', "gun_stats", "detail_address", "image_url", "get_absolute_url"
         ]
 
     def get_gun_stats(self, obj):
@@ -59,6 +60,13 @@ class StationSerializer(serializers.ModelSerializer):
 
     def get_detail_address(self, obj):
         return obj.get_detail_address()
+
+    def get_image_url(self, obj):
+        station_image = obj.stationimage_set.first()
+        if station_image:
+            return station_image.image.url
+        else:
+            return ""
 
     # def get_value(self,obj):
     #     return  obj.code
