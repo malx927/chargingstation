@@ -17,7 +17,7 @@
                              </div>
                          </div>
                      </div>
-                     <div class="van-search__action"><div>搜索</div></div>
+                     <div class="van-search__action"><div id="btn_search">搜索</div></div>
                  </div>
              </form>
               <div class="physicalstore_list van-list">
@@ -117,6 +117,9 @@ function geocoder(latitude,longitude) {
           error: function(xhr, type,error){}
      });
  }
- 
+ $("#btn_search").click(function(){
+    let keyword = $("#search").val();
+
+ });
 </script>
 {% endblock bottomjs %}
