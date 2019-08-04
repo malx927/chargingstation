@@ -82,6 +82,7 @@ function geocoder(latitude,longitude) {
         success: function(data, textStatus){
             if(data.status == 0){
                 var city = data.result.address_component.city;
+                city = "北京";
                 station_list(city);
             }else {
                 alert("系统错误，请联系客服！")
@@ -96,7 +97,6 @@ function geocoder(latitude,longitude) {
  function station_list(city) {
     $("#stations").empty();
     var start = new qq.maps.LatLng(latitude, longitude);
-    alert(start);
      $.ajax({
           type: 'GET',
           url: "{% url 'station-list' %}",
@@ -106,7 +106,6 @@ function geocoder(latitude,longitude) {
           success: function(data){
               $.each(data, function (index, item) {
                   var end = new qq.maps.LatLng(item.latitude, item.longitude);
-                  alert(end);
                   let templateStr = `<div class="store">
                                             <div class="store__header">${item.name}<p>${getDistance(start, end)}</p></div>
                                             <div class="store__info">
@@ -145,11 +144,10 @@ function geocoder(latitude,longitude) {
  }
  function getDistance(start, end) {
      var distance = qq.maps.geometry.spherical.computeDistanceBetween(start, end);
-     alert(distance);
      if(distance<1000){
-         return distance + 'm'
+         return distance.toFixed(2) + 'm'
      }else{
-         return distance/1000 + 'km'
+         return (distance/1000).toFixed(2) + 'km'
      }
  }
 </script>
