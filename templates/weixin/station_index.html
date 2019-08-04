@@ -1,22 +1,23 @@
 {% extends 'weixin/wx_base.html' %}{% load static %}
 {% block js %}
 {% include 'wxchat/include/jssdk.html' %}
+    <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=TOLBZ-NWYLP-A5SD6-VKAJC-UZLHQ-XKB7X&libraries=geometry"></script>
 {% endblock js %}
 {% block title %}附近充电站{% endblock %}
 {% block content %}
     <div class="page">
          <div>
-             <form action="#">
+             <form action="#" id="form1">
                  <div class="van-search van-search--show-action" style="background: rgb(255, 255, 255);">
                      <div class="van-search__content van-search__content--square">
                          <div class="van-cell van-cell--borderless van-field">
                              <div class="van-field__left-icon"><i class="van-icon van-icon-search"><!----></i></div>
                              <div class="van-cell__value van-cell__value--alone">
-                                 <div class="van-field__body"><input type="search" finished-text="没有更多了" placeholder="请输入充电站名称或地点" class="van-field__control"></div>
+                                 <div class="van-field__body"><input type="search" id="keyword" finished-text="没有更多了"  placeholder="请输入充电站名称或地点" class="van-field__control"></div>
                              </div>
                          </div>
                      </div>
-                     <div class="van-search__action"><div id="btn_search">搜索</div></div>
+                     <div class="van-search__action" id="btn_search"><div>搜索</div></div>
                  </div>
              </form>
               <div class="physicalstore_list van-list" id="stations">
@@ -27,20 +28,36 @@
 {% endblock content %}
 {% block bottomjs %}
 <script>
+var latitude;
+var longitude;
+$(function () {
+     $("#btn_search").click(function(){
+        let keyword = $("#keyword").val();
+        station_list(keyword);
+     });
+     $("#keyword").on('keypress',function(e){
+            let keycode = e.keyCode;
+            let keyword = $(this).val();
+            if(keycode=='13'){
+                e.preventDefault();
+                station_list(keyword);
+            }
+     });
+});
  wx.ready(function () {
     wx.getLocation({
         type: 'wgs84',
         success : function(res) {
-            var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
-            var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+            latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+            longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
             geocoder(latitude, longitude);
         },
         cancel : function(res) {
-            var city = "北京"
+            var city = "北京";
             station_list(city);
         },
 		fail : function(res) {
-			var city = "北京"
+			var city = "北京";
             station_list(city);
         },
 		complete: function(res){
@@ -51,6 +68,7 @@
 
 function geocoder(latitude,longitude) {
     var ll=latitude+","+longitude;
+
     $.ajax({
         type: 'get',
         url: 'https://apis.map.qq.com/ws/geocoder/v1/',
@@ -76,7 +94,9 @@ function geocoder(latitude,longitude) {
  }
  
  function station_list(city) {
-
+    $("#stations").empty();
+    var start = new qq.maps.LatLng(latitude, longitude);
+    alert(start);
      $.ajax({
           type: 'GET',
           url: "{% url 'station-list' %}",
@@ -85,8 +105,10 @@ function geocoder(latitude,longitude) {
           timeout: 5000,
           success: function(data){
               $.each(data, function (index, item) {
+                  var end = new qq.maps.LatLng(item.latitude, item.longitude);
+                  alert(end);
                   let templateStr = `<div class="store">
-                                            <div class="store__header">${item.name}<p>0km</p></div>
+                                            <div class="store__header">${item.name}<p>${getDistance(start, end)}</p></div>
                                             <div class="store__info">
                                                 <div class="store__thumb"><img src="${item.image_url}"></div>
                                                 <a href="${item.get_absolute_url}" class="store__detail">
@@ -121,9 +143,14 @@ function geocoder(latitude,longitude) {
           error: function(xhr, type,error){}
      });
  }
- $("#btn_search").click(function(){
-    let keyword = $("#search").val();
-
- });
+ function getDistance(start, end) {
+     var distance = qq.maps.geometry.spherical.computeDistanceBetween(start, end);
+     alert(distance);
+     if(distance<1000){
+         return distance + 'm'
+     }else{
+         return distance/1000 + 'km'
+     }
+ }
 </script>
 {% endblock bottomjs %}

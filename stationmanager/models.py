@@ -51,7 +51,7 @@ class Station(models.Model):
     district = models.ForeignKey(AreaCode, verbose_name='县区', related_name='districts', null=True, on_delete=models.SET_NULL)
     address = models.CharField(verbose_name='详细地址', max_length=50)
     longitude = models.DecimalField(verbose_name='经度', default=0, decimal_places=6, max_digits=12)
-    latitude = models.DecimalField(verbose_name='维度', default=0, decimal_places=6, max_digits=12)
+    latitude = models.DecimalField(verbose_name='纬度', default=0, decimal_places=6, max_digits=12)
     altitude = models.CharField(verbose_name='海拔高度', max_length=20, blank=True, null=True)
     seller = models.ForeignKey(Seller, verbose_name='所属运营商', null=True, on_delete=models.SET_NULL)
     equip_owner_id = models.CharField(verbose_name='设备所属方ID', max_length=9, help_text="组织机构代码")

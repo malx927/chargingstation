@@ -6,13 +6,10 @@
 {% block extra %}
     {% include 'wxchat/include/jssdk.html' %}
 {% endblock extra%}
-{% block side_nav %}
-    {% include "chargingorder/include/side_nav.html" %}
-{% endblock side_nav %}
+{#{% block side_nav %}#}
+{#    {% include "chargingorder/include/side_nav.html" %}#}
+{#{% endblock side_nav %}#}
 {% block container %}
-{#    {% for mode in charg_modes %}#}
-{#          <p><label><input class="with-gap" name="charg_mode" type="radio" value="{{ mode.0 }}" {% if mode.0 == 0 %} checked {% endif %}><span>{{ mode.1 }}</span></label></p>#}
-{#    {% endfor %}#}
      <div class="row">
         <div class="col s12 m4 l4">
             <div class="card gradient-45deg-light-blue-cyan gradient-shadow">
@@ -93,17 +90,11 @@
          </div>
     </div>
 
-{#    <div class="row">#}
-{#        <div class="col s12 center-align">#}
-{#            <a class="btn waves-effect waves-light" href="{% url 'pile-charging-status' %}?pile_sn={{ pile_sn }}&gun_num={{ gun_num }}"><i class="material-icons left">cloud</i>充电状态</a>#}
-{#        </div>#}
-{#    </div>#}
 {% endblock container%}
 
 {% block bottomjs %}
 <script>
     $(document).ready(function(){
-        $('.sidenav').sidenav();
         // 充满为止
         $("#full_recharge").on("click", function (event) {
             var charg_mode = $(this).attr("data-item");
