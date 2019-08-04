@@ -92,7 +92,7 @@ class RechargeView(View):
                 order = Order.objects.filter(openid=openid, out_trade_no=pile_gun.out_trade_no, status__lte=2).first()
                 print(openid, order)
                 if order:
-                    return render(request, template_name='weixin/recharge_order_status.html', context={"order": order})
+                    return render(request, template_name='chargingorder/recharge_order_status.html', context={"order": order})
 
         except ChargingGun.DoesNotExist as ex:
             print(ex)
@@ -274,7 +274,7 @@ class RechargeOrderStatusView(View):
         except Order.DoesNotExist as ex:
             order = None
         print("000000000000000")
-        return render(request, template_name="weixin/recharge_order_status.html", context={"order": order})
+        return render(request, template_name="chargingorder/recharge_order_status.html", context={"order": order})
 
 
 class ChargingStatusView(View):
