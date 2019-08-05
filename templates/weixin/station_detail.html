@@ -94,13 +94,11 @@
 {#             {% for p in station.get_station_price.prices.all %}#}
 {#                <p>{{ p.begin_time }},{{ p.end_time }},{{ p.price }}</p>#}
 {#             {% endfor %}#}
-			<div class="goods-detail" type="detail-block">
-				<div class="goods-detail-tab">
-					<div>
-						<div class="showcase-components-container"></div>
-					</div>
-				</div>
-			</div>
+            <div class="member-center__order" style="margin-top:10px;">
+                <div class="van-cell van-cell--clickable">
+                    <div class="van-cell__value"><span>联系电话：{{ station.telephone }}</span></div>
+                </div>
+            </div>
 			<div type="submit-block">
 				<div class="goods-bottom content">
 					<div></div>

@@ -132,13 +132,14 @@
                   <div class="col s8"><p  class="cyan order-item"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</p></div>
                </div>
             </li>
+            {% endwith %}
              <li class="collection-item co-item">
                <div class="row">
                   <div class="col s4 pad-top-5"><p class="title">订单状态</p></div>
                   <div class="col s8"><p  class="cyan order-item"><span id="id_order_status">{{ order.get_status_display|default:'' }}</span> </p></div>
                </div>
             </li>
-        {% endwith %}
+
         {% if order.charg_mode != 0 %}
            <li class="collection-item co-item">
                <div class="row">

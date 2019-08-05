@@ -70,133 +70,145 @@
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>工作状态</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action item-action" id="id_work_status">{{ order.get_work_status|default:'' }}</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>工作状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action" id="id_work_status">{{ order.get_work_status|default:'' }}</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>充电状态</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action" id="id_charg_status">{{ order.charg_status.name|default:'' }}</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>充电状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action" id="id_charg_status">{{ order.charg_status.name|default:'' }}</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>实际充电时间</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action"><span id="id_total_minutes">{{ order.total_minutes }}</span> 分钟</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>实际充电时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action"><span id="id_total_minutes">{{ order.total_minutes }}</span> 分钟</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>实际充电电量</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action"><span id="id_total_reading">{{ order.get_total_reading }}</span> 度(KWH)</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>实际充电电量</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action"><span id="id_total_reading">{{ order.get_total_reading }}</span> 度(KWH)</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>消费金额</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_consum_money">{{ order.consum_money }}</span> 元</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>消费金额</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_consum_money">{{ order.consum_money }}</span> 元</div>
+                    </div>
+                </div>
+            </div>
+            {% with order.get_record as record %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>充电所需电压</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_voltage">{{ record.voltage|default:0 }}</span> V</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>充电所需电压</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_voltage">{{ record.voltage|default:0 }}</span> V</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>充电所需电流</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_current">{{ record.current|default:0 }}</span> A</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>充电所需电流</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_current">{{ record.current|default:0 }}</span> A</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>实际输出电压</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ record.output_voltage|default:0 }}</span> V</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>实际输出电压</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ record.output_voltage|default:0 }}</span> V</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>实际输出电流</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</div>
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>订单状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_order_status">{{ order.get_status_display|default:'' }}</span></div>
+                    </div>
+                </div>
+            </div>
+            {% if order.charg_mode == 1 %}
+             <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按充电金额</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.total_fee }} 元</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 2 %}
+             <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按充电时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_min_val }} 分钟</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 3 %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按SOC值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_soc_val }} %</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 4 %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按电量值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_reading_val }} 度</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>开始时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action" id="id_begin_time">{{ order.begin_time|default:'' }}</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>实际输出电流</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>电桩编码SN</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action">{{ order.charg_pile.pile_sn|default:''}}</div>
                     </div>
                 </div>
             </div>
             <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>订单状态</span>
-                        </div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_order_status">{{ order.get_status_display|default:'' }}</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>开始时间</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action item-action" id="id_begin_time">{{ order.begin_time|default:'' }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>电桩编码SN</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action item-action">{{ order.charg_pile.pile_sn|default:''}}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="base-info-cell">
-                <div>
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>枪口号</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action item-action">{{ order.gun_num|default:''}}</div>
-                        </div>
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>枪口号</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action">{{ order.gun_num|default:''}}</div>
                     </div>
                 </div>
             </div>
@@ -209,6 +221,7 @@
 <script type="text/javascript">
     var pper = 0;
     var pper_interal;
+    var myCanvas = document.getElementById("myCanvas1");
     var dushu = document.getElementById('dushu');
     var aaa = drawCanvanPercent('myCanvas1', 'rem', 3, '#30A393', 1.5, '#fff');
     function drawCanvanPercent(ele_id, dw, cir_r, cir_color, line_w, fill_color) {
@@ -240,6 +253,9 @@
         if (pper >= circle.per) {
             pper = circle.per;
             clearTimeout(pper_interal);
+            setInterval(function () {
+                drawPercent(ctx,circle);
+            }, 2000);
         } else {
             pper++;
         }
@@ -250,5 +266,122 @@
         ctx.arc(circle.r, circle.r, circle.r, 0, Math.PI * (pper / 100) * 360 / 180, false);
         ctx.stroke();
     }
+    function drawPercent(ctx,circle){
+         console.log(circle);
+         pper = myCanvas.getAttribute('data-percent');
+         circle.per = pper;
+         dushu.innerText=pper+'%';
+         ctx.beginPath();
+         ctx.strokeStyle = circle.color;
+         ctx.lineWidth=circle.lineWidth;
+         ctx.arc(circle.r, circle.r, circle.r, 0, Math.PI*(pper/100)*360/180, false);
+         ctx.stroke();
+    }
+    {% if order %}
+    $(function () {
+        // Correctly decide between ws:// and wss://
+        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+        var ws_path = ws_scheme + '://' + window.location.host + "/ws/recharge/{{ order.charg_pile.pile_sn }}/{{ order.gun_num }}/";
+        console.log("Connecting to " + ws_path);
+        var socket = new ReconnectingWebSocket(ws_path);
+        // Handle incoming messages
+        socket.onmessage = function (message) {
+            {#var msg = JSON.stringify( message);#}
+            var data = JSON.parse( message.data);
+            var msg = JSON.parse(data.message);
+            console.log(msg);
+            if(msg.cmd == "01"){            /*充电桩上报状态信息*/
+                if(msg.return_code == "success"){
+                    $("#id_work_status").text(msg.work_status);
+                    $("#id_charg_status").text(msg.charg_status);
+                }
+            }
+            else if(msg.cmd == "04"){           /*充电桩回复充电指令*/
+                if(msg.return_code == "success"){
+
+                    $("#id_charg_status").text(msg.charg_status);
+                    $("#id_begin_time").text(msg.begin_time);
+                }
+                else{
+                    M.toast({html: msg.message});
+                    {#window.location.href = '{% url "order-errors" %}?errmsg=' + msg.errmsg#}
+                }
+            }
+            else if(msg.cmd == "05"){               /*上报车辆信息*/
+                if(msg.return_code == "success"){
+                    $("#id_charg_status").text(msg.charg_status);
+                    $("#id_order_status").text(msg.order_status);
+                    $("#id_begin_time").text(msg.begin_time);
+                    $("#myCanvas1").attr("data-percent", msg.begin_soc);
+                    $("#id_stop").addClass("pulse");
+                }
+                else{
+                     M.toast({html: msg.message});
+                    {#window.location.href = '{% url "order-errors" %}?errmsg=' + msg.errmsg#}
+                }
+            }
+            else if(msg.cmd == "06"){               /*充电中状态上报*/
+                if(msg.return_code == "success"){
+                    $("#id_order_status").text(msg.order_status);
+                    $("#id_total_minutes").text(msg.total_minutes);
+                    $("#id_total_reading").text(msg.total_reading);
+                    $("#id_consum_money").text(msg.consum_money);
+                    $("#id_voltage").text(msg.voltage);
+                    $("#id_current").text(msg.current);
+                    $("#id_output_voltage").text(msg.output_voltage);
+                    $("#id_output_current").text(msg.output_current);
+                    $("#myCanvas1").attr("data-percent", msg.current_soc);
+
+                }
+            }
+            else if(msg.cmd == "07"){
+                if(msg.return_code == "success"){
+                    $("#id_charg_status").text(msg.charg_status);
+                    $("#id_order_status").text(msg.order_status);
+                    $("#id_total_minutes").text(msg.total_minutes);
+                    $("#id_total_reading").text(msg.total_reading);
+                    $("#id_consum_money").text(msg.consum_money);
+                    $("#id_voltage").text('0');
+                    $("#id_current").text('0');
+                    $("#id_output_voltage").text('0');
+                    $("#id_output_current").text('0');
+                    {#this.close();#}
+                }
+            }
+
+        };
+        // Helpful debugging
+        socket.onopen = function () {
+            console.log("Connected to chat socket");
+        };
+        socket.onclose = function () {
+            console.log("Disconnected from chat socket");
+        }
+    });
+    $("#id_stop").on("click", function () {
+        var out_trade_no = $(this).attr("data-item");
+        var params = {
+            out_trade_no: out_trade_no,
+            pile_sn: '{{ order.charg_pile.pile_sn }}',
+            gun_num: {{ order.gun_num }},
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        }
+        $.ajax({
+              type: 'POST',
+              url: '{% url "order-charge-stop" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                 if(data.return_code == "FAIL") {
+                     M.toast({html: data.errmsg});
+                 }
+              },
+              error: function(error){
+                    M.toast({html: '停止充电失败!'});
+              }
+        });
+    });
+   {% endif %}
 </script>
 {% endblock bottomjs %}
