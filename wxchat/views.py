@@ -416,7 +416,7 @@ class PersonInfoView(View):
             "user": user,
             "sign": signPackage
         }
-        return render(request, template_name="wxchat/wxchat_personinfo.html", context=context)
+        return render(request, template_name="weixin/wxchat_personinfo.html", context=context)
 
     def post(self, request, *args, **kwargs):
         pass
