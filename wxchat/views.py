@@ -162,13 +162,13 @@ def createMenu(request):
         "button": [
             {
                 "type": "view",
-                "name": "充电桩",
-                "url": settings.ROOT_URL + "/order/"
+                "name": "附近电站",
+                "url": settings.ROOT_URL + "/station/"
             },
             {
                 "type": "view",
-                "name": "充电站",
-                "url": settings.ROOT_URL + "/station/"
+                "name": "扫码充电",
+                "url": settings.ROOT_URL + "/wechat/scanqrcode/"
             },
             {
                 "type": "view",
@@ -404,7 +404,7 @@ class RegisterView(View):
 
 class PersonInfoView(View):
     """个人信息"""
-    @method_decorator(weixin_decorator)
+    # @method_decorator(weixin_decorator)
     def get(self, request, *args, **kwargs):
         try:
             openid = request.session.get("openid", None)

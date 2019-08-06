@@ -1,0 +1,62 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block js %}
+     <script type="text/javascript" src="{% static 'weixin/js/touch.js' %}"></script>
+{% endblock js %}
+{% block title %}用户订单{% endblock %}
+{% block extra %}
+    <style>
+        .van-icon{
+          font-size:12px!important;
+        }
+        .store__detail__address{
+            font-size: 14px;
+        }
+    </style>
+{% endblock extra %}
+{% block content %}
+  <div class="coupon-item-container">
+    <div class="coupon-item">
+      <div class="coupon-item__container">
+        <div class="coupon-item__left coupon-item__block">
+          <div class="avatar-image-wrapper">
+            {% if request.session.headimgurl%}
+            <div class="avatar-image" style="background-image: url('{{ request.session.headimgurl }}'); width: 60px; height: 60px;"></div>
+            <img  src="{{ request.session.headimgurl }}"  alt="avatar">
+            {% else %}
+            <div class="avatar-image" style="background-image: url('{% static "weixin/images/logo.jpg" %}'); width: 60px; height: 60px;"></div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="coupon-item__block coupon-item__center">
+          <div class="coupon-item__center-title ellipsis">
+              <span class="coupon-item__title-tag"></span>
+            {% if request.session.username %}
+                 <span>{{ request.session.username|default:'' }}</span>
+            {% else %}
+                <span>{{ request.session.nickname|default:'' }}</span>
+            {% endif %}
+          </div>
+          <!-- <div class="coupon-item__center-time">C0345346477865756</div> -->
+        </div>
+        <div class="coupon-item__right coupon-item__block"></div>
+      </div>
+    </div>
+  </div>
+  <div class="page">
+      <div class="physicalstore_list van-list">
+        {% for order in orders %}
+        <div class="store">
+            <div class="store__info">
+                <a href="{{ order.get_absolute_url }}" class="store__detail">
+                <h3 class="store__detail__address">单号:{{order.out_trade_no}}</h3>
+                <p class="store__detail__time">时间:{{ order.begin_time|default:'' }}</p>
+                </a>
+                <a class="store__phone"><i class="van-icon">{{ order.consum_money }}元</i></a>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="van-list__finished-text">没有更多了</div>
+      </div>
+  </div>
+
+{% endblock content %}

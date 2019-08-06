@@ -74,7 +74,7 @@
         <div class="classic-group-wrapper">
           <div class="classic-group">
             <div class="classic-group__item">
-              <a class="van-cell van-cell--clickable">
+              <a class="van-cell van-cell--clickable" href="{% url 'user-order-list' %}">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/f9c1b3cb9e4f7ec7909e180ae2efbb6c.png'%}"></i>
                 <div class="van-cell__title"><span>我的订单</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
@@ -86,39 +86,39 @@
           </div>
           <div class="classic-group">
             <div class="classic-group__item">
-              <div class="van-cell van-cell--clickable">
+              <a class="van-cell van-cell--clickable">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static '/weixin/images/fba880e26352425d9819c0d7be1693ef.png' %}"></i>
                 <div class="van-cell__title"><span>我的钱包</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-              </div>
+              </a>
             </div>
             <div class="classic-group__item">
-              <div class="van-cell van-cell--clickable">
+              <a class="van-cell van-cell--clickable" href="{% url 'wxchat-order-pay' %}">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/21b0d3f9656d61c4ac292c801382e71d.png' %}"></i>
-                <div class="van-cell__title"><span>我的积分</span></div>
+                <div class="van-cell__title"><span>我要充值</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-              </div>
+              </a>
             </div>
             <div class="classic-group__item">
-              <div class="van-cell van-cell--clickable">
+              <a class="van-cell van-cell--clickable">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/d12a725fd93576ac0e51294f13df52f5.png' %}"></i>
-                <div class="van-cell__title"><span>帐号设置</span></div>
+                <div class="van-cell__title"><span>附属账号</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-              </div>
+              </a>
             </div>
             <div class="classic-group__item">
-              <div class="van-cell van-cell--clickable">
+              <a class="van-cell van-cell--clickable">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/77b91dd266a2b452dc18a192ee709f0d.png' %}"></i>
                 <div class="van-cell__title"><span>个人信息</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-              </div>
+              </a>
             </div>
             <div class="classic-group__item">
-              <div class="van-cell van-cell--clickable">
+              <a class="van-cell van-cell--clickable">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/3026a25897099ffbb1528052ac9c92fd.png' %}"></i>
                 <div class="van-cell__title"><span>拨打充电站电话</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-              </div>
+              </a>
             </div>
           </div>
         </div>

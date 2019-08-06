@@ -356,11 +356,11 @@ class OrderView(View):
     def get(self, request, *args, **kwargs):
         openid = request.session.get("openid", None)
         if openid:
-            orders = Order.objects.filter(openid=openid, status=2)[0:20]
+            orders = Order.objects.filter(openid=openid, status=2)[0:50]
         else:
             orders = None
 
-        return render(request, template_name="chargingorder/user_order_list.html", context={"orders": orders})
+        return render(request, template_name="weixin/user_order_list.html", context={"orders": orders})
 
 
 class OrderDetailView(DetailView):
