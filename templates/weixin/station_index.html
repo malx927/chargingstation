@@ -82,7 +82,6 @@ function geocoder(latitude,longitude) {
         success: function(data, textStatus){
             if(data.status == 0){
                 var city = data.result.address_component.city;
-                city = "北京";
                 station_list(city);
             }else {
                 alert("系统错误，请联系客服！")
