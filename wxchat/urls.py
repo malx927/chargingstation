@@ -2,10 +2,8 @@
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.conf import settings
-# from django.contrib import admin
-from django.views.generic import TemplateView
 from .views import wechat, createMenu, getMenu, deleteMenu, pay_notify, OrderPayView, RegisterView, PersonInfoView, \
-    OrderRemoveView, ScanQRCodeView
+    OrderRemoveView, ScanQRCodeView, UserDetailView
 
 urlpatterns = [
     url(r'^$', wechat),  # 微信入口
@@ -16,5 +14,6 @@ urlpatterns = [
     url(r'^scanqrcode/$', ScanQRCodeView.as_view(), name='wxchat-scanqrcode'),
     url(r'^register/$', RegisterView.as_view(), name='wxchat-register'),
     url(r'^personinfo/$', PersonInfoView.as_view(), name='wxchat-personinfo'),
+    url(r'^userdetail/(?P<id>\d+)/$', UserDetailView.as_view(), name='wxchat-user-detail'),
     url(r'^orderdel/$', OrderRemoveView.as_view(), name='wxchat-order-remove'),
 ]

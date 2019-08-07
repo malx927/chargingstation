@@ -47,9 +47,9 @@
         {% for order in orders %}
         <div class="store">
             <div class="store__info">
-                <a href="{{ order.get_absolute_url }}" class="store__detail">
-                <h3 class="store__detail__address">单号:{{order.out_trade_no}}</h3>
-                <p class="store__detail__time">时间:{{ order.begin_time|default:'' }}</p>
+                <a href="{{ order.get_absolute_url }}" class="store__detail van-cell--clickable">
+                <h3 class="store__detail__address">单号: {{order.out_trade_no}}</h3>
+                <p class="store__detail__time">时间: {{ order.begin_time|default:'' }}</p>
                 </a>
                 <a class="store__phone"><i class="van-icon">{{ order.consum_money }}元</i></a>
             </div>
