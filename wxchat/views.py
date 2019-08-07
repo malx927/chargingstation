@@ -378,8 +378,22 @@ class RegisterView(View):
     """
     def get(self, request, *args, **kwargs):
         openid = request.session.get("openid", None)
+        try:
+            user = UserInfo.objects.get(openid=openid)
+        except UserInfo.DoesNotExist as ex:
+            user = None
+
         url = request.GET.get("url", None)
-        return render(request, template_name='wxchat/register.html', context={"openid": openid, "url": url})
+        if url is None:
+            url = reverse("wxchat-personinfo")
+            print(url)
+        context = {
+            "openid": openid,
+            "url": url,
+            "user": user,
+        }
+
+        return render(request, template_name='wxchat/register.html', context=context)
 
     def post(self, request, *args, **kwargs):
         form = RegisterForm(request.POST or None)
@@ -391,7 +405,7 @@ class RegisterView(View):
             telephone = form.cleaned_data["telephone"]
             car_number = form.cleaned_data["car_number"]
             car_type = form.cleaned_data["car_type"]
-            print(user_name, telephone, car_number, car_type,openid)
+            print(user_name, telephone, car_number, car_type, openid)
             UserInfo.objects.filter(openid=openid).update(name=user_name, telephone=telephone, car_number=car_number, car_type=car_type)
             request.session["created"] = False
             request.session["username"] = user_name

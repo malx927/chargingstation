@@ -1,45 +1,55 @@
 {% extends 'wxchat/base.html' %}{% load static %}
 {% block extra %}
+    <style>
+    h4.header2 {
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+    </style>
 {% endblock extra%}
+{% block title %}用户信息完善{% endblock %}
+{#{% block side_nav %}#}
+{#    {% include "chargingorder/include/side_nav.html" %}#}
+{#{% endblock side_nav %}#}
 {% block container %}
-    <div class="section header-margin-top">
-            <h5 class="center-align  light-blue-text text-darken-2">用户信息完善</h5>
-    </div>
+    <div class="card-panel">
+    <h4 class="header2">用户信息修改</h4>
     <form class="col s12" name="register_form" action="{% url 'wxchat-register' %}" method="post">{% csrf_token %}
     <div class="row">
         <input type="hidden" id="openid" name="openid" value="{{ openid|default:'test' }}">
         <input type="hidden" id="url" name="url" value="{{ url|default:'' }}">
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">account_circle</i>
-            <input id="user_name" name="user_name" type="text" class="validate" required >
+            <input id="user_name" name="user_name" type="text" class="validate" required value="{{ user.name }}">
             <label for="user_name">姓名</label>
             {% if errors.user_name.0 %}<span>{{ errors.user_name.0 }}</span>{% endif %}
         </div>
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">phone</i>
-            <input id="telephone" name="telephone" type="text" class="validate" required>
+            <input id="telephone" name="telephone" type="text" class="validate" required value="{{ user.telephone }}">
             <label for="telephone">手机</label>
             {% if errors.telephone.0 %}<span>{{ errors.telephone.0 }}</span>{% endif %}
         </div>
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">directions_car</i>
-            <input id="car_number" name="car_number" type="text">
+            <input id="car_number" name="car_number" type="text" value="{{ user.car_number }}">
             <label for="car_number">车牌号</label>
             {% if errors.car_number.0 %}<span>{{ errors.car_number.0 }}</span>{% endif %}
         </div>
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">local_taxi</i>
-            <input id="car_type" name="car_type" type="text">
+            <input id="car_type" name="car_type" type="text" value="{{ user.car_type }}">
             <label for="car_type">车型</label>
             {% if errors.car_type.0 %}<span>{{ errors.car_type.0 }}</span>{% endif %}
         </div>
     </div>
     <div class="row">
-        <p class="center-align">
-        <button class="btn waves-effect waves-light gradient-45deg-red-pink" type="submit" name="action">提交
+        <div class="input-field col s12">
+        <button class="btn waves-effect waves-light cyan right" type="submit" name="action">提交
             <i class="material-icons right">send</i>
         </button>
-        </p>
+        </div>
     </div>
     </form>
+    </div>
 {% endblock container %}

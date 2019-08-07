@@ -1,4 +1,14 @@
 {% extends 'weixin/wx_base.html' %}{% load static %}
+{% block extra %}
+    <style>
+    .header_right{
+        position:absolute;
+        right:14px;
+        top:10px;
+        width: 50px;
+    }
+    </style>
+{% endblock %}
 {% block title %}用户信息{% endblock %}
 {% block content %}
   <div class="app-content">
@@ -9,7 +19,8 @@
         </svg>
       </span>
     </div>
-    <h2 class="block-header">用户基本信息</h2>
+    <h2 class="block-header">用户信息</h2>
+    <a class="coupon-item__action header_right" href="{% url 'wxchat-register' %}">修改</a>
     <div class="van-cell-group van-hairline--top-bottom">
       {% if user %}
       <div class="base-info-cell">
@@ -47,13 +58,13 @@
           <div class="van-cell__value van-ellipsis"><span>{{ user.telephone }}</span></div>
         </div>
       </div>
-      <div class="base-info-cell">
-        <div class="van-cell van-cell--clickable">
-          <div class="van-cell__title"><span>性别</span></div>
-          <div class="van-cell__value"><span>{{ user.get_sex_display }}</span></div>
-          <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-        </div>
-      </div>
+{#      <div class="base-info-cell">#}
+{#        <div class="van-cell van-cell--clickable">#}
+{#          <div class="van-cell__title"><span>性别</span></div>#}
+{#          <div class="van-cell__value"><span>{{ user.get_sex_display }}</span></div>#}
+{#          <i class="van-icon van-icon-arrow van-cell__right-icon"></i>#}
+{#        </div>#}
+{#      </div>#}
       <div class="base-info-cell">
         <div>
           <div class="van-cell van-cell--clickable">
