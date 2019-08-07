@@ -409,7 +409,7 @@ class RegisterView(View):
 
 class PersonInfoView(View):
     """个人信息"""
-    # @method_decorator(weixin_decorator)
+    @method_decorator(weixin_decorator)
     def get(self, request, *args, **kwargs):
         try:
             openid = request.session.get("openid", None)
@@ -445,3 +445,17 @@ class ScanQRCodeView(View):
             "sign": signPackage
         }
         return render(request, template_name="weixin/charging_qrcode.html", context=context)
+
+
+class UserDetailView(View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user_id = kwargs.get("id", None)
+            user = UserInfo.objects.get(pk=user_id)
+        except UserInfo.DoesNotExist as ex:
+            user = None
+        context = {
+            "user": user,
+        }
+        return render(request, template_name="weixin/user_info_detail.html", context=context)
