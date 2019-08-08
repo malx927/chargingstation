@@ -1,0 +1,86 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block extra %}
+     <link rel="stylesheet"  href="{% static 'weixin/css/member.css' %}" media="screen">
+    <style>
+        .usercenter{
+            width: 100%;
+            background-color: #f9f9f9;
+        }
+        .top_image{
+            background-image: linear-gradient(rgba(255, 255, 255, 0),
+            rgb(255, 255, 255)),
+            url("{% static 'weixin/images/ban.jpg'%}");
+            height: 172px;
+        }
+        .user-info__avatar{
+            width: 60px;
+            height: 60px;
+            margin-top: 55px;
+        }
+    </style>
+{% endblock extra%}
+{% block title %}我的钱包{% endblock %}
+{% block content %}
+<body ontouchstart="ontouchstart">
+  <div class="container is-pc">
+    <div class="usercenter">
+      <div class="member-center__user-info-wrapper" type="v-user-info">
+        <div class="member-center__user-info avatar-at-top top_image">
+          <div class="user-info__avatar">
+           {% if request.session.headimgurl%}
+            <img  src="{{ request.session.headimgurl }}"  alt="avatar">
+            {% else %}
+            <img src="{% static 'weixin/images/logo.jpg' %}" alt="avatar">
+            {% endif %}
+          </div>
+          <div class="user-info__info" style="margin-top: 6.88px;">
+            <div class="user-info__username" style="color: rgb(51, 51, 51);">
+             {% if request.session.username %}
+                 <span>{{ request.session.username|default:'' }}</span>
+            {% else %}
+                <span>{{ request.session.nickname|default:'' }}</span>
+            {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="van-cell-group van-hairline--top-bottom">
+        {% if user %}
+        <div class="base-info-cell">
+          <div class="van-cell van-cell--clickable">
+            <div class="van-cell__title"><span>我的余额</span></div>
+            <div class="van-cell__value van-ellipsis"><span>{{ user.account_balance }} 元</span></div>
+          </div>
+        </div>
+        <div class="base-info-cell">
+          <div class="van-cell van-cell--clickable">
+            <div class="van-cell__title"><span>优惠券</span></div>
+            <div class="van-cell__value van-ellipsis"><span>0 元</span></div>
+          </div>
+        </div>
+        <div class="base-info-cell">
+          <div class="van-cell">
+            <div class="van-cell__title"><span>卡</span></div>
+            <div class="van-cell__value van-ellipsis"><span>0 元</span></div>
+          </div>
+        </div>
+        <div class="base-info-cell">
+          <div class="van-cell">
+            <div class="van-cell__title"><span>充值合计</span></div>
+            <div class="van-cell__value van-ellipsis"><span>{{ recharge_totals|default:0 }} 元</span></div>
+          </div>
+        </div>
+        <div class="base-info-cell">
+          <div class="van-cell">
+            <div class="van-cell__title"><span>消费合计</span></div>
+            <div class="van-cell__value van-ellipsis"><span>{{ consum_result|default:0 }}元</span></div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="base-info-cell">
+          <div class="address-info-cell"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

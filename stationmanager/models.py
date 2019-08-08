@@ -223,7 +223,7 @@ class ChargingGun(models.Model):
     """
     充电桩枪信息表
     """
-    gun_num = models.CharField(verbose_name='枪口号', max_length=12, help_text='0或1')
+    gun_num = models.CharField(verbose_name='枪口号', max_length=12, choices=GUN_NUM)
     charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE)
     gun_type = models.IntegerField(verbose_name='枪口类型', choices=CONNECTOR_TYPE, default=4)
     work_status = models.IntegerField(verbose_name='工作状态', default=9, blank=True, choices=GUN_WORKING_STATUS)

@@ -16,29 +16,29 @@
     <h4 class="header2">用户信息修改</h4>
     <form class="col s12" name="register_form" action="{% url 'wxchat-register' %}" method="post">{% csrf_token %}
     <div class="row">
-        <input type="hidden" id="openid" name="openid" value="{{ openid|default:'test' }}">
+        <input type="hidden" id="openid" name="openid" value="{{ openid|default:'' }}">
         <input type="hidden" id="url" name="url" value="{{ url|default:'' }}">
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">account_circle</i>
-            <input id="user_name" name="user_name" type="text" class="validate" required value="{{ user.name }}">
+            <input id="user_name" name="user_name" type="text" class="validate" required value="{{ user.name|default:'' }}">
             <label for="user_name">姓名</label>
             {% if errors.user_name.0 %}<span>{{ errors.user_name.0 }}</span>{% endif %}
         </div>
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">phone</i>
-            <input id="telephone" name="telephone" type="text" class="validate" required value="{{ user.telephone }}">
+            <input id="telephone" name="telephone" type="text" class="validate" required value="{{ user.telephone|default:'' }}">
             <label for="telephone">手机</label>
             {% if errors.telephone.0 %}<span>{{ errors.telephone.0 }}</span>{% endif %}
         </div>
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">directions_car</i>
-            <input id="car_number" name="car_number" type="text" value="{{ user.car_number }}">
+            <input id="car_number" name="car_number" type="text" value="{{ user.car_number|default:'' }}">
             <label for="car_number">车牌号</label>
             {% if errors.car_number.0 %}<span>{{ errors.car_number.0 }}</span>{% endif %}
         </div>
         <div class="input-field col s12 m6">
             <i class="material-icons prefix">local_taxi</i>
-            <input id="car_type" name="car_type" type="text" value="{{ user.car_type }}">
+            <input id="car_type" name="car_type" type="text" value="{{ user.car_type|default:'' }}">
             <label for="car_type">车型</label>
             {% if errors.car_type.0 %}<span>{{ errors.car_type.0 }}</span>{% endif %}
         </div>

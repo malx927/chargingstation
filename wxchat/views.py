@@ -5,7 +5,9 @@ import time
 from datetime import datetime
 import json
 
+from chargingorder.models import Order
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -423,7 +425,7 @@ class RegisterView(View):
 
 class PersonInfoView(View):
     """个人信息"""
-    @method_decorator(weixin_decorator)
+    # @method_decorator(weixin_decorator)
     def get(self, request, *args, **kwargs):
         try:
             openid = request.session.get("openid", None)
@@ -473,3 +475,24 @@ class UserDetailView(View):
             "user": user,
         }
         return render(request, template_name="weixin/user_info_detail.html", context=context)
+
+
+class UserBalanceView(View):
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        try:
+            user_id = kwargs.get("id", None)
+            user = UserInfo.objects.get(pk=user_id)
+            openid = user.openid
+            recharge_result = RechargeRecord.objects.filter(openid=openid).aggregate(recharge_totals=Sum("cash_fee"))
+            consum_result = Order.objects.filter(openid=openid, status=2, cash_fee__gt=0).aggregate(consum_totals=Sum("cash_fee"))
+            context = {
+                "user": user,
+                "recharge_totals": recharge_result["recharge_totals"],
+                "consum_result": consum_result["consum_totals"],
+            }
+        except UserInfo.DoesNotExist as ex:
+            print("用户不存在")
+
+        return render(request, template_name="weixin/my_balance.html", context=context)

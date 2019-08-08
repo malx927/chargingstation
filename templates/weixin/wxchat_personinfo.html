@@ -24,7 +24,6 @@
     </style>
 {% endblock extra %}
 {% block title %}用户中心{% endblock %}
-{% block body_class %}class="body-fixed-bottom" {% endblock %}
 {% block content %}
   <div class="container is-pc">
     <div class="usercenter">
@@ -86,7 +85,7 @@
           </div>
           <div class="classic-group">
             <div class="classic-group__item">
-              <a class="van-cell van-cell--clickable">
+              <a class="van-cell van-cell--clickable" href="{% url 'wxchat-balance-detail' user.id %}">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static '/weixin/images/fba880e26352425d9819c0d7be1693ef.png' %}"></i>
                 <div class="van-cell__title"><span>我的钱包</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
