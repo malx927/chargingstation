@@ -425,7 +425,7 @@ class RegisterView(View):
 
 class PersonInfoView(View):
     """个人信息"""
-    # @method_decorator(weixin_decorator)
+    @method_decorator(weixin_decorator)
     def get(self, request, *args, **kwargs):
         try:
             openid = request.session.get("openid", None)

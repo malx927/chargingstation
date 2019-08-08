@@ -84,6 +84,7 @@
             <div class="classic-group__whitespace"></div>
           </div>
           <div class="classic-group">
+            {% if user %}
             <div class="classic-group__item">
               <a class="van-cell van-cell--clickable" href="{% url 'wxchat-balance-detail' user.id %}">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static '/weixin/images/fba880e26352425d9819c0d7be1693ef.png' %}"></i>
@@ -91,6 +92,7 @@
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
               </a>
             </div>
+          {% endif %}
             <div class="classic-group__item">
               <a class="van-cell van-cell--clickable" href="{% url 'wxchat-order-pay' %}">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/21b0d3f9656d61c4ac292c801382e71d.png' %}"></i>
