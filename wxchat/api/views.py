@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from codingmanager.models import AreaCode
-from wxchat.models import UserInfo
+from wxchat.models import UserInfo, UserCollection
 
 from .paginations import PagePagination
 from .serializers import UserInfoSerializer
@@ -24,6 +24,40 @@ class UserInfoRetrieveAPIView(RetrieveAPIView):
     queryset = UserInfo.objects.all()
     serializer_class = UserInfoSerializer
     lookup_field = 'openid'
+
+
+class UserCollectionAPIView(APIView):
+    """收藏"""
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        station_id = request.GET.get("station_id", None)
+        openid = request.session.get("openid", '')
+
+        ret = {}
+        if station_id:
+            counts = UserCollection.objects.filter(station_id=int(station_id), openid=openid).count()
+            ret["counts"] = counts
+        else:
+            ret["counts"] = 0
+        return Response(ret)
+
+    def post(self, request):
+        station_id = request.POST.get("station_id", None)
+        openid = request.session.get("openid", '')
+        if station_id:
+            counts = UserCollection.objects.filter(station_id=int(station_id), openid=openid).count()
+            if counts > 0:      # 已经收藏
+                UserCollection.objects.filter(station_id=int(station_id), openid=openid).delete()
+                return Response({"counts": 0})
+            else:           # 没有收藏
+                collection = UserCollection()
+                collection.station_id = int(station_id)
+                collection.openid = openid
+                collection.save()
+                return Response({"counts": 1})
+        else:
+            return Response({"counts": 0})
 
 
 # class AreaCodeListAPIView(ListAPIView):
@@ -44,33 +78,6 @@ class UserInfoRetrieveAPIView(RetrieveAPIView):
 #         else:
 #             return AreaCode.objects.extra(where=['length(code)=2'])
 
-# #狗配种
-# class DogbreedListAPIView(ListAPIView):
-#     permission_classes = [AllowAny]
-#     queryset = DogBreed.objects.all()
-#     serializer_class = DogbreedListSerializer
-#     def get_queryset(self):
-#         return  DogBreed.objects.filter(is_show=1)
-#
-# class DogBreedDetailAPIView(RetrieveAPIView):
-#     queryset = DogBreed.objects.all()
-#     serializer_class = DogBreedDetailSerializer
-#     permission_classes = [AllowAny]
-#
-#
-# class DogLossDetailAPIView(RetrieveAPIView):
-#     queryset = DogLoss.objects.all()
-#     serializer_class = DogLossDetailSerializer
-#     permission_classes = [AllowAny]
-#
-# #寻找宠物主人
-# class DogOwnerListAPIView(ListAPIView):
-#     permission_classes = [AllowAny]
-#     queryset = DogOwner.objects.all()
-#     serializer_class = DogOwnerSerializer
-#     def get_queryset(self):
-#         return  DogOwner.objects.filter(is_show=1)
-#
 #
 # #宠物领养
 # class DogadoptListAPIView(ListAPIView):

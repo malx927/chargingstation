@@ -5,6 +5,12 @@
 {% endblock js %}
 {% block extra %}
      <link rel="stylesheet"  href="{% static 'weixin/css/member.css' %}" media="screen">
+    <style>
+    .user_collection{
+        color: rgb(255, 68, 68);
+        font-size: 18px;
+    }
+    </style>
 {% endblock extra%}
 {% block title %}充电站详情{% endblock %}
 
@@ -26,10 +32,10 @@
 				<div class="goods-title" style="padding-right: 44px; position: relative;">
 					<div class="goods-title__main"><span> {{ station.name }}</span></div>
 					<div class="goods-title__more">
-						<div class="js-open-share goods-title__more-item">
-							<i class="van-icon van-icon-share" style="color: rgb(255, 68, 68); font-size: 18px;"></i>
+						<a id="user_collection" data-item="{{ station.id }}" class="js-open-share goods-title__more-item" href="javascript:void(0);">
+							<i class="van-icon van-icon-share" ></i>
 							<div class="goods-title__more-item-word">收藏</div>
-						</div>
+						</a>
 					</div>
 				</div>
 				<div class="goods-price">
@@ -48,7 +54,7 @@
 					<div class="van-hairline--top-bottom van-tabbar van-tabbar--fixed" style="z-index: 1;">
 						<div class="van-tabbar-item van-tabbar-item--active">
 							<div class="van-tabbar-item__icon">
-								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A3.gif" %}"></i>
+								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A3.gif" %}" alt=""></i>
 								<div class="van-info"></div>
 							</div>
 							<div class="van-tabbar-item__text" style="text-align:center; line-height:160%;">
@@ -57,7 +63,7 @@
 						</div>
 						<div class="van-tabbar-item">
 							<div class="van-tabbar-item__icon">
-								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A1.gif" %}"></i>
+								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A1.gif" %}" alt=""></i>
 								<div class="van-info"></div>
 							</div>
 							<div class="van-tabbar-item__text" style="text-align:center; line-height:160%;">
@@ -66,7 +72,7 @@
 						</div>
 						<a class="van-tabbar-item" href="#">
 							<div class="van-tabbar-item__icon">
-								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A2.gif" %}"></i>
+								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A2.gif" %}" alt=""></i>
 								<div class="van-info"></div>
 							</div>
 							<div class="van-tabbar-item__text" style="text-align:center; line-height:160%;">
@@ -224,7 +230,6 @@ window.addEventListener("resize",function(){
         var latitude = $(this).attr("data-latitude");
         var name = $(this).attr("data-name");
         var address = $(this).attr("data-address");
-        console.log(longitude, latitude, name , address);
          wx.openLocation({
             latitude: latitude,
             longitude: longitude,
@@ -236,6 +241,51 @@ window.addEventListener("resize",function(){
     });
 
 });
+$(function () {
+    is_collection();    /*判断是收藏*/
 
+    $("#user_collection").click(function (event){
+        var station_id = $("#user_collection").attr("data-item");
+        $.ajax({
+            type: 'POST',
+            url: '{% url "wechat-api-user-collection" %}',
+            dataType: 'json',
+            data : {
+                station_id: station_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data){
+                if(data.counts > 0) {
+                    $("#user_collection i").addClass("user_collection");
+                }else {
+                    $("#user_collection i").removeClass("user_collection");
+                }
+            },
+            error: function(err){
+                $("#user_collection i").removeClass("user_collection");
+            }
+        });
+
+    })
+    function is_collection() {
+        var station_id = $("#user_collection").attr("data-item");
+        $.ajax({
+            type: 'GET',
+            url: '{% url "wechat-api-user-collection" %}',
+            dataType: 'json',
+            data : {
+                station_id: station_id,
+            },
+            success: function(data){
+                if(data.counts > 0){
+                    $("#user_collection i").addClass("user_collection");
+                }
+            },
+            error: function(err){
+                alert("系统错误，请联系客服！");
+            }
+        });
+    }
+});
 </script>
 {% endblock %}

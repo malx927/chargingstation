@@ -496,3 +496,4 @@ class UserBalanceView(View):
             print("用户不存在")
 
         return render(request, template_name="weixin/my_balance.html", context=context)
+

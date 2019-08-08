@@ -6,7 +6,7 @@ from codingmanager.constants import *
 from codingmanager.models import PriceType
 # Create your models here.
 from django.db.models import Max
-from stationmanager.models import Seller
+from stationmanager.models import Seller, Station
 
 
 class GroupClients(models.Model):
@@ -250,4 +250,15 @@ class RechargeList(models.Model):
         ordering = ["money"]
 
 
+class UserCollection(models.Model):
+    """用户收藏"""
+    openid = models.CharField(verbose_name="微信标识", max_length=32,)
+    station = models.ForeignKey(Station, verbose_name="充电站", on_delete=models.CASCADE)
+    create_at = models.DateTimeField(verbose_name="收藏时间", auto_now_add=True)
 
+    def __str__(self):
+        return '{}'.format(self.openid)
+
+    class Meta:
+        verbose_name = '用户收藏'
+        verbose_name_plural = verbose_name
