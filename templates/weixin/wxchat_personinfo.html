@@ -117,9 +117,16 @@
             </div>
             {% endif %}
             <div class="classic-group__item">
-              <a class="van-cell van-cell--clickable">
-                <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/3026a25897099ffbb1528052ac9c92fd.png' %}"></i>
-                <div class="van-cell__title"><span>拨打充电站电话</span></div>
+              <a class="van-cell van-cell--clickable" href="{% url 'wxchat-my-collection' %}">
+                <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/f9c1b3cb9e4f7ec7909e180ae2efbb6c.png' %}"></i>
+                <div class="van-cell__title"><span>我的收藏</span></div>
+                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+              </a>
+            </div>
+            <div class="classic-group__item">
+              <a class="van-cell van-cell--clickable" href="{% url 'station-index' %}">
+                <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/f9c1b3cb9e4f7ec7909e180ae2efbb6c.png' %}"></i>
+                <div class="van-cell__title"><span>附近电站</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
               </a>
             </div>

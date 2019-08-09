@@ -1,0 +1,54 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block js %}
+{% include 'wxchat/include/jssdk.html' %}
+    <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=TOLBZ-NWYLP-A5SD6-VKAJC-UZLHQ-XKB7X&libraries=geometry"></script>
+{% endblock js %}
+{% block title %}我的收藏{% endblock %}
+{% block content %}
+    <div class="page">
+         <div>
+              <div class="physicalstore_list van-list">
+                  {% for c in collections %}
+                  <div class="store">
+                      <div class="store__header">{{ c.station.name }}</div>
+                      <div class="store__info">
+                          <div class="store__thumb">
+                          {% if c.station.stationimage_set.count > 0 %}
+                              <img src="{{ c.station.stationimage_set.first.image.url }}" alt="">
+                          {% endif %}
+                          </div>
+                          <a href="{% url 'station-detail' c.station.id %}" class="store__detail">
+                              <h3 class="store__detail__address">{{ c.station.address }}</h3>
+                              <p class="store__detail__time">空闲充电枪 {{ c.station.get_gun_totals }}</p><!---->
+                          </a>
+                          <a href="javascript:void(0)" class="store__phone" data-longitude="{{ c.station.longitude }}"  data-latitude="{{ c.station.latitude }}"  data-name="{{ c.station.name }}" data-address="{{ c.station.address }}"><i class="van-icon van-icon-map-marked"><!----></i></a>
+                      </div>
+                  </div>
+                  {% endfor %}
+              </div>
+         </div>
+     </div>
+{% endblock content %}
+{% block bottomjs %}
+<script>
+ wx.ready(function () {
+      $(".store__phone").on('click',function(){
+        var longitude = $(this).attr("data-longitude");
+        var latitude = $(this).attr("data-latitude");
+        var name = $(this).attr("data-name");
+        var address = $(this).attr("data-address");
+        console.log(longitude, latitude, name , address);
+         wx.openLocation({
+            latitude: latitude,
+            longitude: longitude,
+              name: name,
+              address: address,
+              scale: 13,
+              infoUrl: ''
+        });
+    });
+
+});
+
+</script>
+{% endblock bottomjs %}

@@ -25,7 +25,7 @@ from wechatpy.utils import check_signature, random_string
 from chargingstation import settings
 from wxchat.decorators import weixin_decorator
 from wxchat.forms import RegisterForm
-from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList
+from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection
 
 redis_client = Redis.from_url(settings.REDIS_URL)
 session_interface = RedisStorage(
@@ -497,3 +497,17 @@ class UserBalanceView(View):
 
         return render(request, template_name="weixin/my_balance.html", context=context)
 
+
+class UserCollectionView(View):
+    """我的收藏"""
+    def get(self, request, *args, **kwargs):
+        openid = request.session.get("openid", None)
+        if openid:
+            collections = UserCollection.objects.filter(openid=openid)
+        else:
+            collections = None
+
+        context = {
+            "collections": collections,
+        }
+        return render(request, template_name="weixin/user_collection.html", context=context)
