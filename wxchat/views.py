@@ -506,8 +506,9 @@ class UserCollectionView(View):
             collections = UserCollection.objects.filter(openid=openid)
         else:
             collections = None
-
+        sign = getJsApiSign(request)
         context = {
             "collections": collections,
+            "sign": sign,
         }
         return render(request, template_name="weixin/user_collection.html", context=context)
