@@ -70,7 +70,7 @@
 							  <span class="blue">{{ station.get_station_price.get_current_serice_price }}元/度</span><br>服务费
 							</div>
 						</div>
-						<a class="van-tabbar-item" href="#">
+						<a class="van-tabbar-item" href="{% url 'station-price-detail' station.id %}">
 							<div class="van-tabbar-item__icon">
 								<i class="van-icon van-icon--image"><img src="{% static "weixin/images/A2.gif" %}" alt=""></i>
 								<div class="van-info"></div>
@@ -109,7 +109,7 @@
 				<div class="goods-bottom content">
 					<div></div>
 					<div class="goods-buttons van-goods-action">
-						<button class="van-button van-button--warning van-button--large van-button--square van-goods-action-big-btn theme__button--vice">
+						<button disabled class="van-button van-button--warning van-button--large van-button--square van-goods-action-big-btn theme__button--vice">
 							<span class="van-button__text">立即预约</span>
 						</button>
 						<button id="navigation" data-longitude="{{ station.longitude }}"  data-latitude="{{ station.latitude }}" data-name="{{ station.name }}" data-address="{{ station.address }}" class="van-button van-button--danger van-button--large van-button--square van-goods-action-big-btn theme__button--main">

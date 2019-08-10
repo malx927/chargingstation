@@ -1,0 +1,29 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block extra %}
+     <link rel="stylesheet"  href="{% static 'weixin/css/list.css' %}" media="screen">
+{% endblock extra%}
+{% block title %}阶段电价明细{% endblock %}
+{% block content %}
+  <div class="page-content">
+    <div class="detail-cell__body-main">
+      <div class="coupon-code">
+        <div class="coupon-code__code">时段电费</div>
+        <div class="coupon-code__bar">
+            {% for price in price_details %}
+            <div class="bar1">{{ price.begin_time }}-{{ price.end_time }}<br />（{{ price.price|floatformat:1 }}元/度）</div>
+            {% endfor %}
+        </div>
+        <div class="coupon-code__code" id="id_close">关闭</div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block js %}
+    <script>
+    $(function () {
+        $("#id_close").click(function () {
+            window.history.back(-1);
+        })
+    })
+    </script>
+{% endblock%}

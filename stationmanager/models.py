@@ -298,14 +298,14 @@ class ChargingPrice(models.Model):
     """
     价格策略管理（主表）
     """
-    flags = (
+    FLAGS = (
         (0, '--无--'),
         (1, '默认价格策略'),
     )
     station = models.ForeignKey(Station, verbose_name='充电站', null=True, on_delete=models.SET_NULL)
     type = models.IntegerField(verbose_name='收费类型', choices=CHARGING_PRICE_TYPE)
     parking_fee = models.DecimalField(verbose_name='停车费(元/小时)', max_digits=5, decimal_places=2, default=0)
-    default_flag = models.IntegerField(verbose_name='默认价格策略', default=0, choices=flags, help_text='每个电站设置一个默认策略')
+    default_flag = models.IntegerField(verbose_name='默认价格策略', default=0, choices=FLAGS, help_text='每个电站设置一个默认策略')
 
     def __str__(self):
         return self.get_type_display()
