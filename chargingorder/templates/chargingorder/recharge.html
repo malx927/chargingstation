@@ -109,7 +109,7 @@
         // 按金额充电
          $("#money_recharge").on("click", function (event) {
             var charg_mode = $(this).attr("data-item");
-            var total_fee = $("#total_fee").val()||"0"
+            var total_fee = $("#total_fee").val()||"0";
             if(total_fee=="0" || total_fee.length==0 )
             {
                 M.toast({html: '请输入充电金额'});
@@ -127,7 +127,12 @@
         // 按时间充电
          $("#min_recharge").on("click", function (event) {
             var charg_mode = $(this).attr("data-item");
-            var charg_min_val = $("#charg_min_val").val()
+            var charg_min_val = $("#charg_min_val").val()||"0";
+            if(charg_min_val=="0" || charg_min_val.length==0 )
+            {
+                M.toast({html: '请输入充电时间'});
+                return;
+            }
             var params = {
                 pile_sn: '{{ pile_sn }}',
                 gun_num: '{{ gun_num }}',
@@ -140,7 +145,12 @@
          // 按时间充电
          $("#soc_recharge").on("click", function (event) {
             var charg_mode = $(this).attr("data-item");
-            var charg_soc_val = $("#charg_soc_val").val()
+            var charg_soc_val = $("#charg_soc_val").val()||"0";
+             if(charg_soc_val=="0" || charg_soc_val.length==0 )
+            {
+                M.toast({html: '请输入充电SOC值'});
+                return;
+            }
             var params = {
                 pile_sn: '{{ pile_sn }}',
                 gun_num: '{{ gun_num }}',
