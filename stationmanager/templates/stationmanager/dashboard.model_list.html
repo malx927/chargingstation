@@ -110,30 +110,29 @@
     </nav>
     <div class="panel panel-default widget list" id="stations">
         <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
-            <h3 class="panel-title"><i class="fa fa-align-justify"></i>充电站列表</h3>
+            <h3 class="panel-title"><i class="fa fa-align-justify"></i>统计信息列表</h3>
         </div>
-      <div class="panel-body nopadding x-scroll">
-        <table class="table table-hover table-striped">
-          <thead>
-            <tr>
-              <th>充电站名称</th><th>运营商</th><th>省市区</th><th>地址</th>
-              <th>联系电话</th><th>收费标准</th><th>充电桩数量</th>
-            </tr>
-          </thead>
-          <tbody id="station_lists">
-          {% for station in stations %}
-          <tr>
-              <td><a href="./stationmanager/station/{{ station.id }}/update">{{ station.name }}</a></td>
-              <td>{{ station.seller.name }}</td>
-              <td>{{ station.province_city_district|default:'' }}</td>
-              <td>{{ station.address|default:'' }}</td>
-              <td>{{ station.telephone|default:''}}</td>
-              <td>{{ station.fee_scale }}</td>
-              <td><a href="javascript:;" id="sta_{{ station.id }}" data-item="{{ station.id }}">共：{{ station.pile_totals|default:0 }}</a></td>
-          </tr>
-          {% endfor %}
-          </tbody>
-        </table>
+      <div class="panel-body nopadding x-scroll" id="stats">
+{#        <table class="table table-hover table-striped">#}
+{#          <thead>#}
+{#            <tr>#}
+{#              <th>序号</th><th>运营商</th><th>充电总量</th><th>充电次数</th><th>充电时长</th><th>充电收入</th>#}
+{#            </tr>#}
+{#          </thead>#}
+{#          <tbody>#}
+{#          {% for station in stations %}#}
+{#          <tr>#}
+{#              <td><a href="./stationmanager/station/{{ station.id }}/update">{{ station.name }}</a></td>#}
+{#              <td>{{ station.seller.name }}</td>#}
+{#              <td>{{ station.province_city_district|default:'' }}</td>#}
+{#              <td>{{ station.address|default:'' }}</td>#}
+{#              <td>{{ station.telephone|default:''}}</td>#}
+{#              <td>{{ station.fee_scale }}</td>#}
+{#              <td><a href="javascript:;" id="sta_{{ station.id }}" data-item="{{ station.id }}">共：{{ station.pile_totals|default:0 }}</a></td>#}
+{#          </tr>#}
+{#          {% endfor %}#}
+{#          </tbody>#}
+{#        </table>#}
       </div>
     </div>
     <div class="panel panel-default widget list hidden" id="piles">
@@ -171,46 +170,55 @@
         getYearStatsData();
 
         $("#btn_search").on("click", function(event){
-            var pile_sn = $("#pile_sn").val();
-            params = {
-                "pile_sn":pile_sn
-            }
+            var begin_time = $("#begin_time").val();
+            var end_time = $("#end_time").val();
+            var category = $("#category").val();
+            console.log(begin_time, end_time, category);
+            var params = {
+                "begin_time": begin_time,
+                "end_time": end_time,
+                "category": category,
+            };
+            getStatsData(params);
+        });
 
+    });
 
-            getPileList(params);
-        })
-
-        $("a[id^='station']").on("click", function(event){
-            var params ={
-                 "station_id": $(this).attr("data-item"),
-             }
-             $("#stations").addClass("hidden");
-             $("#piles").removeClass("hidden");
-             getPileList(params);
-        })
-
-        $("a[id^='sta_']").on("click", function(event){
-            var params ={
-                 "station_id": $(this).attr("data-item"),
-             }
-             $("#stations").addClass("hidden");
-             $("#piles").removeClass("hidden");
-             getPileList(params);
-        })
-
-
-    })
-
-    function getPileList(params){
-        $("#pile_lists").children().remove();
+    function getStatsData(params){
         $.ajax({
               type: 'GET',
-              url: '{% url "charging-pile-list" %}',
+              url: '{% url "order-category-stats" %}',
               dataType: 'json',
               data: params,
               timeout: 5000,
               success: function(data){
-                  appendItem(data);
+                  console.log(JSON.stringify(data));
+                  $("#stats").empty();
+                  var header = `
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                <tr><th>序号</th><th>运营商</th><th>充电总量</th><th>充电次数</th><th>充电时长</th><th>充电收入</th></tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    $("#stats").append(header);
+                    $.each(data,function (index, item) {
+                        var data_template = `<tr>
+                                          <td>${index}</td>
+                                          <td>${item.charg_pile__station__seller__name}</td>
+                                          <td>${item.readings}</td>
+                                          <td>${item.counts}</td>
+                                          <td>${item.times}</td>
+                                          <td>${item.total_fees}</td>
+                                        </tr>`
+                         $("#stats").append(data_template);
+                    });
+                    console.log("0111111111111111");
+              },
+              complete: function(){
+                  var footer = `</tbody></table>`;
+                  console.log("000000000000000000");
+                  $("#stats").append(footer);
               },
               error: function(error){
 
@@ -243,7 +251,6 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                  console.log(JSON.stringify(data));
                 $("#today_readings").text(data.readings.toFixed(2))
                 $("#today_counts").text(data.counts)
                 $("#today_total_fees").text(data.total_fees.toFixed(2))
@@ -265,7 +272,6 @@
               data: params,
               timeout: 5000,
               success: function(data){
-                  console.log(JSON.stringify(data));
                 $("#yesterday_readings").text(data.readings.toFixed(2))
                 $("#yesterday_counts").text(data.counts)
                 $("#yesterday_total_fees").text(data.total_fees.toFixed(2))
@@ -283,7 +289,6 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                  console.log(JSON.stringify(data));
                 $("#month_readings").text(data.readings.toFixed(2))
                 $("#month_counts").text(data.counts)
                 $("#month_total_fees").text(data.total_fees.toFixed(2))
@@ -301,7 +306,6 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                console.log(JSON.stringify(data));
                 $("#year_readings").text(data.readings.toFixed(2))
                 $("#year_counts").text(data.counts)
                 $("#year_total_fees").text(data.total_fees.toFixed(2))
@@ -312,4 +316,5 @@
               }
         });
     }
+
 </script>

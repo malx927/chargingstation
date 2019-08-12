@@ -2,6 +2,7 @@
 import datetime
 
 from django.db.models import Sum, Count, Q, F, DecimalField, FloatField, IntegerField
+from django.db import connection
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -126,6 +127,7 @@ class OrderCategoryStats(APIView):
         category = request.GET.get("category", None)
         begin_time = request.GET.get("begin_time", None)
         end_time = request.GET.get("end_time", None)
+        print("category=", category)
         if category is None or category == "":
             category = "1"
         if self.request.user.is_superuser:
@@ -138,14 +140,13 @@ class OrderCategoryStats(APIView):
         if begin_time and end_time:
             b_date = datetime.datetime.strptime(begin_time, "%Y-%m-%d")
             e_date = datetime.datetime.strptime(end_time, "%Y-%m-%d")
-            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__date__gte=b_date, end_time__date__lte=e_date)
+            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__date__range=[b_date, e_date])
         else:
             queryset = queryset.filter(status=2, pay_time__isnull=False)
 
         if category == "1":     # 按运营商统计
-            seller_stats = Station.objects.annotate(seller_count = Count("seller", distinct=True), pile_counts = Count("chargingpile"))
-            for s in seller_stats:
-                print(s.seller_count, s.pile_counts)
+            # seller_stats = Seller.objects.values("id", "name").annotate(station_counts=Count("station", distinct=True), pile_counts=Count("station__chargingpile")).query
+            # print(seller_stats)
             result = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name").order_by("charg_pile__station__seller").\
                 annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
                          times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
