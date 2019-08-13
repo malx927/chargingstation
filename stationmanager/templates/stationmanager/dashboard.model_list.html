@@ -183,7 +183,27 @@
         });
 
     });
-
+     var template = stations => `
+	<table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>序号</th><th>运营商</th><th>充电总量</th><th>充电次数</th><th>充电时长</th><th>充电收入</th>
+            </tr>
+          </thead>
+          <tbody>
+         ${ stations.map(station => `
+          <tr>
+              <td>${ station.charg_pile__station__seller }</a></td>
+              <td>${ station.charg_pile__station__seller__name }</td>
+              <td>${ station.readings.toFixed(2) }</td>
+              <td>${ station.counts }</td>
+              <td>${ station.times.toFixed(2) }</td>
+              <td>${ station.total_fees.toFixed(2) }</td>
+          </tr>
+		  `).join('')}
+          </tbody>
+        </table>
+ `;
     function getStatsData(params){
         $.ajax({
               type: 'GET',
@@ -194,31 +214,12 @@
               success: function(data){
                   console.log(JSON.stringify(data));
                   $("#stats").empty();
-                  var header = `
-                            <table class="table table-hover table-striped">
-                                <thead>
-                                <tr><th>序号</th><th>运营商</th><th>充电总量</th><th>充电次数</th><th>充电时长</th><th>充电收入</th></tr>
-                                </thead>
-                                <tbody>
-                    `;
-                    $("#stats").append(header);
-                    $.each(data,function (index, item) {
-                        var data_template = `<tr>
-                                          <td>${index}</td>
-                                          <td>${item.charg_pile__station__seller__name}</td>
-                                          <td>${item.readings}</td>
-                                          <td>${item.counts}</td>
-                                          <td>${item.times}</td>
-                                          <td>${item.total_fees}</td>
-                                        </tr>`
-                         $("#stats").append(data_template);
-                    });
-                    console.log("0111111111111111");
+                  var temp = template(data)
+                  console.log(temp);
+                  $("#stats").append(temp);
+                  console.log("0111111111111111");
               },
               complete: function(){
-                  var footer = `</tbody></table>`;
-                  console.log("000000000000000000");
-                  $("#stats").append(footer);
               },
               error: function(error){
 
