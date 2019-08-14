@@ -145,15 +145,14 @@ class OrderCategoryStats(APIView):
             queryset = queryset.filter(status=2, pay_time__isnull=False)
 
         if category == "1":     # 按运营商统计
-            # seller_stats = Seller.objects.values("id", "name").annotate(station_counts=Count("station", distinct=True), pile_counts=Count("station__chargingpile")).query
-            # print(seller_stats)
             result = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name").order_by("charg_pile__station__seller").\
                 annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
                          times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
-
-            print(result)
-        elif category == 2:     # 按充电站统计
-            pass
+        elif category == "2":     # 按充电站统计
+            result = queryset.values("charg_pile__station__seller__name", "charg_pile__station", "charg_pile__station__name").order_by(
+                "charg_pile__station"). \
+                annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                         times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
         elif category == 3:     # 按充电桩统计
             pass
 

@@ -110,29 +110,10 @@
     </nav>
     <div class="panel panel-default widget list" id="stations">
         <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
-            <h3 class="panel-title"><i class="fa fa-align-justify"></i>统计信息列表</h3>
+            <h3 class="panel-title"><i class="fa fa-align-justify"></i> 统计信息列表</h3>
         </div>
       <div class="panel-body nopadding x-scroll" id="stats">
-{#        <table class="table table-hover table-striped">#}
-{#          <thead>#}
-{#            <tr>#}
-{#              <th>序号</th><th>运营商</th><th>充电总量</th><th>充电次数</th><th>充电时长</th><th>充电收入</th>#}
-{#            </tr>#}
-{#          </thead>#}
-{#          <tbody>#}
-{#          {% for station in stations %}#}
-{#          <tr>#}
-{#              <td><a href="./stationmanager/station/{{ station.id }}/update">{{ station.name }}</a></td>#}
-{#              <td>{{ station.seller.name }}</td>#}
-{#              <td>{{ station.province_city_district|default:'' }}</td>#}
-{#              <td>{{ station.address|default:'' }}</td>#}
-{#              <td>{{ station.telephone|default:''}}</td>#}
-{#              <td>{{ station.fee_scale }}</td>#}
-{#              <td><a href="javascript:;" id="sta_{{ station.id }}" data-item="{{ station.id }}">共：{{ station.pile_totals|default:0 }}</a></td>#}
-{#          </tr>#}
-{#          {% endfor %}#}
-{#          </tbody>#}
-{#        </table>#}
+
       </div>
     </div>
     <div class="panel panel-default widget list hidden" id="piles">
@@ -183,7 +164,7 @@
         });
 
     });
-     var template = stations => `
+     var seller_template = stations => `
 	<table class="table table-hover table-striped">
           <thead>
             <tr>
@@ -191,9 +172,9 @@
             </tr>
           </thead>
           <tbody>
-         ${ stations.map(station => `
+         ${ stations.map((station,index) => `
           <tr>
-              <td>${ station.charg_pile__station__seller }</a></td>
+              <td>${ index + 1 }</a></td>
               <td>${ station.charg_pile__station__seller__name }</td>
               <td>${ station.readings.toFixed(2) }</td>
               <td>${ station.counts }</td>
@@ -204,7 +185,31 @@
           </tbody>
         </table>
  `;
+      var station_template = piles => `
+	<table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>序号</th><th>运营商</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+            </tr>
+          </thead>
+          <tbody>
+         ${ piles.map((pile,index) => `
+          <tr>
+              <td>${ index + 1 }</a></td>
+              <td>${ pile.charg_pile__station__seller__name }</td>
+              <td>${ pile.charg_pile__station__name }</td>
+              <td>${ pile.readings.toFixed(2) }</td>
+              <td>${ pile.counts }</td>
+              <td>${ pile.times.toFixed(2) }</td>
+              <td>${ pile.total_fees.toFixed(2) }</td>
+          </tr>
+		  `).join('')}
+          </tbody>
+        </table>
+ `;
     function getStatsData(params){
+        var category = params.category;
+        $("#stats").empty();
         $.ajax({
               type: 'GET',
               url: '{% url "order-category-stats" %}',
@@ -213,11 +218,15 @@
               timeout: 5000,
               success: function(data){
                   console.log(JSON.stringify(data));
-                  $("#stats").empty();
-                  var temp = template(data)
-                  console.log(temp);
-                  $("#stats").append(temp);
-                  console.log("0111111111111111");
+                  if(category == "1") {
+                      var temp = seller_template(data)
+                      console.log(temp);
+                      $("#stats").append(temp);
+                  }else if(category=="2"){
+                      var temp = station_template(data)
+                      console.log(temp);
+                      $("#stats").append(temp);
+                  }
               },
               complete: function(){
               },
