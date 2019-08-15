@@ -1,0 +1,57 @@
+{% extends "xadmin/base_site.html" %}
+{% load i18n %}
+{% load xadmin_tags %}
+{% block extrastyle %}
+    <style>
+    .form-group{
+        margin-left:0px;
+        margin-right:0px;
+    }
+    </style>
+{% endblock %}
+{% block content-nav %}
+    <nav class="navbar navbar-default">
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse">
+
+         <form class="navbar-form navbar-left">
+
+            <div class="form-group">
+                <input type="text" id="begin_time" class="form-control" placeholder="开始时间">
+            </div>
+            <div class="form-group" ><label>至</label></div>
+             <div class="form-group" >
+                <input type="text" id="end_time" class="form-control" placeholder="结束时间">
+            </div>
+             <div class="form-group selectize-control" >
+                <select id="category" class="selectize-input" style="min-width:200px">
+                  <option value="1">按运营商</option>
+                  <option value="2">按充电站</option>
+                  <option value="3">按充电桩</option>
+                </select>
+            </div>
+             <button type="button" id="btn_search" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>  查 询</button>
+          </form>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+{% endblock %}
+{% block content %}
+
+    <div class="panel panel-default widget list" id="stations">
+        <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
+            <h3 class="panel-title"><i class="fa fa-align-justify"></i> 日统计信息列表</h3>
+        </div>
+      <div class="panel-body nopadding x-scroll" id="stats">
+
+      </div>
+    </div>
+    <script>
+        $(function() {
+            $("#begin_time, #end_time").datepicker({
+                format: "yyyy-mm-dd",
+                language: "zh-CN",
+                autoclose: true,
+            });
+        });
+    </script>
+{% endblock %}
