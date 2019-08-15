@@ -18,24 +18,24 @@ class DashBoardPlugin(BaseAdminPlugin):
             self.is_dashboard = True
         return bool(self.is_dashboard)
 
-    def get_context(self, context):
-        if self.request.user.is_superuser:
-            stations = Station.objects.all()
-            fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9))
-        elif self.request.user.station:
-            stations = Station.objects.filter(id=self.request.user.station.id)
-            fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station=self.request.user.station)
-        elif self.request.user.seller:
-            stations = Station.objects.filter(seller=self.request.user.seller)
-            fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station__seller=self.uest.user.seller)
-        else:
-            stations = None
-            fault_guns = None
-
-        context.update({'stations': stations})
-        context.update({'fault_guns': fault_guns})
-
-        return context
+    # def get_context(self, context):
+    #     if self.request.user.is_superuser:
+    #         stations = Station.objects.all()
+    #         fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9))
+    #     elif self.request.user.station:
+    #         stations = Station.objects.filter(id=self.request.user.station.id)
+    #         fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station=self.request.user.station)
+    #     elif self.request.user.seller:
+    #         stations = Station.objects.filter(seller=self.request.user.seller)
+    #         fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station__seller=self.uest.user.seller)
+    #     else:
+    #         stations = None
+    #         fault_guns = None
+    #
+    #     context.update({'stations': stations})
+    #     context.update({'fault_guns': fault_guns})
+    #
+    #     return context
 
     def block_results_top(self, context, nodes):
         if self.is_dashboard:
