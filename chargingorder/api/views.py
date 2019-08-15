@@ -149,12 +149,15 @@ class OrderCategoryStats(APIView):
                 annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
                          times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
         elif category == "2":     # 按充电站统计
-            result = queryset.values("charg_pile__station__seller__name", "charg_pile__station", "charg_pile__station__name").order_by(
-                "charg_pile__station"). \
-                annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
-                         times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
-        elif category == 3:     # 按充电桩统计
-            pass
+            result = queryset.values("charg_pile__station__seller__name", "charg_pile__station", "charg_pile__station__name")\
+                            .order_by("charg_pile__station"). \
+                            annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                                     times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+        elif category == "3":     # 按充电桩统计
+            result = queryset.values("charg_pile", "charg_pile__name", "charg_pile__station__seller__name", "charg_pile__station__name")\
+                            .order_by("charg_pile"). \
+                            annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"),
+                                     times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
 
         return Response(result)
 
