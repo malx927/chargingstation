@@ -7,6 +7,12 @@
         margin-left:0px;
         margin-right:0px;
     }
+    tfoot tr{
+        background-color:#e7e7e7;
+    }
+    tfoot tr td{
+        font-weight: bold;
+    }
     </style>
 {% endblock %}
 {% block content-nav %}
@@ -15,13 +21,8 @@
         <div class="collapse navbar-collapse">
 
          <form class="navbar-form navbar-left">
-
-            <div class="form-group">
-                <input type="text" id="begin_time" class="form-control" placeholder="开始时间">
-            </div>
-            <div class="form-group" ><label>至</label></div>
              <div class="form-group" >
-                <input type="text" id="end_time" class="form-control" placeholder="结束时间">
+                <input type="text" id="s_year" class="form-control" placeholder="查询时间">
             </div>
              <div class="form-group selectize-control" >
                 <select id="category" class="selectize-input" style="min-width:200px">
@@ -45,13 +46,136 @@
 
       </div>
     </div>
-    <script>
+<script>
         $(function() {
-            $("#begin_time, #end_time").datepicker({
-                format: "yyyy-mm-dd",
+
+            $("#s_year").datepicker({
+                format: 'yyyy',
                 language: "zh-CN",
-                autoclose: true,
+                autoclose:true,
+                startView: 2,
+                minViewMode: 2,
+                maxViewMode: 2,
             });
+
+            $("#btn_search").on("click", function(event){
+                var s_year = $("#s_year").val();
+                var category = $("#category").val();
+                var params = {
+                    "s_year": s_year,
+                    "category": category,
+                };
+                getStatsData(params);
+            });
+
+            function getStatsData(params){
+                var category = params.category;
+                $("#stats").empty();
+                $.ajax({
+                      type: 'GET',
+                      url: '{% url "order-year-analysis" %}',
+                      dataType: 'json',
+                      data: params,
+                      timeout: 5000,
+                      success: function(data){
+                          console.log(JSON.stringify(data));
+                          if(category == "1") {
+                              var temp = seller_template(data)
+                              $("#stats").append(temp);
+                          }else if(category=="2"){
+                              var temp = station_template(data)
+                              $("#stats").append(temp);
+                          }else if(category=="3"){
+                              var temp = pile_template(data)
+                              $("#stats").append(temp);
+                          }
+                      },
+                      complete: function(){
+                      },
+                      error: function(error){
+
+                      }
+                });
+            }
+
         });
+   var seller_template = data => `
+	<table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>序号</th><th>运营商</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+            </tr>
+          </thead>
+          <tbody>
+         ${ data.results.map((seller, index) => `
+          <tr>
+              <td>${ index + 1 }</a></td>
+              <td>${ seller.charg_pile__station__seller__name }</td>
+              <td>${ seller.readings.toFixed(2) }</td>
+              <td>${ seller.counts }</td>
+              <td>${ seller.times.toFixed(2) }</td>
+              <td>${ seller.total_fees.toFixed(2) }</td>
+          </tr>
+		  `).join('')}
+          </tbody>
+            <tfoot>
+                <tr>
+                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td>
+                </tr>
+            </tfoot>
+        </table>
+ `;
+var station_template = data => `
+	<table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>序号</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+            </tr>
+          </thead>
+          <tbody>
+         ${ data.results.map((station,index) => `
+          <tr>
+              <td>${ index + 1 }</a></td>
+              <td>${ station.charg_pile__station__name }</td>
+              <td>${ station.readings.toFixed(2) }</td>
+              <td>${ station.counts }</td>
+              <td>${ station.times.toFixed(2) }</td>
+              <td>${ station.total_fees.toFixed(2) }</td>
+          </tr>
+		  `).join('')}
+          </tbody>
+           <tfoot>
+                <tr>
+                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td>
+                </tr>
+           </tfoot>
+        </table>
+ `;
+   var pile_template = data => `
+	<table class="table table-hover table-striped">
+          <thead>
+            <tr>
+              <th>序号</th><th>充电桩</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+            </tr>
+          </thead>
+          <tbody>
+         ${ data.results.map((pile,index) => `
+          <tr>
+              <td>${ index + 1 }</a></td>
+              <td>${ pile.charg_pile__name }</td>
+              <td>${ pile.readings.toFixed(2) }</td>
+              <td>${ pile.counts }</td>
+              <td>${ pile.times.toFixed(2) }</td>
+              <td>${ pile.total_fees.toFixed(2) }</td>
+          </tr>
+		  `).join('')}
+          </tbody>
+          <tfoot>
+                <tr>
+                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td>
+                </tr>
+           </tfoot>
+        </table>
+ `;
     </script>
 {% endblock %}

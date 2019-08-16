@@ -162,6 +162,134 @@ class OrderCategoryStats(APIView):
         return Response(result)
 
 
+class OrderDayAnalysis(APIView):
+    """日统计分析"""
+    def get(self, request, *args, **kwargs):
+        category = request.GET.get("category", None)
+        s_date = request.GET.get("s_date", None)
+
+        if category is None or category == "":
+            category = "1"
+        if self.request.user.is_superuser:
+            queryset = Order.objects.all()
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+
+        if s_date:
+            d_date = datetime.datetime.strptime(s_date, "%Y-%m-%d")
+            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__date=d_date)
+        else:
+            queryset = queryset.filter(status=2, pay_time__isnull=False)
+
+        if category == "1":     # 按运营商统计
+            results = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name")\
+                            .order_by("charg_pile__station__seller")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+        elif category == "2":     # 按充电站统计
+            results = queryset.values("charg_pile__station", "charg_pile__station__name")\
+                            .order_by("charg_pile__station")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+        elif category == "3":     # 按充电桩统计
+            results = queryset.values("charg_pile", "charg_pile__name")\
+                            .order_by("charg_pile")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+
+        return Response(totals)
+
+
+class OrderMonthAnalysis(APIView):
+    """月统计分析"""
+    def get(self, request, *args, **kwargs):
+        category = request.GET.get("category", None)
+        s_month = request.GET.get("s_month", None)
+
+        if category is None or category == "":
+            category = "1"
+        if self.request.user.is_superuser:
+            queryset = Order.objects.all()
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+
+        if s_month:
+            d_date = datetime.datetime.strptime(s_month, "%Y-%m")
+            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__year=d_date.year, begin_time__month=d_date.month)
+        else:
+            queryset = queryset.filter(status=2, pay_time__isnull=False)
+
+        if category == "1":     # 按运营商统计
+            results = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name")\
+                            .order_by("charg_pile__station__seller")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+        elif category == "2":     # 按充电站统计
+            results = queryset.values("charg_pile__station", "charg_pile__station__name")\
+                            .order_by("charg_pile__station")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+        elif category == "3":     # 按充电桩统计
+            results = queryset.values("charg_pile", "charg_pile__name")\
+                            .order_by("charg_pile")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+
+        return Response(totals)
+
+
+class OrderYearAnalysis(APIView):
+    """年统计分析"""
+    def get(self, request, *args, **kwargs):
+        category = request.GET.get("category", None)
+        s_year = request.GET.get("s_year", None)
+
+        if category is None or category == "":
+            category = "1"
+        if self.request.user.is_superuser:
+            queryset = Order.objects.all()
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+
+        if s_year:
+            d_date = datetime.datetime.strptime(s_year, "%Y")
+            queryset = queryset.filter(status=2, pay_time__isnull=False, begin_time__year=d_date.year)
+        else:
+            queryset = queryset.filter(status=2, pay_time__isnull=False)
+
+        if category == "1":     # 按运营商统计
+            results = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name")\
+                            .order_by("charg_pile__station__seller")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+        elif category == "2":     # 按充电站统计
+            results = queryset.values("charg_pile__station", "charg_pile__station__name")\
+                            .order_by("charg_pile__station")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+        elif category == "3":     # 按充电桩统计
+            results = queryset.values("charg_pile", "charg_pile__name")\
+                            .order_by("charg_pile")\
+                            .annotate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals = queryset.aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("cash_fee"), times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60)))
+            totals["results"] = results
+
+        return Response(totals)
+
 # class ChargingPileListAPIView(ListAPIView):
 #     """
 #     电桩列表
