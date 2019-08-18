@@ -1,0 +1,70 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block js %}
+{% include 'wxchat/include/jssdk.html' %}
+{% endblock js %}
+{% block extra %}
+     <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen"/>
+    <link rel="stylesheet"  href="{% static 'weixin/css/list.css' %}" media="screen">
+    <style>
+    a{
+        color: #333;
+    }
+    </style>
+{% endblock extra%}
+{% block title %}附属账户{% endblock %}
+{% block content %}
+   <div class="page-content" style="min-height: 812px; min-height: 100vh;">
+      <div class="list van-list">
+        <div class="list-item">
+          <div class="list-item__header" type="list-item-header"><a href="{% url 'wxchat-show-qrcode' %}">我的二维码</a><a class="list-item__header__state">添加附属账户</a></div>
+          <div class="list-item__order-list" type="order-list">
+            {% for account in sub_accounts %}
+            <div class="cap-order-item">
+              <div class="cap-order-item__body">
+                <div class="van-card">
+                  <div class="van-card__header">
+                    <a class="van-card__thumb"><img src="{{ account.sub_user.headimgurl }}" class="van-card__img"></a>
+                    <div class="van-card__content">
+                      <div class="van-card__title">{{ account.sub_user.name|default:account.sub_user.nickname }}　<span>[<a href="{% url 'wxchat-register' %}">修改备注</a>]</span></div>
+                      <div></div>
+                      <div class="van-card__bottom">
+                        <div class="van-card__price">{{ account.sub_user.telephone }}</div>
+                        <div class="van-card__num">
+                          <a class="modal-trigger van-tag" style="background-color: rgb(255, 68, 68);" href="#modal1">移除</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="cap-order-item__footer">
+                <div class="cap-order-item__total-price1">共1笔订单</div>
+                <div class="cap-order-item__total-price">合计 ：<span>¥188.80</span></div>
+              </div>
+            </div>
+           {% endfor %}
+          </div>
+        </div>
+      </div>
+    <div class="no-more-tip">
+      没有更多订单啦
+    </div>
+  </div>
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <h4>模态标题</h4>
+      <p>一堆文本</p>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">同意</a>
+    </div>
+  </div>
+{% endblock content %}
+{% block bottomjs %}
+    <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
+    <script>
+    $(function () {
+        $('.modal').modal();
+    })
+    </script>
+{% endblock bottomjs %}

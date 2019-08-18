@@ -1,0 +1,35 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block js %}
+{% include 'wxchat/include/jssdk.html' %}
+     <script type="text/javascript" src="{% static 'weixin/js/touch.js' %}"></script>
+{% endblock js %}
+{% block extra %}
+    <link rel="stylesheet"  href="{% static 'weixin/css/list.css' %}" media="screen">
+{% endblock extra%}
+{% block title %}客户二维码{% endblock %}
+
+{% block content %}
+ <div class="page-content">
+    <div class="detail-cell__body-main">
+      <div class="coupon-code">
+        <div class="coupon-code__shop-info">
+            {% if request.session.headimgurl%}
+            <img src="{{ request.session.headimgurl }}" class="coupon-code__shop-logo">
+            {% else %}
+             <img src="{% static '/weixin/images/logo.jpg' %}" class="coupon-code__shop-logo">
+            {% endif %}
+            {% if request.session.username %}
+                <div class="title">{{ request.session.username|default:'' }}</div>
+            {% else %}
+                <div class="title">{{ request.session.nickname|default:'' }}</div>
+            {% endif %}
+        </div>
+        <div class="coupon-code__container">
+          <div class="coupon-code__qr"><img src="{% url 'wxchat-user-qrcode' %}?openid={{ openid }}"></div>
+        </div>
+        <div class="coupon-code__tip">扫一扫二维码，添加为附属账户。</div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
