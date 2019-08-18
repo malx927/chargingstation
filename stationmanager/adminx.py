@@ -29,12 +29,14 @@ site.register_plugin(DashBoardPlugin, Dashboard)
 class LoginViewAdmin(LoginView):
     title = settings.SITE_TITLE
 
+
 xadmin.site.register(LoginView, LoginViewAdmin)
 
 
 class BaseXadminSetting(object):
     enable_themes = True
     use_bootswatch = True
+
 
 xadmin.site.register(views.BaseAdminView, BaseXadminSetting)
 
@@ -50,6 +52,7 @@ class CommXadminSetting(object):
     #             {'title': '网站文章', 'icon': 'file', 'url': self.get_model_url(UserProfile, 'changelist') + '?_rel_categories__id__exact=1'},
     #         )},
     #     )
+
 
 xadmin.site.register(views.CommAdminView, CommXadminSetting)
 

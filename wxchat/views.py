@@ -13,6 +13,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
+from io import BytesIO
 
 from django.views.decorators.csrf import csrf_exempt
 from redis import Redis
@@ -25,7 +26,9 @@ from wechatpy.utils import check_signature, random_string
 from chargingstation import settings
 from wxchat.decorators import weixin_decorator
 from wxchat.forms import RegisterForm
-from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection
+from stationmanager.utils import create_qrcode
+from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection, \
+    SubAccount
 
 redis_client = Redis.from_url(settings.REDIS_URL)
 session_interface = RedisStorage(
@@ -150,7 +153,6 @@ def unSubUserinfo(openid):
     try:
         user = UserInfo.objects.get(openid=openid)
         if user:
-            # 是否应该保存历史信息
             user.subscribe = 0
             user.save()
     except UserInfo.DoesNotExist:
@@ -512,3 +514,57 @@ class UserCollectionView(View):
             "sign": sign,
         }
         return render(request, template_name="weixin/user_collection.html", context=context)
+
+
+class UserQRCodeView(View):
+    """客户二维码"""
+    def get(self, request, *args, **kwargs):
+        openid = request.GET.get("openid", None)
+        if openid:
+            image = create_qrcode(openid)
+            f = BytesIO()
+            image.save(f, "PNG")
+            return HttpResponse(f.getvalue())
+        else:
+            return HttpResponse()
+
+
+class ShowUserQRCodeView(View):
+    """显示客户二维码"""
+    def get(self, request, *args, **kwargs):
+        openid = request.session.get("openid", "")
+        context = {
+            "openid": openid,
+        }
+
+        return render(request, template_name="weixin/my_qrcode.html", context=context)
+
+
+class SubAccountView(View):
+    """附属账号"""
+    def get(self, request, *args, **kwargs):
+        openid = request.session.get("openid", None)
+        if openid:
+            sub_accounts = SubAccount.objects.filter(main_user__openid=openid)
+            print(sub_accounts)
+        else:
+            sub_accounts = None
+
+        context = {
+            "sub_accounts": sub_accounts,
+        }
+        return render(request, template_name="weixin/sub_account.html", context=context)
+
+
+class UpdateUserName(View):
+    """修改姓名"""
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+class DelSubAccountView(View):
+    """删除附加用户"""
+    def get(self, request, *args, **kwargs):
+        account_id = kwargs.get("id")
+        SubAccount.objects.filter(id=account_id).delete()
+        return HttpResponseRedirect(reverse("wxchat-sub-account"))

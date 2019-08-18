@@ -3,7 +3,8 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.conf import settings
 from .views import wechat, createMenu, getMenu, deleteMenu, pay_notify, OrderPayView, RegisterView, PersonInfoView, \
-    OrderRemoveView, ScanQRCodeView, UserDetailView, UserBalanceView, UserCollectionView
+    OrderRemoveView, ScanQRCodeView, UserDetailView, UserBalanceView, UserCollectionView, UserQRCodeView, \
+    ShowUserQRCodeView, SubAccountView, DelSubAccountView
 
 urlpatterns = [
     url(r'^$', wechat),  # 微信入口
@@ -18,4 +19,8 @@ urlpatterns = [
     url(r'^balance/(?P<id>\d+)/$', UserBalanceView.as_view(), name='wxchat-balance-detail'),
     url(r'^orderdel/$', OrderRemoveView.as_view(), name='wxchat-order-remove'),
     url(r'^mycollection/$', UserCollectionView.as_view(), name='wxchat-my-collection'),
+    url(r'^userqrcode/$', UserQRCodeView.as_view(), name='wxchat-user-qrcode'),
+    url(r'^showqrcode/$', ShowUserQRCodeView.as_view(), name='wxchat-show-qrcode'),
+    url(r'^subaccount/$', SubAccountView.as_view(), name='wxchat-sub-account'),
+    url(r'^delaccount/(?P<id>\d+)/$', DelSubAccountView.as_view(), name='wxchat-del-account'),
 ]

@@ -1,33 +1,29 @@
 # -*-coding:utf-8-*-
-__author__ = 'Administrator'
+
 import xadmin
 from xadmin import views
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText
 from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord, RechargeList, \
-    UserCollection
+    UserCollection, SubAccount, SubAccountHis
 
 
 class GroupClientsAdmin(object):
     """
     集团大客户
     """
-    list_display = ['name', 'bank_name', 'account_name', 'account_number', 'tax_number', 'legal_person', 'telephone', 'address',
-                    'fee_scale']
+    list_display = ['name', 'contact_man', 'telephone', 'address', 'bank_name', 'account_name', 'account_number', 'tax_number', 'legal_person', ]
     search_fields = ['name', 'telephone', 'account_name', 'legal_person']
     model_icon = 'fa fa-paypal'
     form_layout = (
         Main(
             Fieldset('基本信息',
-                Row('name', 'short_name'),
-                Row('address', 'contact_info'),
-                Row('contact_man', 'telephone'),
+                Row('name', 'telephone'),
+                Row('contact_man', 'address'),
+                     Row('legal_person', 'id_card'),
             ),
             Fieldset('公司银行信息',
                 Row('bank_name', 'account_name'),
                 Row('account_number', 'tax_number'),
-            ),
-            Fieldset('法人信息',
-                Row('legal_person', 'id_card'),
             ),
             Fieldset('其他信息',
                 Row(
@@ -35,11 +31,10 @@ class GroupClientsAdmin(object):
                     AppendedText('occupy_fee', '元')
                 ),
                 Row(AppendedText('low_fee', '元'), 'low_restrict'),
-                'user'
             ),
         ),
         Side(
-            Fieldset("优惠方案", "fee_scale", "dicount", "is_reduction", AppendedText("purchase_amount", "元"), AppendedText("reduction", "元")),
+            Fieldset("优惠方案", "dicount", "is_reduction", AppendedText("purchase_amount", "元"), AppendedText("reduction", "元")),
         )
     )
 
@@ -51,10 +46,10 @@ class UserInfoAdmin(object):
     """
     充电(微信)用户
     """
-    list_display = ['name', 'nickname', 'openid', 'user_type', 'seller', 'group_client', 'binding_amount', 'telephone', 'total_money',
+    list_display = ['name', 'nickname', 'openid', 'user_type', 'seller', 'binding_amount', 'telephone', 'total_money',
                     'consume_money', 'account_balance']
     search_fields = ['name', 'openid', 'telephone']
-    list_filter = ['user_type', 'seller', 'group_client']
+    list_filter = ['user_type', 'seller']
     list_per_page = 50
     style_fields = {"is_freeze": "radio-inline"}
     model_icon = 'fa fa-weixin'
@@ -64,9 +59,9 @@ class UserInfoAdmin(object):
             Fieldset('',
                 Row('name', 'nickname'),
                 Row('user_type', 'telephone'),
-                Row('seller', 'group_client'),
-                Row('id_card', 'openid'),
+                Row('seller', 'openid'),
                 Row('car_number', 'car_type'),
+                Row('id_card', None),
                 css_class='unsort no_title'
             ),
             Fieldset(
@@ -96,6 +91,40 @@ class UserInfoAdmin(object):
 
 
 xadmin.site.register(UserInfo, UserInfoAdmin)
+
+
+class SubAccountAdmin(object):
+    """附属账号"""
+    list_display = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'update_time', 'create_time']
+    search_fields = ['sub_user__nickname', 'sub_user__name', 'main_user__nicknam', 'main_user__name']
+    readonly_fields = ['balance']
+    list_per_page = 50
+    show_all_rel_details = False
+    model_icon = 'fa fa-weixin'
+    form_layout = (
+        Row('main_user', 'sub_user'),
+        Row('recharge_amount', 'balance'),
+    )
+
+
+xadmin.site.register(SubAccount, SubAccountAdmin)
+
+
+class SubAccountHisAdmin(object):
+    """附属账号充值记录"""
+    list_display = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'create_time']
+    search_fields = ['sub_user__nickname', 'sub_user__name', 'main_user__nicknam', 'main_user__name']
+    readonly_fields = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'create_time']
+    list_per_page = 50
+    show_all_rel_details = False
+    model_icon = 'fa fa-weixin'
+    form_layout = (
+        Row('main_user', 'sub_user'),
+        Row('recharge_amount', 'balance'),
+    )
+
+
+xadmin.site.register(SubAccountHis, SubAccountHisAdmin)
 
 
 # 微信统一支付结果
@@ -154,7 +183,7 @@ xadmin.site.register(RechargeList, RechargeListAdmin)
 
 
 class UserCollectionAdmin(object):
-    """用户充值设置"""
+    """用户收藏设置"""
     list_display = ['openid', 'station', 'create_at']
     list_per_page = 50
     model_icon = 'fa fa-check-square'

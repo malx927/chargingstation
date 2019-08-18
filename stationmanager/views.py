@@ -1,19 +1,20 @@
 # coding=utf-8
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views import View
 
+from wxchat.decorators import weixin_decorator
 from wxchat.views import getJsApiSign
 from .models import ChargingPile, Station, ChargingPrice
 
 
 class StationListView(View):
     """充电站列表"""
+    @method_decorator(weixin_decorator)
     def get(self, request, *arg, **kwargs):
         sign = getJsApiSign(request)
-        stations = Station.objects.all()
         context = {
             "sign": sign,
-            "stations": stations,
         }
         print(request.session.get("openid"))
         return render(request, template_name='weixin/station_index.html', context=context)
