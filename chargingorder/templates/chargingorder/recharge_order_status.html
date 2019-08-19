@@ -78,6 +78,7 @@
                    <div class="col s8"><p class="cyan order-item"><span id="id_charg_status">{{ order.charg_status.name|default:'' }}</span></p></div>
                </div>
            </li>
+            {% if order.protocol != 0 or order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6%}
            <li class="collection-item co-item">
                <div class="row">
                   <div class="col s4 pad-top-5"><p class="title">电池电量SOC</p></div>
@@ -89,6 +90,7 @@
                    </div>
                </div>
            </li>
+            {% endif %}
             <li class="collection-item co-item">
                <div class="row">
                   <div class="col s4 pad-top-5"><p class="title">实际充电时间</p></div>
@@ -108,6 +110,7 @@
                </div>
            </li>
            {% with order.get_record as record %}
+            {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
             <li class="collection-item co-item">
                <div class="row">
                   <div class="col s4 pad-top-5"><p class="title">充电所需电压</p></div>
@@ -120,6 +123,7 @@
                   <div class="col s8"><p class="cyan order-item"><span id="id_current">{{ record.current|default:0 }}</span> A</p></div>
                </div>
             </li>
+            {% endif %}
             <li class="collection-item co-item">
                <div class="row">
                   <div class="col s4 pad-top-5"><p class="title">实际输出电压</p></div>

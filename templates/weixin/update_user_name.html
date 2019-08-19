@@ -1,0 +1,36 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+    <style>
+    h4.header2 {
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+    </style>
+{% endblock extra%}
+{% block title %}修改备注{% endblock %}
+
+{% block container %}
+    <div class="center-align" style="height:70vh;margin-top:60px;">
+        <div class="card-panel valign ">
+            <h4 class="header2">修改备注</h4>
+            <form class="col s12" name="register_form" action="{% url 'wxchat-update-user' %}" method="post">{% csrf_token %}
+            <div class="row">
+                <input type="hidden" id="user_id" name="user_id" value="{{ user.id}}">
+                <div class="input-field col s12 m6">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input id="user_name" name="user_name" type="text" class="validate" required value="{{ user.name|default:'' }}">
+                    <label for="user_name">姓名</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                <button class="btn waves-effect waves-light cyan right" type="submit" name="action">提交
+                    <i class="material-icons right">send</i>
+                </button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock container %}
