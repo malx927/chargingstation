@@ -25,12 +25,12 @@
                   <div class="van-card__header">
                     <a class="van-card__thumb"><img src="{{ account.sub_user.headimgurl }}" class="van-card__img"></a>
                     <div class="van-card__content">
-                      <div class="van-card__title">{{ account.sub_user.name|default:account.sub_user.nickname }}　<span>[<a href="{% url 'wxchat-register' %}">修改备注</a>]</span></div>
+                      <div class="van-card__title">{{ account.sub_user.name|default:account.sub_user.nickname }}　<span>[<a href="{% url 'wxchat-update-user' %}?user_id={{ account.sub_user.id }}">修改备注</a>]</span></div>
                       <div></div>
                       <div class="van-card__bottom">
                         <div class="van-card__price">{{ account.sub_user.telephone }}</div>
                         <div class="van-card__num">
-                          <a class="modal-trigger van-tag" style="background-color: rgb(255, 68, 68);" href="#modal1">移除</a>
+                          <a data-item="{{ account.id }}" class="van-tag" style="background-color: rgb(255, 68, 68);" href="javascript:void(0);" id="del_btn_{{ account.id }}">移除</a>
                         </div>
                       </div>
                     </div>
@@ -64,7 +64,36 @@
     <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
     <script>
     $(function () {
-        $('.modal').modal();
+        {#$('.modal').modal();#}
+        $("a[id^='del_btn']").click(function () {
+            var r=confirm("真的要删除吗？");
+            var account_id = $(this).attr("data-item");
+            if(r==true){
+                var params ={
+                  account_id: account_id,
+                  csrfmiddlewaretoken:'{{ csrf_token }}',
+                }
+                $.ajax({
+                      type: 'POST',
+                      url: '{% url "wxchat-del-account" %}',
+                      dataType: 'json',
+                      data: params,
+                      timeout: 5000,
+                      success: function(data){
+                        if(data.success=="true") {
+                            window.location.reload();
+                        }else{
+                            M.toast({html: '充值失败!'});
+                        }
+                      },
+                      error: function(error){
+                          M.toast({html: '充值失败!!'});
+                      }
+                });
+            }
+            else{
+            }
+        })
     })
     </script>
 {% endblock bottomjs %}

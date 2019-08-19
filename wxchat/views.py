@@ -8,7 +8,7 @@ import json
 from chargingorder.models import Order
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -558,13 +558,36 @@ class SubAccountView(View):
 
 class UpdateUserName(View):
     """修改姓名"""
+    def get(self, request, *args, **kwargs):
+        user_id = request.GET.get("user_id", None)
+        try:
+            user = UserInfo.objects.get(id=user_id)
+        except UserInfo.DoesNotExist as ex:
+            user = None
+
+        context = {
+            "user": user,
+        }
+        return render(request, template_name="weixin/update_user_name.html", context=context)
+
     def post(self, request, *args, **kwargs):
-        pass
+        user_name = request.POST.get("user_name", None)
+        user_id = request.POST.get("user_id", None)
+        if user_name:
+            UserInfo.objects.filter(id=user_id).update(name=user_name)
+
+        return HttpResponseRedirect(reverse("wxchat-sub-account"))
 
 
 class DelSubAccountView(View):
     """删除附加用户"""
-    def get(self, request, *args, **kwargs):
-        account_id = kwargs.get("id")
-        SubAccount.objects.filter(id=account_id).delete()
-        return HttpResponseRedirect(reverse("wxchat-sub-account"))
+    def post(self, request, *args, **kwargs):
+        account_id = request.POST.get("account_id")
+        ret = SubAccount.objects.filter(id=account_id).delete()
+        context = {
+            "success": "false",
+        }
+        if ret[0] > 0:
+            context["success"] = "true"
+
+        return JsonResponse(context)
