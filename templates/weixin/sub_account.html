@@ -98,7 +98,7 @@
     });
     wx.ready(function () {
         $("#add_btn").click(function () {
-            var r=confirm("扫码附属账户的二维码，完成账户的添加");
+            var r=confirm("<font color='red'>扫码附属账户的二维码</font>，完成账户的添加");
             if(r == true){
                 wx.scanQRCode({
                         needResult: 1,
@@ -119,11 +119,11 @@
                                     if(data.success=="true") {
                                         window.location.reload();
                                     }else{
-                                        M.toast({html: '充值失败!'});
+                                        M.toast({html: '添加失败!'});
                                     }
                                   },
                                   error: function(error){
-                                      M.toast({html: '充值失败!!'});
+                                      M.toast({html: '添加失败!!'});
                                   }
                             });
                         },
