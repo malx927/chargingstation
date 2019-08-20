@@ -3,7 +3,8 @@
 {% include 'wxchat/include/jssdk.html' %}
 {% endblock js %}
 {% block extra %}
-     <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen"/>
+    <link href="{% static 'materialize/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen"/>
+    <link href="{% static 'materialize/css/googlefonticon.css' %}" rel="stylesheet" media="screen">
     <link rel="stylesheet"  href="{% static 'weixin/css/list.css' %}" media="screen">
     <style>
     a{
@@ -13,10 +14,13 @@
 {% endblock extra%}
 {% block title %}附属账户{% endblock %}
 {% block content %}
+   <div style="buttom: 30px; right: 19px;" class="fixed-action-btn direction-top">
+       <a class="btn-floating btn-large red gradient-shadow" id="add_btn"><i class="material-icons">add</i></a>
+    </div>
    <div class="page-content" style="min-height: 812px; min-height: 100vh;">
       <div class="list van-list">
         <div class="list-item">
-          <div class="list-item__header" type="list-item-header"><a href="{% url 'wxchat-show-qrcode' %}">我的二维码</a><a class="list-item__header__state" href="javascript:void(0);" id="add_btn">添加附属账户</a></div>
+          <div class="list-item__header" type="list-item-header"><a href="{% url 'wxchat-show-qrcode' %}">我的二维码</a><a class="list-item__header__state" href="javascript:void(0);" id="btn_money">分配账户金额</a></div>
           <div class="list-item__order-list" type="order-list">
             {% for account in sub_accounts %}
             <div class="cap-order-item">

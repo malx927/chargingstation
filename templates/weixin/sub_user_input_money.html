@@ -1,0 +1,37 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+<style>
+    .container{
+        width: 100%
+    }
+</style>
+{% endblock extra%}
+{% block container %}
+      <div class="collection">
+        <div class="collection-item avatar">
+          <i class="material-icons cyan circle">shopping_basket</i>
+          <h6 class="collection-header m-0">{{ owner.name|default:owner.nickname }}</h6>
+          <p>{{ owner.account_balance }}</p>
+        </div>
+        <div class="collection-item">
+        <table>
+            <thead>
+                <tr>
+                    <th>姓名</th>
+                    <th>金额</th>
+                    <th>余额</th>
+                </tr>
+            </thead>
+            <tbody>
+             {% for user in sub_users %}
+                <tr>
+                    <td>{{ user.sub_user.name|default:user.sub_user.nickname }}</td>
+                    <td>{{ user.recharge_amount }}</td>
+                    <td>{{ user.balance }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+      </div>
+{% endblock %}

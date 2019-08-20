@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from .views import wechat, createMenu, getMenu, deleteMenu, pay_notify, OrderPayView, RegisterView, PersonInfoView, \
     OrderRemoveView, ScanQRCodeView, UserDetailView, UserBalanceView, UserCollectionView, UserQRCodeView, \
-    ShowUserQRCodeView, SubAccountView, DelSubAccountView, UpdateUserName
+    ShowUserQRCodeView, SubAccountView, DelSubAccountView, UpdateUserName, SubAccountUpdateAmount
 
 urlpatterns = [
     url(r'^$', wechat),  # 微信入口
@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^subaccount/$', SubAccountView.as_view(), name='wxchat-sub-account'),
     url(r'^delaccount/$', DelSubAccountView.as_view(), name='wxchat-del-account'),
     url(r'^updateuser/$', UpdateUserName.as_view(), name='wxchat-update-user'),
+    url(r'^subupdateamount/$', SubAccountUpdateAmount.as_view(), name='wxchat-update-amount'),
 ]

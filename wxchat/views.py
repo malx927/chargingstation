@@ -615,3 +615,24 @@ class DelSubAccountView(View):
 
         return JsonResponse(context)
 
+
+class SubAccountUpdateAmount(View):
+    """用户分配金额"""
+    def get(self, request, *args, **kwargs):
+        try:
+            openid = request.session.get("openid")
+            owner = UserInfo.objects.get(openid=openid)
+            sub_users = SubAccount.objects.filter(main_user__openid=openid)
+        except UserInfo.DoesNotExist as ex:
+            owner = None
+            sub_users = None
+
+        context = {
+            "owner": owner,
+            "sub_users": sub_users,
+        }
+
+        return render(request, template_name="weixin/sub_user_input_money.html", context=context)
+
+    def post(self, request, *args, **kwargs):
+        pass
