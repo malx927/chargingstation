@@ -549,11 +549,31 @@ class SubAccountView(View):
             print(sub_accounts)
         else:
             sub_accounts = None
-
+        sign = getJsApiSign(request)
         context = {
             "sub_accounts": sub_accounts,
+            "sign": sign,
         }
         return render(request, template_name="weixin/sub_account.html", context=context)
+
+    def post(self, request, *args, **kwargs):
+        sub_openid = request.POST.get("openid", None)
+        openid = request.session.get("openid", None)
+        context = {
+            "success": "false",
+        }
+        if openid and sub_openid:
+            try:
+                sub_user = UserInfo.objects.get(openid=sub_openid)
+                user = UserInfo.objects.get(openid=openid)
+                sub_account = SubAccount()
+                sub_account.sub_user = sub_user
+                sub_account.main_user = user
+                sub_account.save()
+                context["success"] = "true"
+            except UserInfo.DoesNotExist as ex:
+                print(ex)
+        return JsonResponse(context)
 
 
 class UpdateUserName(View):
@@ -591,3 +611,4 @@ class DelSubAccountView(View):
             context["success"] = "true"
 
         return JsonResponse(context)
+

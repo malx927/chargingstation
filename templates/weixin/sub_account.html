@@ -65,12 +65,7 @@
     <script>
     $(function () {
         {#$('.modal').modal();#}
-        $("#add_btn").click(function () {
-            var r=confirm("扫码附属账户的二维码，完成账户的添加");
-            if(r == true){
-                alert("true");
-            }
-        });
+
         $("a[id^='del_btn']").click(function () {
             var r=confirm("真的要删除吗？");
             var account_id = $(this).attr("data-item");
@@ -89,17 +84,58 @@
                         if(data.success=="true") {
                             window.location.reload();
                         }else{
-                            M.toast({html: '充值失败!'});
+                            M.toast({html: '删除失败!'});
                         }
                       },
                       error: function(error){
-                          M.toast({html: '充值失败!!'});
+                          M.toast({html: '删除失败!!'});
                       }
                 });
             }
             else{
             }
         })
-    })
+    });
+    wx.ready(function () {
+        $("#add_btn").click(function () {
+            var r=confirm("扫码附属账户的二维码，完成账户的添加");
+            if(r == true){
+                alert("true");
+                wx.scanQRCode({
+                        needResult: 1,
+                        scanType: ["qrCode","barCode"],
+                        success: function (res) {
+                            var openid = res.resultStr;
+                            alert(openid);
+                            console.log(openid);
+                            var params ={
+                              openid: openid,
+                              csrfmiddlewaretoken:'{{ csrf_token }}',
+                            };
+                            $.ajax({
+                                  type: 'POST',
+                                  url: '{% url "wxchat-sub-account" %}',
+                                  dataType: 'json',
+                                  data: params,
+                                  timeout: 5000,
+                                  success: function(data){
+                                    if(data.success=="true") {
+                                        window.location.reload();
+                                    }else{
+                                        M.toast({html: '充值失败!'});
+                                    }
+                                  },
+                                  error: function(error){
+                                      M.toast({html: '充值失败!!'});
+                                  }
+                            });
+                        },
+                      error:function(res){
+
+                      }
+                });
+            }
+        });
+    });
     </script>
 {% endblock bottomjs %}
