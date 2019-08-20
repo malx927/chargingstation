@@ -100,14 +100,11 @@
         $("#add_btn").click(function () {
             var r=confirm("扫码附属账户的二维码，完成账户的添加");
             if(r == true){
-                alert("true");
                 wx.scanQRCode({
                         needResult: 1,
                         scanType: ["qrCode","barCode"],
                         success: function (res) {
                             var openid = res.resultStr;
-                            alert(openid);
-                            console.log(openid);
                             var params ={
                               openid: openid,
                               csrfmiddlewaretoken:'{{ csrf_token }}',

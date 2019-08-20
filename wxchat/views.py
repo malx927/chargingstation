@@ -564,15 +564,18 @@ class SubAccountView(View):
         }
         if openid and sub_openid:
             try:
-                sub_user = UserInfo.objects.get(openid=sub_openid)
-                user = UserInfo.objects.get(openid=openid)
-                sub_account = SubAccount()
-                sub_account.sub_user = sub_user
-                sub_account.main_user = user
-                sub_account.save()
-                context["success"] = "true"
-            except UserInfo.DoesNotExist as ex:
-                print(ex)
+                SubAccount.objects.get(sub_user__openid=sub_openid)
+            except SubAccount.DoesNotExist as ex:
+                try:
+                    sub_user = UserInfo.objects.get(openid=sub_openid)
+                    user = UserInfo.objects.get(openid=openid)
+                    sub_account = SubAccount()
+                    sub_account.sub_user = sub_user
+                    sub_account.main_user = user
+                    sub_account.save()
+                    context["success"] = "true"
+                except UserInfo.DoesNotExist as ex:
+                    print(ex)
         return JsonResponse(context)
 
 
