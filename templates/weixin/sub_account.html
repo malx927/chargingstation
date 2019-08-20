@@ -116,7 +116,7 @@
                                   data: params,
                                   timeout: 5000,
                                   success: function(data){
-                                    if(data.success=="true") {
+                                    if(data.success == "true") {
                                         window.location.reload();
                                     }else{
                                         M.toast({html: '添加失败!'});
