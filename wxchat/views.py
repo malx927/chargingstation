@@ -8,6 +8,7 @@ import json
 from chargingorder.models import Order
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django import forms
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -25,7 +26,7 @@ from wechatpy.session.redisstorage import RedisStorage
 from wechatpy.utils import check_signature, random_string
 from chargingstation import settings
 from wxchat.decorators import weixin_decorator
-from wxchat.forms import RegisterForm
+from wxchat.forms import RegisterForm, SubAccountForm
 from stationmanager.utils import create_qrcode
 from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection, \
     SubAccount
@@ -621,18 +622,29 @@ class SubAccountUpdateAmount(View):
     def get(self, request, *args, **kwargs):
         try:
             openid = request.session.get("openid")
+            openid = "oX5Zn04Imn5RlCGlhEVg-aEUCHNs"
             owner = UserInfo.objects.get(openid=openid)
-            sub_users = SubAccount.objects.filter(main_user__openid=openid)
+            sub_users = SubAccount.objects.filter(main_user__openid=openid).values("id", "sub_user", "recharge_amount", "balance")
+            SubAccountFormSet = forms.formset_factory(SubAccountForm, extra=0)
+            formset = SubAccountFormSet(initial=sub_users)
         except UserInfo.DoesNotExist as ex:
             owner = None
-            sub_users = None
+            formset = None
 
         context = {
             "owner": owner,
-            "sub_users": sub_users,
+            "formset": formset,
         }
-
         return render(request, template_name="weixin/sub_user_input_money.html", context=context)
 
     def post(self, request, *args, **kwargs):
         pass
+        # SubAccountFormSet = forms.formset_factory(SubAccountForm, extra=0)
+        # formset = SubAccountFormSet(request.POST)
+        # if formset.is_valid():
+        #     for row in formset.cleaned_data:
+        #         # 删除字典携带的id
+        #         id = row.pop('id')
+        #         SubAccount.objects.filter(id=id).update(**row)
+        #
+        # return render(request, 'index.html', {'formset': formset})

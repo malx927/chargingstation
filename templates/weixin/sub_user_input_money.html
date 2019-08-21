@@ -4,6 +4,12 @@
     .container{
         width: 100%
     }
+    td{
+        padding: 0px 5px;
+    }
+select{
+    display:block;
+}
 </style>
 {% endblock extra%}
 {% block container %}
@@ -11,27 +17,39 @@
         <div class="collection-item avatar">
           <i class="material-icons cyan circle">shopping_basket</i>
           <h6 class="collection-header m-0">{{ owner.name|default:owner.nickname }}</h6>
-          <p>{{ owner.account_balance }}</p>
+          <p>账户余额：{{ owner.account_balance }}元</p>
         </div>
         <div class="collection-item">
-        <table>
-            <thead>
-                <tr>
-                    <th>姓名</th>
-                    <th>金额</th>
-                    <th>余额</th>
-                </tr>
-            </thead>
-            <tbody>
-             {% for user in sub_users %}
-                <tr>
-                    <td>{{ user.sub_user.name|default:user.sub_user.nickname }}</td>
-                    <td>{{ user.recharge_amount }}</td>
-                    <td>{{ user.balance }}</td>
-                </tr>
+            {% for form in formset %}
+                {% for choice in form.sub_user.queryset %}
+                    {{ choice.id }}
+                {% endfor %}
+                {{ form.recharge_amount }}
             {% endfor %}
-            </tbody>
-        </table>
+{#        <table>#}
+{#            <thead>#}
+{#                <tr>#}
+{#                    <th>姓名</th>#}
+{#                    <th>分配金额数(元)</th>#}
+{#                </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#                        <div class="input-field">#}
+{#                          <input id="recharge_amount_{{ user.id }}" name="recharge_amount" type="number"  class="validate">#}
+{#                            <label for="recharge_amount_{{ user.id }}">金额(元)</label>#}
+{#                        </div>#}
+{#            </tbody>#}
+{#        </table>#}
         </div>
       </div>
 {% endblock %}
+{% block bottomjs %}
+    <script>
+    $(function () {
+        $('#recharge_amount').formatter({
+        'pattern': '¥{{99999}}.{{99}}',
+        'persistent': true
+      });
+    })
+    </script>
+{% endblock bottomjs %}
