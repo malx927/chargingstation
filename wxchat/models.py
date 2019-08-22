@@ -92,7 +92,12 @@ class UserInfo(models.Model):
         verbose_name_plural = verbose_name
 
     def account_balance(self):
-        return self.total_money - self.consume_money + self.binding_amount
+        sub_account = self.subaccount_set.first()
+        if sub_account:
+            main_user = sub_account.main_user
+            return main_user.total_money - main_user.consume_money + main_user.binding_amount
+        else:
+            return self.total_money - self.consume_money + self.binding_amount
 
     account_balance.short_description = '账户余额'
 
