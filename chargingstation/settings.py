@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'codingmanager',
     'wxchat',
     'echargenet',
+    'statistic',
 ]
 
 MIDDLEWARE = [
@@ -90,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'chargingstation',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': '',     # admin@123
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
@@ -147,8 +148,8 @@ STATICFILES_DIRS = (
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-SITE_TITLE = u'测试'
-SITE_FOOTER = u'测试'
+SITE_TITLE = u'亚电充电桩后台管理'
+SITE_FOOTER = u'亚电建设集团'
 
 # 账号资金阀值()元
 ACCOUNT_BALANCE = 1.1
@@ -161,15 +162,15 @@ FACTOR_TEMPERATURE = 0.1
 FACTOR_BATTERY_SOC = 1
 FACTOR_READINGS = 0.01
 
-
-WEB_URL = 'hzymlx.natapp1.cc'
+# WEB_URL = 'www.canage.com.cn'
+WEB_URL = 'haotian.natapp1.cc'
 
 # mqtt
-MQTT_HOST = "hzymlx.natapp1.cc"
+MQTT_HOST = "iot.canage.com.cn"
 DEVICENAME_RECV = 'server_recv1'
 DEVICENAME_SEND = 'server_send1'
-USERNAME = ''
-PASSWORD = ''
+USERNAME = 'mqtt'
+PASSWORD = 'yd1q2w3e4r'
 
 # redis 超时判断
 MQTT_REDIS_URL = '127.0.0.1'
@@ -178,8 +179,8 @@ MQTT_REDIS_PORT = 6379
 CHARGING_SEND_CMD_INTERVAL = 5
 FREQUENCY = 3
 
-CHARG_STATUS_OVER_TIME = 30
-PILE_STATUS_OVER_TIME = 2 * 60
+CHARG_STATUS_OVER_TIME = 15
+PILE_STATUS_OVER_TIME = 10 * 60
 REPLY_TO_WORK_OVERTIME = 60 * 3
 
 CHARING_PILE_STATUS = 'charing_pile_status'             # 电桩桩状态上报超时
@@ -190,25 +191,37 @@ CHARG_REPLY_TO_WORK_OVERTIME = "reply_to_work_overtime"  # 充电回复到开始
 # websocket url
 WEBSOCKET_URL = 'ws://' + WEB_URL
 
-
+# wechatpy
+# WECHAT_TOKEN = 'yddqyddq123'
+# WECHAT_APPID = 'wx6db278073329c1c9'
+# WECHAT_SECRET = '81f81cdb2506bed75b6f13554b507573'
+# APP_URL = 'http://' + WEB_URL + '/wechat'
+# ROOT_URL = 'http://' + WEB_URL
+# MCH_ID = '1524231921'
+# MCH_KEY = 'BE0EE67671564031714961EA24AAFS77'
+# NOTIFY_URL = 'http://' + WEB_URL + '/order/pay/notify/'        # 根据实际域名修改
+# API_CLIENT_CERT_PATH = os.path.join(BASE_DIR, 'apiclient_cert.pem')
+# API_CLIENT_KEY_PATH = os.path.join(BASE_DIR, 'apiclient_key.pem')
+# REDIS_URL = 'redis://127.0.0.1:6379/0'
 # 测试号WeChat
 WECHAT_TOKEN = 'dayankele123'
 APP_URL = 'http://' + WEB_URL + '/wechat'
 ROOT_URL = 'http://' + WEB_URL
 WECHAT_APPID = 'wxbc591183cb175d16'
 WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
-MCH_ID = '1524211111'
-MCH_KEY = 'BE0EE67111111114961EA24AAFS77'
+MCH_ID = '1524231921'
+MCH_KEY = 'BE0EE67671564031714961EA24AAFS77'
 REDIS_URL = 'redis://127.0.0.1:6379/0'
 NOTIFY_URL = 'http://' + WEB_URL + '/order/pay/notify/'        # 根据实际域名修改
+# WEIXIN_PAY = 'http://iot.hld8000.com/order/pay/'
 
 # e充网
-OPERATORSECRET = '333333'  # 申请认证使用
-SIGSECRET = '22222'  # 签名的加密密钥
-DATASECRET = '22222'  # Data信息进行加密
-DATASECRETIV = '11111'  # 用户AES加密过程的混合加密
+OPERATORSECRET = 'RJ4MmF9RdKMV8lGn'  # 申请认证使用
+SIGSECRET = 'TiF5KmJCfXrNzz3r'  # 签名的加密密钥
+DATASECRET = 'YaDtFWtGGGiisEBB'  # Data信息进行加密
+DATASECRETIV = '6T20he7lkiG2XAuv'  # 用户AES加密过程的混合加密
 OPERATORID = 'MA004REG2'  # 组织机构代码
-ECHARGE_OPERATORID = '333333'  # e充网组织机构代码
+ECHARGE_OPERATORID = '348375727'  # e充网组织机构代码
 EXPIRATION_DELTA = 3 * 24 * 3600
 
 # celery
