@@ -34,6 +34,11 @@ def get_account_balance(openid, value=None):
     """账号余额"""
     try:
         user = UserInfo.objects.get(openid=openid)
+        sub_account = user.is_sub_user()
+        if sub_account:     # 附属账号
+            account_balance = settings.MAIN_ACCOUNT_BALANCE
+            if sub_account.main_user.account_balance() > account_balance:
+                return True
         if value is None:
             account_balance = settings.ACCOUNT_BALANCE
         else:
