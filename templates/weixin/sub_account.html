@@ -20,7 +20,7 @@
    <div class="page-content" style="min-height: 812px; min-height: 100vh;">
       <div class="list van-list">
         <div class="list-item">
-          <div class="list-item__header" type="list-item-header"><a href="{% url 'wxchat-show-qrcode' %}">我的二维码</a><a class="list-item__header__state" href="{% url 'wxchat-update-amount' %}">分配账户金额</a></div>
+          <div class="list-item__header" type="list-item-header"><a href="{% url 'wxchat-show-qrcode' %}">我的二维码</a><a id="add_sub_btn" class="list-item__header__state" href="javascript:void(0);">添加附属用户</a></div>
           <div class="list-item__order-list" type="order-list">
             {% for account in sub_accounts %}
             <div class="cap-order-item">
@@ -42,8 +42,8 @@
                 </div>
               </div>
               <div class="cap-order-item__footer">
-                <div class="cap-order-item__total-price1">共1笔订单</div>
-                <div class="cap-order-item__total-price">合计 ：<span>¥188.80</span></div>
+                <div class="cap-order-item__total-price1">共{{ account.account_totals.counts }}笔订单</div>
+                <div class="cap-order-item__total-price">合计:<span>¥{{ account.account_totals.amounts|default:0.00 }}</span></div>
               </div>
             </div>
            {% endfor %}
@@ -54,15 +54,7 @@
       没有更多订单啦
     </div>
   </div>
-  <div id="modal1" class="modal">
-    <div class="modal-content">
-      <h4>模态标题</h4>
-      <p>一堆文本</p>
-    </div>
-    <div class="modal-footer">
-      <a href="#!" class=" modal-action modal-close waves-effect waves-green btn-flat">同意</a>
-    </div>
-  </div>
+
 {% endblock content %}
 {% block bottomjs %}
     <script src="{% static 'materialize/js/materialize.min.js' %}"></script>
@@ -101,7 +93,7 @@
         })
     });
     wx.ready(function () {
-        $("#add_btn").click(function () {
+        $("#add_btn, #add_sub_btn").click(function () {
             var r=confirm("扫码附属账户的二维码，完成账户的添加");
             if(r == true){
                 wx.scanQRCode({

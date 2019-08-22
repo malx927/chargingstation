@@ -4,7 +4,7 @@ import xadmin
 from xadmin import views
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText
 from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord, RechargeList, \
-    UserCollection, SubAccount, SubAccountHis
+    UserCollection, SubAccount, SubAccountConsume
 
 
 class GroupClientsAdmin(object):
@@ -93,38 +93,40 @@ class UserInfoAdmin(object):
 xadmin.site.register(UserInfo, UserInfoAdmin)
 
 
+class SubAccountConsumeInline(object):
+    model = SubAccountConsume
+    style = "table"
+    extra = 1
+
+
 class SubAccountAdmin(object):
     """附属账号"""
-    list_display = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'update_time', 'create_time']
-    search_fields = ['sub_user__nickname', 'sub_user__name', 'main_user__nicknam', 'main_user__name']
-    readonly_fields = ['balance']
+    list_display = ['sub_user', 'main_user', 'update_time', 'create_time']
+    search_fields = ['sub_user__nickname', 'sub_user__name', 'main_user__nickname', 'main_user__name']
     list_per_page = 50
     show_all_rel_details = False
     model_icon = 'fa fa-weixin'
-    form_layout = (
-        Row('main_user', 'sub_user'),
-        Row('recharge_amount', 'balance'),
-    )
+    inlines = [SubAccountConsumeInline]
 
 
 xadmin.site.register(SubAccount, SubAccountAdmin)
 
 
-class SubAccountHisAdmin(object):
-    """附属账号充值记录"""
-    list_display = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'create_time']
-    search_fields = ['sub_user__nickname', 'sub_user__name', 'main_user__nicknam', 'main_user__name']
-    readonly_fields = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'create_time']
-    list_per_page = 50
-    show_all_rel_details = False
-    model_icon = 'fa fa-weixin'
-    form_layout = (
-        Row('main_user', 'sub_user'),
-        Row('recharge_amount', 'balance'),
-    )
-
-
-xadmin.site.register(SubAccountHis, SubAccountHisAdmin)
+# class SubAccountHisAdmin(object):
+#     """附属账号充值记录"""
+#     list_display = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'create_time']
+#     search_fields = ['sub_user__nickname', 'sub_user__name', 'main_user__nicknam', 'main_user__name']
+#     readonly_fields = ['sub_user', 'main_user', 'recharge_amount', 'balance', 'create_time']
+#     list_per_page = 50
+#     show_all_rel_details = False
+#     model_icon = 'fa fa-weixin'
+#     form_layout = (
+#         Row('main_user', 'sub_user'),
+#         Row('recharge_amount', 'balance'),
+#     )
+#
+#
+# xadmin.site.register(SubAccountHis, SubAccountHisAdmin)
 
 
 # 微信统一支付结果

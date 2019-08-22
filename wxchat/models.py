@@ -1,12 +1,14 @@
 # -*-coding:utf-8-*-
+import datetime
+
 from django.contrib.auth.models import Group
 from django.db import models
 from django.conf import settings
 from codingmanager.constants import *
 from codingmanager.models import PriceType
 # Create your models here.
-from django.db.models import Max
-from stationmanager.models import Seller, Station
+from django.db.models import Max, Count, Sum
+from stationmanager.models import Seller, Station, ChargingPile
 
 
 class GroupClients(models.Model):
@@ -269,8 +271,8 @@ class SubAccount(models.Model):
     """附属账号"""
     sub_user = models.ForeignKey(UserInfo, verbose_name="附属账号", on_delete=models.CASCADE, null=True)
     main_user = models.ForeignKey(UserInfo, verbose_name="主账号", related_name="main_users", on_delete=models.CASCADE, null=True)
-    recharge_amount = models.DecimalField(verbose_name='充值金额', max_digits=7, decimal_places=2, default=0)
-    balance = models.DecimalField(verbose_name='账户余额', max_digits=7, decimal_places=2, default=0)
+    # recharge_amount = models.DecimalField(verbose_name='充值金额', max_digits=7, decimal_places=2, default=0)
+    # balance = models.DecimalField(verbose_name='账户余额', max_digits=7, decimal_places=2, default=0)
     update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
     create_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
 
@@ -281,18 +283,22 @@ class SubAccount(models.Model):
         verbose_name = '附属账户'
         verbose_name_plural = verbose_name
 
+    def account_totals(self):
+        return self.subaccountconsume_set.all().aggregate(counts=Count("id"), amounts=Sum("consum_money"))
 
-class SubAccountHis(models.Model):
+
+class SubAccountConsume(models.Model):
     """附属账号充值记录"""
-    sub_user = models.ForeignKey(UserInfo, verbose_name="附属账号", on_delete=models.CASCADE, null=True)
-    main_user = models.ForeignKey(UserInfo, verbose_name="主账号", related_name="musers", on_delete=models.CASCADE, null=True)
-    recharge_amount = models.DecimalField(verbose_name='充值金额', max_digits=7, decimal_places=2, default=0)
-    balance = models.DecimalField(verbose_name='账户余额', max_digits=7, decimal_places=2, default=0)
-    create_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
+    account = models.ForeignKey(SubAccount, verbose_name="附属账号", on_delete=models.CASCADE, null=True)
+    out_trade_no = models.CharField(verbose_name="订单号", max_length=32, null=True, blank=True)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name="充电桩", on_delete=models.CASCADE, null=True)
+    gun_num = models.IntegerField(verbose_name="枪口", blank=True, null=True)
+    consum_money = models.DecimalField(verbose_name='消费余额(元)', max_digits=7, decimal_places=2, default=0)
+    create_time = models.DateTimeField(verbose_name="添加时间", default=datetime.datetime.now)
 
     def __str__(self):
-        return '{}'.format(self.sub_user.nickname)
+        return '{}'.format(self.account.sub_user.nickname)
 
     class Meta:
-        verbose_name = '附属账户充值记录'
+        verbose_name = '附属账户消费记录'
         verbose_name_plural = verbose_name
