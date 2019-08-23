@@ -10,7 +10,7 @@ from channels.layers import get_channel_layer
 from chargingorder.models import ChargingCmdRecord, GroupName
 from chargingstation import settings
 from django.db.models import F
-from wxchat.models import UserInfo, UserAcountHistory
+from wxchat.models import UserInfo, UserAcountHistory, SubAccountConsume
 
 channel_layer = get_channel_layer()
 
@@ -195,15 +195,28 @@ def user_account_deduct_money(order):
         openid = order.openid
         try:
             user = UserInfo.objects.get(openid=openid)
-            his_data = {
-                "name": user.name if user.name is not None else user.nickname,
-                "openid": user.openid,
-                "total_money": user.total_money,
-                "consume_money": user.consume_money,
-                "binding_amount": user.binding_amount
-            }
-            UserAcountHistory.objects.create(**his_data)
-            UserInfo.objects.filter(openid=openid).update(consume_money=F('consume_money') + consum_money)
+            sub_account = user.is_sub_user()
+            if sub_account:     # 附属账户
+                order_data = {
+                    "account": sub_account,
+                    "out_trade_no": order.out_trade_no,
+                    "charg_pile": order.charg_pile,
+                    "gun_num": order.gun_num,
+                    "consum_money": order.consum_money,
+                }
+                logging.info(order_data)
+                SubAccountConsume.objects.create(**order_data)
+                UserInfo.objects.filter(openid=sub_account.main_user.openid).update(consume_money=F('consume_money') + consum_money)
+            else:
+                his_data = {
+                    "name": user.name if user.name is not None else user.nickname,
+                    "openid": user.openid,
+                    "total_money": user.total_money,
+                    "consume_money": user.consume_money,
+                    "binding_amount": user.binding_amount
+                }
+                UserAcountHistory.objects.create(**his_data)
+                UserInfo.objects.filter(openid=openid).update(consume_money=F('consume_money') + consum_money)
             order.pay_time = datetime.datetime.now()
             order.cash_fee = consum_money
             order.save(update_fields=['pay_time', 'cash_fee'])

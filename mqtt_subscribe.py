@@ -853,7 +853,14 @@ def save_pile_charg_status_to_db(**data):
 
     try:
         charg_user = UserInfo.objects.get(openid=order.openid)
-        if charg_user.account_balance() - order.consum_money <= 0.2:
+        sub_account = charg_user.is_sub_user()
+        if sub_account:
+            if sub_account.main_user.account_balance() - order.consum_money <= 10:  # 附属用户
+                # 发送停充指令
+                stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
+                logging.info(stop_data)
+                server_send_stop_charging_cmd(**stop_data)
+        elif charg_user.account_balance() - order.consum_money <= 0.2:
             # 发送停充指令
             stop_data["fault_code"] = 93    # 后台主动停止－帐号无费用
             logging.info(stop_data)
@@ -1060,7 +1067,7 @@ def server_send_stop_charging_cmd(*args, **kwargs):
 def pile_charging_stop_handler(topic, byte_msg):
     """
     13、充电桩停止充电回复或主动上报
-    说明：充电桩->服务器，充电桩主动上报停止充电或回复0x86命令（80字节）py。
+    说明：充电桩->服务器，充电桩主动上报停止充电或回复0x86命令（80字节）。
     :param topic:
     :param byte_msg:
     :return:
@@ -1134,7 +1141,7 @@ def pile_charging_stop_handler(topic, byte_msg):
             "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
             "stop_code": 1,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
             "state_code": state_code,
-            "fault_code": 0,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
+            "fault_code": 0,
         }
         logging.info(stop_data)
         server_send_stop_charging_cmd(**stop_data)
@@ -1155,7 +1162,6 @@ def pile_charging_stop_handler(topic, byte_msg):
     send_data_to_client(pile_sn, gun_num, **send_data)
 
     logging.info("Leave pile_charging_stop_handler function")
-
 
 
 def decrypt_message(byte_msg):
