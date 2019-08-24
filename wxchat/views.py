@@ -728,7 +728,6 @@ def send_charging_end_message_to_user(order):
     """充电结束提醒"""
     template = 'rhHOX9gT02FXaHxINaP6Xoc1v2LkU1VydxRSsDwKBpY'
 
-    account_balance = get_user_balance(order.openid)
     url = "{}{}?out_trade_no={}".format(settings.ROOT_URL, reverse('order-recharge-status'), order.out_trade_no)
     color = "#173177"
     data = {
@@ -753,7 +752,7 @@ def send_charging_end_message_to_user(order):
             "color": color,
         },
         "keyword5": {
-            "value": "{}元".format(account_balance),
+            "value": "{}元".format(order.balance),
             "color": color
         },
         "remark": {
