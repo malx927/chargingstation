@@ -21,7 +21,6 @@ from django.db.models import F, Sum, DecimalField
 
 # logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
 #                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
-from wxchat.views import send_charging_start_message_to_user
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 # 导入django model
@@ -42,6 +41,7 @@ from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
 from wxchat.models import UserInfo, UserAcountHistory
+from wxchat.utils import send_charging_start_message_to_user
 from stationmanager.signals import update_operator_info
 from stationmanager.signals import operator_info_init
 from stationmanager.signals import operator_info_delete

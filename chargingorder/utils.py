@@ -11,7 +11,7 @@ from chargingorder.models import ChargingCmdRecord, GroupName
 from chargingstation import settings
 from django.db.models import F
 from wxchat.models import UserInfo, UserAcountHistory, SubAccountConsume
-from wxchat.views import send_charging_end_message_to_user
+from wxchat.utils import send_charging_end_message_to_user
 
 channel_layer = get_channel_layer()
 
