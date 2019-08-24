@@ -685,7 +685,8 @@ def send_charging_start_message_to_user(order):
             "color": color,
         },
         "keyword1": {
-           "value": order.begin_time,
+           # "value": order.begin_time.strftime('%Y-%m-%d %H:%M:%S') if order.begin_time else "",
+           "value": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
            "color": color,
         },
         "keyword2": {
@@ -706,7 +707,7 @@ def send_charging_start_message_to_user(order):
         },
         "remark": {
            "value": "感谢您的使用。点击查看订单详情",
-           "color": color
+           "color": color,
        }
     }
     client = wxClient()
@@ -736,7 +737,7 @@ def send_charging_end_message_to_user(order):
             "color": color,
         },
         "keyword1": {
-           "value": order.end_time,
+           "value": order.end_time.strftime('%Y-%m-%d %H:%M:%S') if order.end_time else "",
            "color": color,
         },
         "keyword2": {
