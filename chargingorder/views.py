@@ -181,8 +181,8 @@ class RechargeView(View):
         data["charging_policy_value"] = charging_policy_value
 
         server_send_charging_cmd(**data)
-        send_charging_start_message_to_user(order)
-        send_charging_end_message_to_user(order)
+        # send_charging_start_message_to_user(order)
+        # send_charging_end_message_to_user(order)
         data = {
             "return_code": "success",
             "redirect_url": "{0}?out_trade_no={1}".format(reverse("order-recharge-status"), out_trade_no)
@@ -283,6 +283,8 @@ class RechargeOrderStatusView(View):
         try:
             out_trade_no = request.GET.get("out_trade_no", None)
             order = Order.objects.get(out_trade_no=out_trade_no)
+            if order.status == 2 and order.pay_time is not None:
+                return render(request, template_name="weixin/order_detail.html", context={"order": order})
         except Order.DoesNotExist as ex:
             order = None
         print("000000000000000")
