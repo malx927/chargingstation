@@ -22,7 +22,7 @@ from chargingstation import settings
 from chargingorder.mqtt import server_send_charging_cmd, server_send_stop_charging_cmd
 from wxchat.decorators import weixin_decorator
 from wxchat.models import UserInfo, SubAccount
-from wxchat.views import send_charging_start_message_to_user, send_charging_end_message_to_user
+from wxchat.utils import send_charging_start_message_to_user, send_charging_end_message_to_user
 
 
 @weixin_decorator
