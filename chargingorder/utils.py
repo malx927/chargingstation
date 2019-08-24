@@ -11,6 +11,7 @@ from chargingorder.models import ChargingCmdRecord, GroupName
 from chargingstation import settings
 from django.db.models import F
 from wxchat.models import UserInfo, UserAcountHistory, SubAccountConsume
+from wxchat.views import send_charging_end_message_to_user
 
 channel_layer = get_channel_layer()
 
@@ -220,5 +221,6 @@ def user_account_deduct_money(order):
             order.pay_time = datetime.datetime.now()
             order.cash_fee = consum_money
             order.save(update_fields=['pay_time', 'cash_fee'])
+            send_charging_end_message_to_user(order)
         except UserInfo.DoesNotExist as ex:
             logging.warning(ex)

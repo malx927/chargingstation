@@ -21,7 +21,8 @@ import paho.mqtt.publish as publish
 from chargingstation import settings
 from chargingorder.mqtt import server_send_charging_cmd, server_send_stop_charging_cmd
 from wxchat.decorators import weixin_decorator
-from wxchat.models import UserInfo
+from wxchat.models import UserInfo, SubAccount
+from wxchat.views import send_charging_start_message_to_user
 
 
 @weixin_decorator
@@ -180,6 +181,7 @@ class RechargeView(View):
         data["charging_policy_value"] = charging_policy_value
 
         server_send_charging_cmd(**data)
+        send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
         data = {
             "return_code": "success",
             "redirect_url": "{0}?out_trade_no={1}".format(reverse("order-recharge-status"), out_trade_no)
@@ -208,6 +210,10 @@ class RechargeView(View):
             "charg_pile": gun.charg_pile,
             "gun": gun,
         }
+        sub_account = SubAccount.objects.filter(sub_user__openid=openid).first()
+        if sub_account:
+            main_openid = sub_account.main_user.openid
+            params["main_openid"] = main_openid
         return params
 
     def create_order(self, **kwargs):

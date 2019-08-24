@@ -86,6 +86,7 @@ class OrderAdmin(object):
             ),
             Fieldset(
                 '其他信息',
+                'main_openid',
                 'prev_reading',
                 'start_charge_seq',
                 'report_result',
