@@ -99,7 +99,7 @@ def send_charging_end_message_to_user(order):
            "color": color,
         },
         "keyword2": {
-           "value": order.charg_status.name,
+           "value": order.charg_status.name if order.charg_status else "",
            "color": color,
         },
         "keyword3": {
