@@ -69,6 +69,10 @@ class OrderAdmin(object):
                     'transaction_id',
                     'pay_time',
                 ),
+                Row(
+                    AppendedText('balance', '元'),
+                    'main_openid',
+                ),
             ),
             Fieldset(
                 '充电状态信息',

@@ -21,6 +21,7 @@ from django.db.models import F, Sum, DecimalField
 
 # logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
 #                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 # 导入django model
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,6 +41,7 @@ from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
 from wxchat.models import UserInfo, UserAcountHistory
+from wxchat.utils import send_charging_start_message_to_user
 from stationmanager.signals import update_operator_info
 from stationmanager.signals import operator_info_init
 from stationmanager.signals import operator_info_delete
@@ -413,6 +415,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
         "status": 1,  # 未结帐
     }
     logging.info(data)
+
     update_gun_order_status(**data)
     # 清除发送充电命令超时判断
     ChargingCmdRecord.objects.filter(out_trade_no=out_trade_no, pile_sn=pile_sn, cmd_flag="start").delete()
@@ -469,6 +472,7 @@ def update_gun_order_status(**data):
         order.begin_time = begin_time
         order.status = status
         order.save()
+        send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
         send_data = {
             "return_code": "success",
             "cmd": "04",        # 充电命令

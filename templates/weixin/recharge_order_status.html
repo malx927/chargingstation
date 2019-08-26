@@ -34,7 +34,6 @@
                 </svg>
             </span>
         </div>
-        <h2 class="block-header">充电信息</h2>
         {% if order %}
         <div class="van-cell-group van-hairline--top-bottom">
             <div class="base-info-cell"></div>
@@ -350,6 +349,7 @@
                     $("#id_current").text('0');
                     $("#id_output_voltage").text('0');
                     $("#id_output_current").text('0');
+                    window.location.href=window.location.href;
                     {#this.close();#}
                 }
             }
