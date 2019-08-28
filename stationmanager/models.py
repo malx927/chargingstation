@@ -8,6 +8,7 @@ import time
 
 from django.db.models import Count, Q
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from codingmanager.models import PileType, FaultCode, PriceType, AreaCode
 from codingmanager.constants import *
@@ -283,12 +284,20 @@ class ChargingPileStatus(models.Model):
         verbose_name_plural = verbose_name
 
 
-class FaultChargingGun(ChargingGun):
+class FaultChargingGun(models.Model):
     """
     故障充电桩枪信息表
     """
+    gun_num = models.CharField(verbose_name='枪口号', max_length=12, choices=GUN_NUM)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE)
+    work_status = models.IntegerField(verbose_name='工作状态', default=9, blank=True, choices=GUN_WORKING_STATUS)
+    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True)
+    fault_time = models.DateTimeField(verbose_name="故障时间", default=timezone.now)
+    repair_time = models.DateTimeField(verbose_name="修复时间", blank=True, null=True)
+    repair_persons = models.CharField(verbose_name="修复人", blank=True, null=True, max_length=64)
+    repair_flag = models.BooleanField(verbose_name="修复标志", default=False)
+
     class Meta:
-        proxy = True
         verbose_name = '故障枪口信息'
         verbose_name_plural = verbose_name
 

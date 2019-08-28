@@ -287,7 +287,7 @@ class RechargeOrderStatusView(View):
                 return render(request, template_name="weixin/order_detail.html", context={"order": order})
         except Order.DoesNotExist as ex:
             order = None
-        print("000000000000000")
+
         return render(request, template_name="weixin/recharge_order_status.html", context={"order": order})
 
 
