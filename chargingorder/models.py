@@ -49,6 +49,7 @@ class Order(models.Model):
     max_temp = models.IntegerField(verbose_name='车辆最高充电温度', blank=True, null=True)
     power_fee = models.DecimalField(verbose_name='电费', blank=True, default=0, max_digits=10, decimal_places=2)
     service_fee = models.DecimalField(verbose_name='服务费', blank=True, default=0, max_digits=10, decimal_places=2)
+    park_fee = models.DecimalField(verbose_name='停充费', blank=True, default=0, max_digits=6, decimal_places=2)
     status = models.IntegerField(verbose_name='订单状态', choices=ORDER_STATUS, default=0)
     main_openid = models.CharField(verbose_name='主账号ID', max_length=64, blank=True, null=True,)
     balance = models.DecimalField(verbose_name='余额', blank=True, default=0, max_digits=8, decimal_places=2)

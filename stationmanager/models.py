@@ -326,7 +326,6 @@ class ChargingPrice(models.Model):
     def get_current_serice_price(self):
         cur_time = datetime.now().time()
         price_detail = self.prices.filter(begin_time__lte=cur_time, end_time__gte=cur_time).first()
-        print("get_current_serice_price", price_detail)
         if price_detail:
             return price_detail.service_price
         else:

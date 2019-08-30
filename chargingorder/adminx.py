@@ -53,7 +53,10 @@ class OrderAdmin(object):
                     AppendedText('begin_reading', '度'),
                     AppendedText('end_reading', '度')
                 ),
-                Row("total_readings"),
+                Row(
+                    AppendedText('total_readings', 'KWH'),
+                    AppendedText('park_fee', '元'),
+                ),
                 Row(
                     AppendedText('power_fee', '元'),
                     AppendedText('service_fee', '元'),

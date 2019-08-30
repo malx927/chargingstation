@@ -559,11 +559,7 @@ def pile_report_car_info_handler(topic, byte_msg):
 
 
 def get_charging_price(station_id, curTime):
-    """
-    获取充电站的当前价格值
-    :param station_id:
-    :return:
-    """
+    """获取充电站的当前价格值"""
     try:
         chargingPrice = ChargingPrice.objects.filter(station__id=station_id, default_flag=1).first()
         if chargingPrice:
