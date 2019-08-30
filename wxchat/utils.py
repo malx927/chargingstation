@@ -107,7 +107,7 @@ def send_charging_end_message_to_user(order):
             "color": color
         },
         "keyword4": {
-            "value": order.cash_fee,
+            "value": "{}元".format(order.cash_fee),
             "color": color,
         },
         "keyword5": {
