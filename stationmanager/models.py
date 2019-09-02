@@ -292,7 +292,7 @@ class FaultChargingGun(models.Model):
     charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE)
     work_status = models.IntegerField(verbose_name='工作状态', default=9, blank=True, choices=GUN_WORKING_STATUS)
     charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True)
-    fault_time = models.DateTimeField(verbose_name="故障时间", default=timezone.now)
+    fault_time = models.DateTimeField(verbose_name="故障时间", blank=True, null=True)
     repair_time = models.DateTimeField(verbose_name="修复时间", blank=True, null=True)
     repair_persons = models.CharField(verbose_name="修复人", blank=True, null=True, max_length=64)
     repair_flag = models.BooleanField(verbose_name="修复标志", default=False)

@@ -1,11 +1,12 @@
 # coding=utf-8
+import datetime
 import logging
 
 from django.db.models.signals import post_init, post_save, post_delete
 from django.dispatch import receiver
 
 from chargingstation import settings
-from .models import Seller, Station, ChargingPile, ChargingGun
+from .models import Seller, Station, ChargingPile, ChargingGun, FaultChargingGun
 from echargenet.models import OperatorInfo, StationInfo, EquipmentInfo, ConnectorInfo
 
 
@@ -108,44 +109,59 @@ def equipment_info_delete(sender, instance, **kwargs):
     EquipmentInfo.objects.filter(EquipmentID=str(instance.id)).delete()
 
 
+@receiver(post_init, sender=ChargingGun)
+def operator_info_init(instance, **kwargs):
+    instance.old_work_status = instance.work_status
+
+
 # 充电枪
 @receiver(post_save, sender=ChargingGun)
 def update_connector_info(sender, instance, created, **kwargs):
-        try:
-            ID = instance.id
-            ConnectorID = '{}{}'.format(instance.charg_pile.pile_sn, instance.gun_num)
-            EquipmentID = instance.charg_pile.id
-            equipment_info = EquipmentInfo.objects.get(EquipmentID=str(EquipmentID))
-            connector_type = 0
-            if instance.work_status == 9:
-                connector_type = 0          # 离网
-            elif instance.work_status == 0:
-                connector_type = 1          # 空闲
-            elif instance.work_status == 1 and 5 >= instance.charg_status.id >= 0:
-                connector_type = 2
-            elif instance.work_status == 3:
-                connector_type = 2
-            elif instance.work_status == 1 and instance.charg_status.id == 6:
-                connector_type = 3
-            elif instance.work_status == 2:
-                connector_type = 255
-            print("update_connector_info")
-            defaults = {
-                "ConnectorID": ConnectorID,
-                "ConnectorType": instance.gun_type,
-                "VoltageUpperLimits": instance.voltage_upper_limits,
-                "VoltageLowerLimits": instance.voltage_lower_limits,
-                "Current": instance.current,
-                "Power": instance.power,
-                "EquipmentID": equipment_info,
-                "NationalStandard": instance.nationalstandard,
-                "Status": connector_type,
-            }
+    if not created and instance.old_work_status not in [2, 9] and instance.work_status in [2, 9]:
+        data = {
+            "gun_num": instance.gun_num,
+            "charg_pile": instance.charg_pile,
+            "work_status": instance.work_status,
+            "charg_status": instance.charg_status,
+            "fault_time": datetime.datetime.now(),
+        }
+        FaultChargingGun.objects.create(**data)
 
-            ret = ConnectorInfo.objects.update_or_create(ID=str(ID), defaults=defaults)
-            logging.info(ret)
-        except EquipmentInfo.DoesNotExist as ex:
-            logging.warning(ex)
+    try:
+        ID = instance.id
+        ConnectorID = '{}{}'.format(instance.charg_pile.pile_sn, instance.gun_num)
+        EquipmentID = instance.charg_pile.id
+        equipment_info = EquipmentInfo.objects.get(EquipmentID=str(EquipmentID))
+        connector_type = 0
+        if instance.work_status == 9:
+            connector_type = 0          # 离网
+        elif instance.work_status == 0:
+            connector_type = 1          # 空闲
+        elif instance.work_status == 1 and 5 >= instance.charg_status.id >= 0:
+            connector_type = 2
+        elif instance.work_status == 3:
+            connector_type = 2
+        elif instance.work_status == 1 and instance.charg_status.id == 6:
+            connector_type = 3
+        elif instance.work_status == 2:
+            connector_type = 255
+        print("update_connector_info")
+        defaults = {
+            "ConnectorID": ConnectorID,
+            "ConnectorType": instance.gun_type,
+            "VoltageUpperLimits": instance.voltage_upper_limits,
+            "VoltageLowerLimits": instance.voltage_lower_limits,
+            "Current": instance.current,
+            "Power": instance.power,
+            "EquipmentID": equipment_info,
+            "NationalStandard": instance.nationalstandard,
+            "Status": connector_type,
+        }
+
+        ret = ConnectorInfo.objects.update_or_create(ID=str(ID), defaults=defaults)
+        logging.info(ret)
+    except EquipmentInfo.DoesNotExist as ex:
+        logging.warning(ex)
 
 
 @receiver(post_delete, sender=ChargingGun)
