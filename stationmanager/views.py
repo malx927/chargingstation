@@ -1,11 +1,12 @@
 # coding=utf-8
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 
 from wxchat.decorators import weixin_decorator
 from wxchat.views import getJsApiSign
-from .models import ChargingPile, Station, ChargingPrice
+from .models import ChargingPile, Station, ChargingPrice, FaultChargingGun
 
 
 class StationListView(View):
@@ -57,12 +58,10 @@ class StationPricesDetailView(View):
         return render(request, template_name="weixin/stage_price.html", context=context)
 
 
-# class DashboardListView(View):
-#     def get(self, request, *args, **kwargs):
-#         station_id = request.GET.get("station_id", None)
-#
-#         if pile_sn and gun_num:
-#             return render(request, template_name='stationmanager/recharge.html', context={"pile_sn": pile_sn})
-#         else:
-#             piles = ChargingPile.objects.all()
-#             return render(request, template_name='stationmanager/index.html', context={"piles": piles})
+class FaultChargingGunListView(View):
+    def get(self, request, *args, **kwargs):
+        fault_counts = FaultChargingGun.objects.filter(repair_flag=False).count()
+        data = {
+            "fault_counts": fault_counts
+        }
+        return JsonResponse(data)
