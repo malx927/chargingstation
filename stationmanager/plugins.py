@@ -55,4 +55,19 @@ class DashBoardPlugin(BaseAdminPlugin):
         return media
 
 
+class WarningPlugin(BaseAdminPlugin):
+    is_warning = False
+
+    def init_request(self, *args, **kwargs):
+        self.is_warning = True
+        return bool(self.is_warning)
+
+    def block_top_navbar(self, context, nodes):
+        if self.is_warning:
+            nodes.append(
+                loader.render_to_string('stationmanager/charging_pile_warning.html', context=get_context_dict(context))
+            )
+
+
+
 

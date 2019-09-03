@@ -11,18 +11,19 @@ from django.urls import reverse
 from codingmanager.models import AreaCode
 from users.models import UserProfile
 from xadmin.sites import site
-from stationmanager.plugins import DashBoardPlugin
+from stationmanager.plugins import DashBoardPlugin, WarningPlugin
 import xadmin
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText, Col, TabHolder, Tab
 from stationmanager.utils import create_qrcode
 from xadmin import views
 from xadmin.plugins.inline import Inline
-from xadmin.views import Dashboard
+from xadmin.views import Dashboard, CommAdminView
 from xadmin.views.website import LoginView
 from .models import Seller, Station, ChargingPile, ChargingPrice, ChargingPriceDetail, MqttSubData, ChargingGun, \
     PowerModuleStatus, StationImage, FaultChargingGun
 
 site.register_plugin(DashBoardPlugin, Dashboard)
+site.register_plugin(WarningPlugin, CommAdminView)
 
 
 # 修改登录界面标题
@@ -462,7 +463,7 @@ xadmin.site.register(ChargingGun, ChargingGunAdmin)
 
 
 class FaultChargingGunAdmin(object):
-    list_display = ['charg_pile', 'gun_num', 'work_status', 'charg_status', 'fault_time', 'repair_time','repair_flag']
+    list_display = ['charg_pile', 'gun_num', 'work_status', 'charg_status', 'fault_time', 'repair_time', 'repair_flag']
     search_fields = ['gun_num', 'charg_pile__pile_sn']
     list_display_links = ['gun_num', 'charg_pile']
     list_filter = ['charg_pile', 'work_status', 'charg_status']
@@ -470,13 +471,23 @@ class FaultChargingGunAdmin(object):
     show_all_rel_details = False
 
     def queryset(self):
-        queryset = super(FaultChargingGunAdmin, self).queryset().filter(Q(work_status=2)| Q(work_status=9))
+        queryset = super(FaultChargingGunAdmin, self).queryset()
         if self.request.user.is_superuser:
             return queryset
         elif self.request.user.station:
             return queryset.filter(charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(charg_pile__station__seller=self.request.user.seller)
+
+    form_layout = (
+        Fieldset('',
+            Row('charg_pile', 'gun_num'),
+            Row('work_status', 'charg_status'),
+            Row('fault_time', 'repair_time'),
+            Row('repair_persons'),
+            Row('repair_flag'),
+        ),
+    )
 
 
 xadmin.site.register(FaultChargingGun, FaultChargingGunAdmin)
@@ -535,6 +546,7 @@ class ChargingPriceAdmin(object):
                 kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)
 
         return super(ChargingPriceAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
+
 
 xadmin.site.register(ChargingPrice, ChargingPriceAdmin)
 
