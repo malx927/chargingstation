@@ -161,7 +161,7 @@ class ChargingPile(models.Model):
     充电桩信息
     """
     name = models.CharField(verbose_name='名称', max_length=64)
-    pile_sn = models.CharField(verbose_name='电桩编码(SN)', max_length=32,)
+    pile_sn = models.CharField(verbose_name='电桩编码(SN)', max_length=32, unique=True)
     pile_type = models.ForeignKey(PileType, verbose_name='电桩类型', on_delete=models.SET_NULL, null=True)
     pile_mode = models.IntegerField(verbose_name='电桩模式', default=0, blank=True, choices=CHARGING_PILE_MODE)
     max_gun = models.IntegerField(verbose_name='最大枪口数', blank=True, default=0)
