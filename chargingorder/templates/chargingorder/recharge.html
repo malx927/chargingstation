@@ -97,6 +97,8 @@
     $(document).ready(function(){
         // 充满为止
         $("#full_recharge").on("click", function (event) {
+            var ret = delay_time();
+            if(!ret) return;
             var charg_mode = $(this).attr("data-item");
             var params = {
                 pile_sn: '{{ pile_sn }}',
@@ -108,6 +110,8 @@
         })
         // 按金额充电
          $("#money_recharge").on("click", function (event) {
+            var ret = delay_time();
+            if(!ret) return;
             var charg_mode = $(this).attr("data-item");
             var total_fee = $("#total_fee").val()||"0";
             if(total_fee=="0" || total_fee.length==0 )
@@ -126,6 +130,8 @@
         })
         // 按时间充电
          $("#min_recharge").on("click", function (event) {
+            var ret = delay_time();
+            if(!ret) return;
             var charg_mode = $(this).attr("data-item");
             var charg_min_val = $("#charg_min_val").val()||"0";
             if(charg_min_val=="0" || charg_min_val.length==0 )
@@ -144,6 +150,8 @@
         })
          // 按时间充电
          $("#soc_recharge").on("click", function (event) {
+            var ret = delay_time();
+            if(!ret) return;
             var charg_mode = $(this).attr("data-item");
             var charg_soc_val = $("#charg_soc_val").val()||"0";
              if(charg_soc_val=="0" || charg_soc_val.length==0 )
@@ -182,6 +190,21 @@
               }
         });
     }
-
+    function delay_time(){
+        var ts = sessionStorage.getItem('recharge');
+        if(ts==null) {
+           sessionStorage.setItem('recharge', new Date().getTime());
+        }
+       else{
+           var cur_ts = new Date().getTime();
+           var diff = (cur_ts - Number(ts))/1000;
+           if(diff < 20 ){
+               M.toast({html: '您刚才已经提交过，如果没有成功请20秒后再提交!'});
+                return false;
+           }
+           sessionStorage.setItem('recharge', cur_ts);
+       }
+       return true;
+    }
     </script>
 {% endblock bottomjs %}
