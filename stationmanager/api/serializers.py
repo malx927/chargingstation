@@ -7,7 +7,7 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework import serializers
 from codingmanager.models import AreaCode
-from stationmanager.models import ChargingPile, Station
+from stationmanager.models import ChargingPile, Station, FaultChargingGun
 
 __author__ = 'malixin'
 
@@ -76,30 +76,7 @@ class StationSerializer(serializers.ModelSerializer):
     #     serializer = CodeDistrictSerializer(distrSet, many=True)
     #     return serializer.data
 
-#
-# class CodeProvinceSerializer(serializers.ModelSerializer):
-#     label = serializers.SerializerMethodField()
-#     value = serializers.SerializerMethodField()
-#     children = serializers.SerializerMethodField()
-#
-#     class Meta:
-#         model = AreaCode
-#         fields = [
-#             'label',
-#             'value',
-#             'children',
-#         ]
-#
-#     def get_label(self,obj):
-#         return obj.name
-#
-#     def get_value(self,obj):
-#         return  obj.code
-#
-#     def get_children(self,obj):
-#         citySet = AreaCode.objects.extra(where=['left(code,2)=%s', 'length(code)=4'], params=[obj.code])
-#         serializer = CodeCitySerializer(citySet, many=True)
-#         return serializer.data
+
 #
 # class DogLossSerializer(serializers.ModelSerializer):
 #     # url = HyperlinkedIdentityField(

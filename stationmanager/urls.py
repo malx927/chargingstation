@@ -18,10 +18,11 @@ from django.conf.urls.static import static
 from django.conf import settings
 # from django.contrib import admin
 from django.views.generic import TemplateView
-from .views import StationListView, StationDetailView, StationPricesDetailView
+from .views import StationListView, StationDetailView, StationPricesDetailView, FaultChargingGunListView
 
 urlpatterns = [
    url(r'^$', StationListView.as_view(), name='station-index'),
    url(r'^detail/(?P<stationid>\d+)/$', StationDetailView.as_view(), name='station-detail'),
    url(r'^pricedetail/(?P<stationid>\d+)/$', StationPricesDetailView.as_view(), name='station-price-detail'),
+   url(r'^faultgun/$', FaultChargingGunListView.as_view(), name='fault-gun-list'),
 ]

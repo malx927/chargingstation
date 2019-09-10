@@ -648,3 +648,5 @@ class SubAccountUpdateAmount(View):
         #         SubAccount.objects.filter(id=id).update(**row)
         #
         # return render(request, 'index.html', {'formset': formset})
+
+

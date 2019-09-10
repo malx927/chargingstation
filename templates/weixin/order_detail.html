@@ -1,0 +1,193 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block extra %}
+<style>
+.bing_word{
+    display:block;
+    position:absolute;
+    top:40%;left:50%;
+    text-align:center;
+    width:90px;
+    margin-left:-45px;
+}
+.bing_word p{
+    font-size:14px;
+    line-height:160%;
+}
+.bing_word span{
+    font-size:2.0rem;
+    font-family:microsoft Yahei;
+}
+.item-action{
+    {#text-align:left;#}
+    {#padding-left:20px;#}
+    min-height: 24px;
+}
+</style>
+{% endblock extra %}
+{% block title %}充电信息{% endblock %}
+{% block content %}
+    <div class="app-content">
+        {% if order %}
+        <div class="van-cell-group van-hairline--top-bottom">
+            <div class="base-info-cell"></div>
+            <div class="coupon-section__list">
+                <div class="coupon-item-container">
+                    <div class="coupon-item">
+                        <div class="coupon-item__container">
+                            <div class="coupon-item__left coupon-item__block">
+                                <div class="avatar-image-wrapper">
+                                {% if request.session.headimgurl %}
+                                <div class="avatar-image" style="background-image: url('{{ request.session.headimgurl }}'); width: 60px; height: 60px;"></div>
+                                <img  src="{{ request.session.headimgurl }}"  alt="avatar">
+                                {% else %}
+                                <div class="avatar-image" style="background-image: url('{% static "weixin/images/logo.jpg" %}'); width: 60px; height: 60px;"></div>
+                                {% endif %}
+                                </div>
+                            </div>
+                            <div class="coupon-item__block coupon-item__center">
+                                <div class="coupon-item__center-title ellipsis">
+                                    <span class="coupon-item__title-tag"></span>{{ order.name }} [{{ order.get_charg_mode_display }}]
+                                </div>
+                                <div class="coupon-item__center-time">{{ order.out_trade_no }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>充电状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action" id="id_charg_status">{{ order.charg_status.name|default:'' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>开始SOC值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action" id="id_charg_status">{{ order.begin_soc|default:0}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>结束SOC值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action" id="id_charg_status">{{ order.end_soc|default:0}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>实际充电时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action"><span id="id_total_minutes">{{ order.total_minutes }}</span> 分钟</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>实际充电电量</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action"><span id="id_total_reading">{{ order.get_total_reading }}</span> 度(KWH)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>消费金额</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_consum_money">{{ order.consum_money }}</span> 元</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>账户余额</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span>{{ order.balance }}</span> 元</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>订单状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_order_status">{{ order.get_status_display|default:'' }}</span></div>
+                    </div>
+                </div>
+            </div>
+            {% if order.charg_mode == 1 %}
+             <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按充电金额</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.total_fee }} 元</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 2 %}
+             <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按充电时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_min_val }} 分钟</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 3 %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按SOC值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_soc_val }} %</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 4 %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按电量值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_reading_val }} 度</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>开始时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action" id="id_begin_time">{{ order.begin_time|default:'' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>结束时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action" id="id_begin_time">{{ order.end_time|default:'' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>电桩编码SN</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action">{{ order.charg_pile.pile_sn|default:''}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>枪口号</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action">{{ order.gun_num|default:''}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}

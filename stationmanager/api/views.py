@@ -93,10 +93,9 @@ class StationListAPIView(ListAPIView):
         stations = Station.objects.filter(Q(name__icontains=city_name) | Q(address__icontains=city_name)
                                             | Q(province__name__icontains=city_name) | Q(city__name__contains=city_name)
                                             | Q(district__name__icontains=city_name))
-        print(stations)
         return stations
 
-#
+
 # class DogLossDetailAPIView(RetrieveAPIView):
 #     queryset = DogLoss.objects.all()
 #     serializer_class = DogLossDetailSerializer

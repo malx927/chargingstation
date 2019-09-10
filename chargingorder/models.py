@@ -49,7 +49,10 @@ class Order(models.Model):
     max_temp = models.IntegerField(verbose_name='车辆最高充电温度', blank=True, null=True)
     power_fee = models.DecimalField(verbose_name='电费', blank=True, default=0, max_digits=10, decimal_places=2)
     service_fee = models.DecimalField(verbose_name='服务费', blank=True, default=0, max_digits=10, decimal_places=2)
+    park_fee = models.DecimalField(verbose_name='停车费', blank=True, default=0, max_digits=6, decimal_places=2)
     status = models.IntegerField(verbose_name='订单状态', choices=ORDER_STATUS, default=0)
+    main_openid = models.CharField(verbose_name='主账号ID', max_length=64, blank=True, null=True,)
+    balance = models.DecimalField(verbose_name='余额(元)', blank=True, default=0, max_digits=8, decimal_places=2)
     start_charge_seq = models.CharField(verbose_name='e充电订单号', max_length=32, blank=True, null=True,)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     report_result = models.IntegerField(verbose_name='上报确认', blank=True, null=True)
@@ -76,6 +79,13 @@ class Order(models.Model):
         if self.end_time and self.begin_time:
             seconds = (self.end_time - self.begin_time).total_seconds()
             return seconds
+        else:
+            return 0
+
+    def total_hours(self):
+        if self.end_time and self.begin_time:
+            hours = Decimal((self.end_time - self.begin_time).total_seconds()/3600)
+            return hours.quantize(Decimal('0.01'))
         else:
             return 0
 

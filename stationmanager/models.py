@@ -8,6 +8,7 @@ import time
 
 from django.db.models import Count, Q
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from codingmanager.models import PileType, FaultCode, PriceType, AreaCode
 from codingmanager.constants import *
@@ -160,7 +161,7 @@ class ChargingPile(models.Model):
     充电桩信息
     """
     name = models.CharField(verbose_name='名称', max_length=64)
-    pile_sn = models.CharField(verbose_name='电桩编码(SN)', max_length=32,)
+    pile_sn = models.CharField(verbose_name='电桩编码(SN)', max_length=32, unique=True)
     pile_type = models.ForeignKey(PileType, verbose_name='电桩类型', on_delete=models.SET_NULL, null=True)
     pile_mode = models.IntegerField(verbose_name='电桩模式', default=0, blank=True, choices=CHARGING_PILE_MODE)
     max_gun = models.IntegerField(verbose_name='最大枪口数', blank=True, default=0)
@@ -283,12 +284,20 @@ class ChargingPileStatus(models.Model):
         verbose_name_plural = verbose_name
 
 
-class FaultChargingGun(ChargingGun):
+class FaultChargingGun(models.Model):
     """
     故障充电桩枪信息表
     """
+    gun_num = models.CharField(verbose_name='枪口号', max_length=12, choices=GUN_NUM)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE)
+    work_status = models.IntegerField(verbose_name='工作状态', default=9, blank=True, choices=GUN_WORKING_STATUS)
+    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True)
+    fault_time = models.DateTimeField(verbose_name="故障时间", blank=True, null=True)
+    repair_time = models.DateTimeField(verbose_name="修复时间", blank=True, null=True)
+    repair_persons = models.CharField(verbose_name="修复人", blank=True, null=True, max_length=64)
+    repair_flag = models.BooleanField(verbose_name="修复标志", default=False)
+
     class Meta:
-        proxy = True
         verbose_name = '故障枪口信息'
         verbose_name_plural = verbose_name
 
@@ -317,7 +326,6 @@ class ChargingPrice(models.Model):
     def get_current_serice_price(self):
         cur_time = datetime.now().time()
         price_detail = self.prices.filter(begin_time__lte=cur_time, end_time__gte=cur_time).first()
-        print("get_current_serice_price", price_detail)
         if price_detail:
             return price_detail.service_price
         else:

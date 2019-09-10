@@ -1,0 +1,36 @@
+<a href="/ydadmin/stationmanager/faultcharginggun/" id="fault_gun" class="btn  navbar-btn pull-right hidden" style="padding:0px 12px;">
+    <span id="warning" class="glyphicon glyphicon-bell"  style="font-size:28px;color:red"></span>
+</a>
+
+<script type="application/javascript">
+
+$(function () {
+    get_fault_guns();
+    setInterval("get_fault_guns()",10000);
+    setInterval("flash_color()", 1000);
+})
+function get_fault_guns() {
+    $.ajax({
+          type: 'GET',
+          url: '{% url "fault-gun-list" %}',
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              console.log(JSON.stringify(data));
+              if(data.fault_counts == 0 && !$("#fault_gun").hasClass("hidden")) {
+                  $("#fault_gun").addClass("hidden");
+              }else if( data.fault_counts > 0){
+                  $("#fault_gun").removeClass("hidden");
+              }
+          },
+          complete: function(){
+          },
+          error: function(error){
+
+          }
+    });
+}
+function flash_color() {
+    $("#warning").fadeOut(100).fadeIn(100);
+}
+</script>

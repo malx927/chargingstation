@@ -21,6 +21,7 @@ from django.db.models import F, Sum, DecimalField
 
 # logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
 #                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 # 导入django model
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,6 +41,7 @@ from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
 from wxchat.models import UserInfo, UserAcountHistory
+from wxchat.utils import send_charging_start_message_to_user
 from stationmanager.signals import update_operator_info
 from stationmanager.signals import operator_info_init
 from stationmanager.signals import operator_info_delete
@@ -413,6 +415,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
         "status": 1,  # 未结帐
     }
     logging.info(data)
+
     update_gun_order_status(**data)
     # 清除发送充电命令超时判断
     ChargingCmdRecord.objects.filter(out_trade_no=out_trade_no, pile_sn=pile_sn, cmd_flag="start").delete()
@@ -469,6 +472,7 @@ def update_gun_order_status(**data):
         order.begin_time = begin_time
         order.status = status
         order.save()
+        send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
         send_data = {
             "return_code": "success",
             "cmd": "04",        # 充电命令
@@ -555,11 +559,7 @@ def pile_report_car_info_handler(topic, byte_msg):
 
 
 def get_charging_price(station_id, curTime):
-    """
-    获取充电站的当前价格值
-    :param station_id:
-    :return:
-    """
+    """获取充电站的当前价格值"""
     try:
         chargingPrice = ChargingPrice.objects.filter(station__id=station_id, default_flag=1).first()
         if chargingPrice:
@@ -853,7 +853,14 @@ def save_pile_charg_status_to_db(**data):
 
     try:
         charg_user = UserInfo.objects.get(openid=order.openid)
-        if charg_user.account_balance() - order.consum_money <= 0.2:
+        sub_account = charg_user.is_sub_user()
+        if sub_account:
+            if sub_account.main_user.account_balance() - order.consum_money <= 10:  # 附属用户
+                # 发送停充指令
+                stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
+                logging.info(stop_data)
+                server_send_stop_charging_cmd(**stop_data)
+        elif charg_user.account_balance() - order.consum_money <= 0.2:
             # 发送停充指令
             stop_data["fault_code"] = 93    # 后台主动停止－帐号无费用
             logging.info(stop_data)
@@ -981,11 +988,13 @@ def calculate_order(**kwargs):
     order.total_readings = order.end_reading - order.begin_reading
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
-    order.consum_money = order.power_fee + order.service_fee
+    order.park_fee = (order.total_hours() * price.charg_price.parking_fee).quantize(decimal.Decimal("0.01"))
+    order.consum_money = order.power_fee + order.service_fee + order.park_fee
     order.end_soc = currRec.current_soc
     order.charg_status = charg_status if charg_status is not None else gun.charg_status
+
     order.status = order_status
-    order.save(update_fields=['end_time', 'prev_reading', 'end_reading', 'total_readings', 'power_fee', 'service_fee', 'consum_money', 'end_soc', 'charg_status', 'status'])
+    order.save(update_fields=['end_time', 'prev_reading', 'end_reading', 'total_readings', 'park_fee', 'power_fee', 'service_fee', 'consum_money', 'end_soc', 'charg_status', 'status'])
     return order
 
 
@@ -1060,7 +1069,7 @@ def server_send_stop_charging_cmd(*args, **kwargs):
 def pile_charging_stop_handler(topic, byte_msg):
     """
     13、充电桩停止充电回复或主动上报
-    说明：充电桩->服务器，充电桩主动上报停止充电或回复0x86命令（80字节）py。
+    说明：充电桩->服务器，充电桩主动上报停止充电或回复0x86命令（80字节）。
     :param topic:
     :param byte_msg:
     :return:
@@ -1134,7 +1143,7 @@ def pile_charging_stop_handler(topic, byte_msg):
             "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
             "stop_code": 1,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
             "state_code": state_code,
-            "fault_code": 0,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
+            "fault_code": 0,
         }
         logging.info(stop_data)
         server_send_stop_charging_cmd(**stop_data)
@@ -1155,7 +1164,6 @@ def pile_charging_stop_handler(topic, byte_msg):
     send_data_to_client(pile_sn, gun_num, **send_data)
 
     logging.info("Leave pile_charging_stop_handler function")
-
 
 
 def decrypt_message(byte_msg):

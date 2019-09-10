@@ -11,7 +11,7 @@ from .models import Order, OrderRecord, OrderChargDetail
 # 订单admin
 class OrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'charg_pile', 'total_minutes', 'total_readings', 'pay_time', 'consum_money', 'cash_fee'
+        'out_trade_no', 'name', 'charg_mode', 'charg_pile', 'total_minutes', 'total_readings', 'begin_time', 'pay_time', 'cash_fee'
     ]
     search_fields = ['out_trade_no', 'charg_pile.pile_sn', 'name']
     list_filter = ['charg_mode', 'charg_type', 'charg_status', 'begin_time']
@@ -19,6 +19,7 @@ class OrderAdmin(object):
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
+    readonly_fields = ["balance", "main_openid"]
     relfield_style = 'fk_ajax'
     aggregate_fields = {"total_readings": "sum", 'cash_fee': "sum"}
 
@@ -53,7 +54,10 @@ class OrderAdmin(object):
                     AppendedText('begin_reading', '度'),
                     AppendedText('end_reading', '度')
                 ),
-                Row("total_readings"),
+                Row(
+                    AppendedText('total_readings', 'KWH'),
+                    AppendedText('park_fee', '元'),
+                ),
                 Row(
                     AppendedText('power_fee', '元'),
                     AppendedText('service_fee', '元'),
@@ -68,6 +72,10 @@ class OrderAdmin(object):
                 Row(
                     'transaction_id',
                     'pay_time',
+                ),
+                Row(
+                    'balance',
+                    'main_openid',
                 ),
             ),
             Fieldset(
