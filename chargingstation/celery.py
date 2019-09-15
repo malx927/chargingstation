@@ -26,23 +26,23 @@ app.autodiscover_tasks()
 
 app.conf.update(
     CELERYBEAT_SCHEDULE={
-        # 'notification_equip_charge_status_task': {
-        #     'task': 'echargenet.tasks.notification_equip_charge_status',
-        #     'schedule':  timedelta(seconds=50),
-        # },
-        # 'notification_charge_order_info_for_bonus_task': {
-        #     'task': 'echargenet.tasks.notification_charge_order_info_for_bonus',
-        #     'schedule': timedelta(seconds=5),
-        # },
-        # 'notification_connector_status_task': {
-        #     'task': 'echargenet.tasks.notification_connector_status',
-        #     'schedule': crontab(minute=30, hour='1,4,7,10,13,16,19,22'),
-        # },
-        # 'check_charge_orders_task': {
-        #     'task': 'echargenet.tasks.check_charge_orders',
-        #     'schedule': crontab(minute=0, hour='1'),
-        #     # 'schedule': timedelta(seconds=15),
-        # },
+        'notification_equip_charge_status_task': {
+            'task': 'echargenet.tasks.notification_equip_charge_status',
+            'schedule':  timedelta(seconds=50),
+        },
+        'notification_charge_order_info_for_bonus_task': {
+            'task': 'echargenet.tasks.notification_charge_order_info_for_bonus',
+            'schedule': timedelta(seconds=5),
+        },
+        'notification_connector_status_task': {
+            'task': 'echargenet.tasks.notification_connector_status',
+            'schedule': crontab(minute=30, hour='1,4,7,10,13,16,19,22'),
+        },
+        'check_charge_orders_task': {
+            'task': 'echargenet.tasks.check_charge_orders',
+            'schedule': crontab(minute=0, hour='1'),
+            # 'schedule': timedelta(seconds=15),
+        },
         'update_pile_status_overtime_task': {
             'task': 'chargingorder.tasks.update_pile_status_overtime',
             'schedule': timedelta(seconds=5),
