@@ -220,8 +220,8 @@ def pile_status_handler_v12(topic, byte_msg):
     logging.info('工作状态枪2:{}[{}]'.format(gun2_status, gun2_desc))
 
     # 更新枪口状态
-    gun1 = update_charging_gun_status(pile_sn, 0, gun1_desc, gun1_status)  # 枪1
-    gun2 = update_charging_gun_status(pile_sn, 1, gun2_desc, gun2_status)  # 枪2
+    gun1 = update_charging_gun_status(pile_sn, '0', gun1_desc, gun1_status)  # 枪1
+    gun2 = update_charging_gun_status(pile_sn, '1', gun2_desc, gun2_status)  # 枪2
 
     # 通知前端
     send_data = {
