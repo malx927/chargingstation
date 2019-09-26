@@ -162,14 +162,14 @@ FACTOR_BATTERY_SOC = 1
 FACTOR_READINGS = 0.01
 
 
-WEB_URL = 'hzymlx.natapp1.cc'
+WEB_URL = 'haotian.natapp1.cc'
 
 # mqtt
-MQTT_HOST = "hzymlx.natapp1.cc"
-DEVICENAME_RECV = 'server_recv1'
-DEVICENAME_SEND = 'server_send1'
-USERNAME = ''
-PASSWORD = ''
+MQTT_HOST = "iot.canage.com.cn"
+DEVICENAME_RECV = 'server_recv2'
+DEVICENAME_SEND = 'server_send2'
+USERNAME = 'mqtt'
+PASSWORD = 'yd1q2w3e4r'
 
 # redis 超时判断
 MQTT_REDIS_URL = '127.0.0.1'
@@ -178,8 +178,10 @@ MQTT_REDIS_PORT = 6379
 CHARGING_SEND_CMD_INTERVAL = 5
 FREQUENCY = 3
 
-CHARG_STATUS_OVER_TIME = 30
-PILE_STATUS_OVER_TIME = 2 * 60
+CHARG_STATUS_OVER_TIME = 30     # 直流
+CHARG_AC_STATUS_OVER_TIME = 30 * 60     # 交流
+PILE_STATUS_OVER_TIME = 2 * 60  # 直流
+PILE_AC_STATUS_OVER_TIME = 30 * 60  # 交流
 REPLY_TO_WORK_OVERTIME = 60 * 3
 
 CHARING_PILE_STATUS = 'charing_pile_status'             # 电桩桩状态上报超时
@@ -203,12 +205,12 @@ REDIS_URL = 'redis://127.0.0.1:6379/0'
 NOTIFY_URL = 'http://' + WEB_URL + '/order/pay/notify/'        # 根据实际域名修改
 
 # e充网
-OPERATORSECRET = '333333'  # 申请认证使用
-SIGSECRET = '22222'  # 签名的加密密钥
-DATASECRET = '22222'  # Data信息进行加密
-DATASECRETIV = '11111'  # 用户AES加密过程的混合加密
+OPERATORSECRET = 'RJ4MmF9RdKMV8lGn'  # 申请认证使用
+SIGSECRET = 'TiF5KmJCfXrNzz3r'  # 签名的加密密钥
+DATASECRET = 'YaDtFWtGGGiisEBB'  # Data信息进行加密
+DATASECRETIV = '6T20he7lkiG2XAuv'  # 用户AES加密过程的混合加密
 OPERATORID = 'MA004REG2'  # 组织机构代码
-ECHARGE_OPERATORID = '333333'  # e充网组织机构代码
+ECHARGE_OPERATORID = '348375727'  # e充网组织机构代码
 EXPIRATION_DELTA = 3 * 24 * 3600
 
 # celery
