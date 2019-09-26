@@ -227,6 +227,7 @@ class ChargingStatusRecord(models.Model):
     """充电状态记录表"""
     pile_sn = models.CharField(verbose_name="充电桩SN", max_length=32)
     gun_num = models.IntegerField(verbose_name="枪口号")
+    pile_type = models.IntegerField(verbose_name="电桩类型", default=0)
     out_trade_no = models.CharField(verbose_name="订单号", max_length=32)
     recv_time = models.DateTimeField(verbose_name="接收时间", auto_now=True)
     over_time = models.DateTimeField(verbose_name="超时时间", blank=True, null=True)
