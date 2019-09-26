@@ -38,6 +38,7 @@ session_interface = RedisStorage(
 )
 
 
+
 def wxClient():
     """
     创建微信客户端对象

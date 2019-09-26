@@ -39,9 +39,16 @@ def update_pile_status_overtime():
             continue
         delta_time = (current_time - update_time).seconds
         print("---------------:", delta_time)
-        if delta_time > settings.PILE_STATUS_OVER_TIME:     # 600
+        if gun.charg_pile.pile_type not in [5, 6] and delta_time > settings.PILE_STATUS_OVER_TIME:     # 600
             # 更新pile状态 为离线状态
-            log.info('update_pile_status_overtime:电桩SN{}枪口{}{}'.format(gun.charg_pile.pile_sn, gun.gun_num, '离线'))
+            log.info('update_pile_status_overtime:直流电桩SN{}枪口{}{}'.format(gun.charg_pile.pile_sn, gun.gun_num, '离线'))
+            gun.work_status = 9
+            gun.charg_status = None
+            gun.add_time = datetime.datetime.now()
+            gun.save(update_fields={"work_status", "charg_status", "add_time"})
+        elif gun.charg_pile.pile_type in [5, 6] and delta_time > settings.PILE_AC_STATUS_OVER_TIME:     # 60 * 30
+            # 更新pile状态 为离线状态
+            log.info('update_pile_status_overtime:交流电桩SN{}枪口{}{}'.format(gun.charg_pile.pile_sn, gun.gun_num, '离线'))
             gun.work_status = 9
             gun.charg_status = None
             gun.add_time = datetime.datetime.now()

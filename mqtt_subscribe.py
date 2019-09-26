@@ -623,7 +623,7 @@ def stop_charging(order):
     if order.begin_time is None:
         stop_data = {
             "pile_sn": order.charg_pile.pile_sn,
-            "gun_num": order.gun_num,
+            "gun_num": int(order.gun_num),
             "out_trade_no": order.out_trade_no,
             "consum_money": 0,
             "total_reading": 0,
@@ -772,13 +772,24 @@ def pile_charging_status_handler(topic, byte_msg):
     save_pile_charg_status_to_db(**data)
 
     # 更新redis 数据
-    current_time = datetime.datetime.now()
-    defaults = {
-        "recv_time": current_time,
-        "over_time": current_time + datetime.timedelta(seconds=settings.CHARG_STATUS_OVER_TIME),
-    }
-    ret = ChargingStatusRecord.objects.update_or_create(pile_sn=pile_sn, gun_num=gun_num, out_trade_no=out_trade_no, defaults=defaults)
-    logging.info(ret)
+    charg_pile = ChargingPile.objects.filter(pile_sn=pile_sn).first()
+    if charg_pile:
+        current_time = datetime.datetime.now()
+        defaults = {
+            "recv_time": current_time,
+        }
+        if charg_pile.pile_type not in [5, 6]:
+            defaults["over_time"] = current_time + datetime.timedelta(seconds=settings.CHARG_STATUS_OVER_TIME)
+        else:
+            defaults["over_time"] = current_time + datetime.timedelta(seconds=settings.CHARG_AC_STATUS_OVER_TIME)
+
+        defaults["pile_type"] = charg_pile.pile_type_id
+        ret = ChargingStatusRecord.objects.update_or_create(pile_sn=pile_sn, gun_num=gun_num, out_trade_no=out_trade_no,
+                                                            defaults=defaults)
+        logging.info(ret)
+    else:
+        logging.info("{}电桩不存在".format(pile_sn))
+
 
 
 # 11
