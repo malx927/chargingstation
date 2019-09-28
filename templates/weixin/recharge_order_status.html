@@ -18,8 +18,6 @@
     font-family:microsoft Yahei;
 }
 .item-action{
-    {#text-align:left;#}
-    {#padding-left:20px;#}
     min-height: 24px;
 }
 </style>
@@ -117,6 +115,22 @@
             </div>
             {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
                 {% with order.get_record as record %}
+                 <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>充电所需电压</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_voltage">{{ record.voltage|default:0 }}</span> V</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>充电所需电流</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_current">{{ record.current|default:0 }}</span> A</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="base-info-cell">
                     <div class="van-cell">
                         <div class="van-cell__title"><span>实际输出电压</span></div>
@@ -136,22 +150,6 @@
                 {% endwith %}
             {% else %}
                 {% with order.get_record as record %}
-                <div class="base-info-cell">
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>充电所需电压</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_voltage">{{ record.voltage|default:0 }}</span> V</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="base-info-cell">
-                    <div class="van-cell">
-                        <div class="van-cell__title"><span>充电所需电流</span></div>
-                        <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_current">{{ record.current|default:0 }}</span> A</div>
-                        </div>
-                    </div>
-                </div>
                 <div class="base-info-cell">
                     <div class="van-cell">
                         <div class="van-cell__title"><span>实际输出电压</span></div>
@@ -247,6 +245,7 @@
 
 {% block bottomjs %}
 <script type="text/javascript">
+    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
     var pper = 0;
     var pper_interal;
     var myCanvas = document.getElementById("myCanvas1");
@@ -305,6 +304,7 @@
          ctx.arc(circle.r, circle.r, circle.r, 0, Math.PI*(pper/100)*360/180, false);
          ctx.stroke();
     }
+    {% endif %}
     {% if order %}
     $(function () {
         // Correctly decide between ws:// and wss://
@@ -340,7 +340,9 @@
                     $("#id_charg_status").text(msg.charg_status);
                     $("#id_order_status").text(msg.order_status);
                     $("#id_begin_time").text(msg.begin_time);
+                    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
                     $("#myCanvas1").attr("data-percent", msg.begin_soc);
+                    {% endif %}
                     $("#id_stop").addClass("pulse");
                 }
                 else{
@@ -354,11 +356,14 @@
                     $("#id_total_minutes").text(msg.total_minutes);
                     $("#id_total_reading").text(msg.total_reading);
                     $("#id_consum_money").text(msg.consum_money);
+                    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
                     $("#id_voltage").text(msg.voltage);
                     $("#id_current").text(msg.current);
+                    $("#myCanvas1").attr("data-percent", msg.current_soc);
+                    {% endif %}
                     $("#id_output_voltage").text(msg.output_voltage);
                     $("#id_output_current").text(msg.output_current);
-                    $("#myCanvas1").attr("data-percent", msg.current_soc);
+                    
 
                 }
             }
@@ -369,12 +374,13 @@
                     $("#id_total_minutes").text(msg.total_minutes);
                     $("#id_total_reading").text(msg.total_reading);
                     $("#id_consum_money").text(msg.consum_money);
+                    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
                     $("#id_voltage").text('0');
                     $("#id_current").text('0');
+                    {% endif %}
                     $("#id_output_voltage").text('0');
                     $("#id_output_current").text('0');
                     window.location.href=window.location.href;
-                    {#this.close();#}
                 }
             }
 

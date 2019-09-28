@@ -62,6 +62,7 @@
                     </div>
                 </div>
             </div>
+        {% if  order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
             <div class="base-info-cell">
                 <div class="van-cell">
                     <div class="van-cell__title"><span>开始SOC值</span></div>
@@ -78,6 +79,7 @@
                     </div>
                 </div>
             </div>
+        {% endif %}
             <div class="base-info-cell">
                 <div class="van-cell">
                     <div class="van-cell__title"><span>实际充电时间</span></div>
