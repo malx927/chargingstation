@@ -4,7 +4,7 @@ import xadmin
 from xadmin import views
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText
 from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord, RechargeList, \
-    UserCollection, SubAccount, SubAccountConsume
+    UserCollection, SubAccount, SubAccountConsume, UserAcountHistory
 
 
 class GroupClientsAdmin(object):
@@ -192,3 +192,16 @@ class UserCollectionAdmin(object):
 
 
 xadmin.site.register(UserCollection, UserCollectionAdmin)
+
+
+class UserAcountHistoryAdmin(object):
+    """
+    客户账号历史记录
+    """
+    list_display = ['name', 'openid', 'total_money', 'consume_money', 'binding_amount', 'account_balance', 'create_time']
+    readonly_fields = ['name', 'openid', 'total_money', 'consume_money', 'binding_amount']
+    list_per_page = 50
+    model_icon = 'fa fa-check-square'
+
+
+xadmin.site.register(UserAcountHistory, UserAcountHistoryAdmin)

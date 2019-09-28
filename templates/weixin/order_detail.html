@@ -28,6 +28,8 @@
 {% block content %}
     <div class="app-content">
         {% if order %}
+            {% load chargingorder %}
+            {% is_AC order as is_ac %}
         <div class="van-cell-group van-hairline--top-bottom">
             <div class="base-info-cell"></div>
             <div class="coupon-section__list">
@@ -62,6 +64,7 @@
                     </div>
                 </div>
             </div>
+        {% if not is_ac %}
             <div class="base-info-cell">
                 <div class="van-cell">
                     <div class="van-cell__title"><span>开始SOC值</span></div>
@@ -78,6 +81,7 @@
                     </div>
                 </div>
             </div>
+        {% endif %}
             <div class="base-info-cell">
                 <div class="van-cell">
                     <div class="van-cell__title"><span>实际充电时间</span></div>

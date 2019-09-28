@@ -223,6 +223,11 @@ class UserAcountHistory(models.Model):
     binding_amount = models.DecimalField(verbose_name='绑定金额', default=0, blank=True, max_digits=6, decimal_places=2)
     create_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
 
+    def account_balance(self):
+        return self.total_money - self.consume_money + self.binding_amount
+
+    account_balance.short_description = '账户余额'
+
     def __str__(self):
         return self.name
 
