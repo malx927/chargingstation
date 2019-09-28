@@ -32,9 +32,9 @@
                 </svg>
             </span>
         </div>
+        {% load chargingorder %}
+        {% is_AC order as is_ac %}
         {% if order %}
-            {% load chargingorder %}
-            {% is_AC order as is_ac %}
         <div class="van-cell-group van-hairline--top-bottom">
             <div class="base-info-cell"></div>
             <div class="coupon-section__list">
