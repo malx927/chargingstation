@@ -33,6 +33,8 @@
             </span>
         </div>
         {% if order %}
+            {% load chargingorder %}
+            {% is_AC order as is_ac %}
         <div class="van-cell-group van-hairline--top-bottom">
             <div class="base-info-cell"></div>
             <div class="coupon-section__list">
@@ -61,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-                {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
+                {% if not is_ac %}
                 <div style="text-align:center;">
                     <div class="bing">
                         <canvas id="myCanvas1" data-percent="{{ order.end_soc|default:0}}">您的浏览器不支持canvas标签。</canvas>
@@ -113,7 +115,7 @@
                     </div>
                 </div>
             </div>
-            {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
+            {% if not is_ac %}
                 {% with order.get_record as record %}
                  <div class="base-info-cell">
                     <div class="van-cell">
@@ -245,7 +247,7 @@
 
 {% block bottomjs %}
 <script type="text/javascript">
-    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
+    {% if not is_ac %}
     var pper = 0;
     var pper_interal;
     var myCanvas = document.getElementById("myCanvas1");
@@ -340,7 +342,7 @@
                     $("#id_charg_status").text(msg.charg_status);
                     $("#id_order_status").text(msg.order_status);
                     $("#id_begin_time").text(msg.begin_time);
-                    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
+                    {% if not is_ac %}
                     $("#myCanvas1").attr("data-percent", msg.begin_soc);
                     {% endif %}
                     $("#id_stop").addClass("pulse");
@@ -356,7 +358,7 @@
                     $("#id_total_minutes").text(msg.total_minutes);
                     $("#id_total_reading").text(msg.total_reading);
                     $("#id_consum_money").text(msg.consum_money);
-                    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
+                    {% if not is_ac %}
                     $("#id_voltage").text(msg.voltage);
                     $("#id_current").text(msg.current);
                     $("#myCanvas1").attr("data-percent", msg.current_soc);
@@ -374,7 +376,7 @@
                     $("#id_total_minutes").text(msg.total_minutes);
                     $("#id_total_reading").text(msg.total_reading);
                     $("#id_consum_money").text(msg.consum_money);
-                    {% if order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
+                    {% if not is_ac %}
                     $("#id_voltage").text('0');
                     $("#id_current").text('0');
                     {% endif %}
