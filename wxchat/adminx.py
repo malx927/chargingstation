@@ -198,7 +198,8 @@ class UserAcountHistoryAdmin(object):
     """
     客户账号历史记录
     """
-    list_display = ['name', 'openid', 'total_money', 'consume_money', 'binding_amount', 'create_time']
+    list_display = ['name', 'openid', 'total_money', 'consume_money', 'binding_amount', 'account_balance', 'create_time']
+    readonly_fields = ['name', 'openid', 'total_money', 'consume_money', 'binding_amount']
     list_per_page = 50
     model_icon = 'fa fa-check-square'
 
