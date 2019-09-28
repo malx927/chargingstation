@@ -63,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-                {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6%}
+                {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
                 <div style="text-align:center;">
                     <div class="bing">
                         <canvas id="myCanvas1" data-percent="{{ order.end_soc|default:0}}">您的浏览器不支持canvas标签。</canvas>
@@ -115,42 +115,62 @@
                     </div>
                 </div>
             </div>
-            {% with order.get_record as record %}
-             {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
-            <div class="base-info-cell">
-                <div class="van-cell">
-                    <div class="van-cell__title"><span>充电所需电压</span></div>
-                    <div class="van-cell__value van-ellipsis">
-                        <div class="coupon-item__action  item-action"><span id="id_voltage">{{ record.voltage|default:0 }}</span> V</div>
+            {% if order.protocol != 0 and order.protocol != 1 and order.charg_pile.pile_type.id != 5 and order.charg_pile.pile_type.id != 6 %}
+                {% with order.get_record as record %}
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电压</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ record.output_voltage|default:0 }}</span> V</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="base-info-cell">
-                <div class="van-cell">
-                    <div class="van-cell__title"><span>充电所需电流</span></div>
-                    <div class="van-cell__value van-ellipsis">
-                        <div class="coupon-item__action  item-action"><span id="id_current">{{ record.current|default:0 }}</span> A</div>
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电流</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-             {% endif %}
-            <div class="base-info-cell">
-                <div class="van-cell">
-                    <div class="van-cell__title"><span>实际输出电压</span></div>
-                    <div class="van-cell__value van-ellipsis">
-                        <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ record.output_voltage|default:0 }}</span> V</div>
+                {% endwith %}
+            {% else %}
+                {% with order.get_record as record %}
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>充电所需电压</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_voltage">{{ record.voltage|default:0 }}</span> V</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="base-info-cell">
-                <div class="van-cell">
-                    <div class="van-cell__title"><span>实际输出电流</span></div>
-                    <div class="van-cell__value van-ellipsis">
-                        <div class="coupon-item__action  item-action"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</div>
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>充电所需电流</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_current">{{ record.current|default:0 }}</span> A</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% endwith %}
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电压</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ record.output_voltage|default:0 }}</span> V</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电流</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</div>
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+            {% endif %}
+
             <div class="base-info-cell">
                 <div class="van-cell">
                     <div class="van-cell__title"><span>订单状态</span></div>
