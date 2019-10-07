@@ -57,6 +57,8 @@ class Order(models.Model):
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     report_result = models.IntegerField(verbose_name='上报确认', blank=True, null=True)
     report_time = models.DateTimeField(verbose_name='上报确认时间', blank=True, null=True)
+    output_voltage = models.IntegerField(verbose_name='输出电压(V)', blank=True, default=0)
+    output_current = models.IntegerField(verbose_name='输出电流(A)', blank=True, default=0)
 
     def __str__(self):
         return self.out_trade_no

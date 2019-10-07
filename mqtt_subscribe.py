@@ -791,7 +791,6 @@ def pile_charging_status_handler(topic, byte_msg):
         logging.info("{}电桩不存在".format(pile_sn))
 
 
-
 # 11
 def save_pile_charg_status_to_db(**data):
     """
@@ -911,6 +910,8 @@ def calculate_order(**kwargs):
     pile_sn = kwargs.get("pile_sn", None)
     gun_num = kwargs.get("gun_num", None)
     end_time = kwargs.get("end_time", datetime.datetime.now())
+    output_voltage = kwargs.get("output_voltage", 0)
+    output_current = kwargs.get("output_current", 0)
     charg_status = kwargs.pop("charg_status", None)
     order_status = kwargs.pop("status", 0)
     logging.info(kwargs)
@@ -1003,9 +1004,12 @@ def calculate_order(**kwargs):
     order.consum_money = order.power_fee + order.service_fee + order.park_fee
     order.end_soc = currRec.current_soc
     order.charg_status = charg_status if charg_status is not None else gun.charg_status
-
+    order.output_voltage = output_voltage
+    order.output_current = output_current
     order.status = order_status
-    order.save(update_fields=['end_time', 'prev_reading', 'end_reading', 'total_readings', 'park_fee', 'power_fee', 'service_fee', 'consum_money', 'end_soc', 'charg_status', 'status'])
+    order.save(update_fields=['end_time', 'prev_reading', 'end_reading',
+                              'total_readings', 'park_fee', 'power_fee', 'service_fee',
+                              'consum_money', 'end_soc', 'charg_status', 'status', 'output_voltage', 'output_current'])
     return order
 
 

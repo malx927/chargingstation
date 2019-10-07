@@ -94,6 +94,8 @@ class OrderAdmin(object):
             ),
             Fieldset(
                 '其他信息',
+                'output_voltage',
+                'output_current',
                 'prev_reading',
                 'start_charge_seq',
                 'report_result',
