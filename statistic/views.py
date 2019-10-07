@@ -88,6 +88,10 @@ class TodayChargingReadingsAPIView(APIView):
         # 今天合计数据
         total_results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_date)\
             .aggregate(total_readings=Sum("total_readings"))
+        print("total_results:", total_results)
+        total_readings = total_results.get("total_readings", 0)
+        if total_readings is None:
+            total_readings = 0
         # 今天分时数据
         today_results = self.get_hour_readings_data(cur_date, cur_hour)
         # 昨天分时数据
@@ -95,9 +99,10 @@ class TodayChargingReadingsAPIView(APIView):
         yesterday = yesterday.date()
         yesterday_results = self.get_hour_readings_data(yesterday)
         data = {
-            "total_readings": total_results.get("total_readings", 0),
-            "today_readings": today_results,
-            "yesterday_readings": yesterday_results,
+            "total_readings": total_readings,
+            "today_readings": list(today_results.values()),
+            "yesterday_readings": list(yesterday_results.values()),
+            "hour_list": list(yesterday_results.keys()),
         }
         return Response(data)
 
@@ -121,6 +126,9 @@ class TodayChargingMoneyAPIView(APIView):
         # 今天合计数据
         total_results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_date)\
             .aggregate(total_money=Sum("cash_fee"))
+        total_money = total_results.get("total_money", 0)
+        if total_money is None:
+            total_money = 0
         # 今天分时数据
         today_results = self.get_hour_money_data(cur_date, cur_hour)
         # 昨天分时数据
@@ -128,9 +136,10 @@ class TodayChargingMoneyAPIView(APIView):
         yesterday = yesterday.date()
         yesterday_results = self.get_hour_money_data(yesterday)
         data = {
-            "total_money": total_results.get("total_money", 0),
-            "today_money": today_results,
-            "yesterday_money": yesterday_results,
+            "total_money": total_money,
+            "today_money": list(today_results.values()),
+            "yesterday_money": list(yesterday_results.values()),
+            "hour_list": list(yesterday_results.keys()),
         }
         return Response(data)
 
