@@ -166,17 +166,17 @@ class OrderRecord(models.Model):
 
 class OrderChargDetail(models.Model):
     """
-    订单充电记录明细
+    充电监控明细
     """
     pile_sn = models.CharField(verbose_name="电桩SN", max_length=32, blank=True, null=True)
     gun_num = models.IntegerField(verbose_name="枪口", blank=True, null=True)
     out_trade_no = models.CharField(verbose_name="订单编号", max_length=32, blank=True, null=True)
     current_time = models.DateTimeField(verbose_name='当前时间', blank=True, null=True)
     current_soc = models.IntegerField(verbose_name="当前SOC", blank=True, default=0)
-    voltage = models.IntegerField(verbose_name='所需电压值', blank=True, null=True)
-    current = models.IntegerField(verbose_name='所需电流值', blank=True, null=True)
-    output_voltage = models.IntegerField(verbose_name='实际输出电压值', blank=True, null=True)
-    output_current = models.IntegerField(verbose_name='实际输出电流', blank=True, null=True)
+    voltage = models.IntegerField(verbose_name='所需电压值', blank=True, default=0)
+    current = models.IntegerField(verbose_name='所需电流值', blank=True, default=0)
+    output_voltage = models.IntegerField(verbose_name='实际输出电压值', blank=True, default=0)
+    output_current = models.IntegerField(verbose_name='实际输出电流', blank=True, default=0)
     gun_temp = models.DecimalField(verbose_name='枪头温度1', blank=True, null=True, max_digits=6, decimal_places=2)
     gun_temp1 = models.DecimalField(verbose_name='枪头温度2', blank=True, null=True, max_digits=6, decimal_places=2)
     cab_temp = models.DecimalField(verbose_name='柜内温度1', blank=True, null=True, max_digits=6, decimal_places=2)

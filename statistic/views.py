@@ -3,7 +3,7 @@ import datetime
 from django.db.models import Sum, Count, F, Case, When, IntegerField
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from chargingorder.models import Order
+from chargingorder.models import Order, OrderChargDetail
 from django.db import connection
 
 # 累计充电次数
@@ -155,7 +155,38 @@ class TodayChargingMoneyAPIView(APIView):
         return dict_results
 
 
-# class TodayChargingMoney(APIView):
-#     """今日充电电力"""
-#     def get(self, request, *args, **kwargs):
-#         pass
+class TodayChargingPowerAPIView(APIView):
+    """今日充电电力"""
+    def get(self, request, *args, **kwargs):
+        cur_date = datetime.datetime.now().date()
+        cur_hour = datetime.datetime.now().hour + 1
+        # 今天合计数据
+        total_results = OrderChargDetail.objects.filter(current_time__date=cur_date)\
+            .aggregate(total_power=Sum(F("output_voltage") * F("output_current"))/1000)
+        total_power = total_results.get("total_power", 0)
+        if total_power is None:
+            total_power = 0
+        # 今天分时数据
+        today_results = self.get_hour_power_data(cur_date, cur_hour)
+        # 昨天分时数据
+        yesterday = datetime.datetime.now() + datetime.timedelta(days=-1)
+        yesterday = yesterday.date()
+        yesterday_results = self.get_hour_power_data(yesterday)
+        data = {
+            "total_power": total_power,
+            "today_power": list(today_results.values()),
+            "yesterday_power": list(yesterday_results.values()),
+            "hour_list": list(yesterday_results.keys()),
+        }
+        return Response(data)
+
+    def get_hour_power_data(self, current_date, limit_hour=24):
+        """分时统计数据"""
+        results = OrderChargDetail.objects.filter(current_time__date=current_date) \
+            .extra(select={'hour': "HOUR(current_time)"}) \
+            .values("hour").annotate(power=Sum(F("output_voltage") * F("output_current"))/1000).order_by("hour")
+        dict_results = {k: 0 for k in range(limit_hour)}
+        for item in results:
+            key = item["hour"]
+            dict_results[key] = item["power"]
+        return dict_results

@@ -2,9 +2,42 @@
 <html style="font-size: 96px;">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>生意参谋大数据可视化HTML模板</title>
+    <title>亚电新能源充电桩可视化数据大屏</title>
     <script type="text/javascript" src="{% static 'weixin/js/jquery-3.3.1.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'statistic/css/comon0.css' %}">
+    <style>
+        .StateTit {
+            height: 37px;
+            border-bottom: 1px dashed #404040;
+            font-size: .18rem;
+        }
+
+        .StateBox span {
+            float: left;
+            line-height: .52rem;
+            height: .52rem;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+    .StateBox span:nth-child(1) {
+        width: 60%;
+    }
+
+    .StateBox span:nth-child(2) {
+        width: 20%;
+    }
+
+    .StateBox span:nth-child(3) {
+        width: 20%;
+    }
+
+    .StateBox .fontInner {
+        border-bottom: 1px dashed #404040;
+    }
+
+    </style>
 </head>
 
 <body>
@@ -13,6 +46,7 @@
     </div>
     <div class="head">
         <h1>亚电新能源充电桩可视化数据大屏</h1>
+        <div class="weather"><span id="nowtime"></span></div>
     </div>
     <div class="mainbox">
         <ul class="clearfix">
@@ -73,99 +107,21 @@
                 </div>
             </li>
             <li>
-                <div class="boxall" style="height:5.2rem">
-                    <div class="alltitle">新增会员信息</div>
-                    <div class="tabs">
-                        <ul class="clearfix">
-                            <li><a class="active" href="http://v.bootstrapmb.com/2019/4/ewa0u4160/#">7天</a></li>
-                            <li><a href="http://v.bootstrapmb.com/2019/4/ewa0u4160/#">15天</a></li>
-                            <li><a href="http://v.bootstrapmb.com/2019/4/ewa0u4160/#">30天</a></li>
-                        </ul>
-                    </div>
-                    <div class="clearfix">
-                        <div class="sy" id="echarts6" style="-webkit-tap-highlight-color: transparent; user-select: none;">
-                            <div style="position: relative; overflow: hidden; width: 145px; height: 211px; padding: 0px; margin: 0px; border-width: 0px;">
-                                <canvas data-zr-dom-id="zr_0" width="145" height="211" style="position: absolute; left: 0px; top: 0px; width: 145px; height: 211px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
-                            </div>
-                        </div>
-                        <div class="sy" id="echarts7"   style="-webkit-tap-highlight-color: transparent; user-select: none;">
-                            <div style="position: relative; overflow: hidden; width: 144px; height: 211px; padding: 0px; margin: 0px; border-width: 0px;">
-                                <canvas data-zr-dom-id="zr_0" width="144" height="211" style="position: absolute; left: 0px; top: 0px; width: 144px; height: 211px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
-                            </div>
-                        </div>
-                        <div class="sy" id="echarts8"  style="-webkit-tap-highlight-color: transparent; user-select: none;">
-                            <div style="position: relative; overflow: hidden; width: 145px; height: 211px; padding: 0px; margin: 0px; border-width: 0px;">
-                                <canvas data-zr-dom-id="zr_0" width="145" height="211" style="position: absolute; left: 0px; top: 0px; width: 145px; height: 211px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="addnew">
-                        <div class="tit02"><span>今日新增会员列表</span></div>
-                        <div class="adduser">
-                            <ul class="clearfix" style="margin-top: -1.5rem;">
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">1今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">2今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">3今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">4今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">1今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">2今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">3今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-                                <li class="clearfix"> <span class="pulll_left"><img
-                                            src="./images/head.jpg">4今日新增会员列表</span> <span class="pulll_right">24岁 - 女 -
-                                        广州 </span> </li>
-                            </ul>
-                        </div>
-                    </div>
+                <div class="boxall" >
+                    <div class="alltitle">今日充电电力(千瓦)</div>
+                    <div id="id_today_power" style="height: 3.0rem;width:100%;"></div>
                     <div class="boxfoot"></div>
                 </div>
-                <div class="boxall" style="height: 3.4rem">
-                    <div class="alltitle">实时消费记录</div>
+                <div class="boxall">
+                    <div class="alltitle">充电站电桩统计</div>
                     <div class="wrap">
-                        <ul style="margin-top: -0.52rem;">
-                            <li>
-                                <p>1李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                            <li>
-                                <p>2李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                            <li>
-                                <p>3李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                            <li>
-                                <p>4李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                            <li>
-                                <p>5李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                            <li>
-                                <p>6李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-
-                            <li>
-                                <p>1李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                            <li>
-                                <p>2李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                            <li>
-                                <p>3李东梁-支付宝支付-120元-XXX门店</p>
-                            </li>
-                        </ul>
+                        <div class="StateBox">
+                            <div class="StateTit"><span>充电站名称</span><span>直流桩(个)</span><span>交流桩(个)</span></div>
+                            <div style="min-height: 2.0rem">
+                                <ul class="line" id="id_device_stats">
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="boxfoot"></div>
                 </div>
@@ -185,6 +141,9 @@
             today_count_stats();
             today_readings_stats();
             today_money_stats();
+            today_power_stats();
+            station_device_stats();
+
         })
         function get_charging_stats(){
             $.ajax({
@@ -227,9 +186,14 @@
         setInterval(function (){
             get_charging_stats();
             get_realtime_power();
-        }, 5000);
+            today_count_stats();
+            today_readings_stats();
+            today_money_stats();
+            today_power_stats();
+            station_device_stats();
+        }, 10000);
 
-        var today_counts = echarts.init(document.getElementById('id_today_counts'), "dark");
+        var today_counts = echarts.init(document.getElementById('id_today_counts'));
 
         function today_count_stats(){
             $.ajax({
@@ -241,8 +205,11 @@
                 console.log(JSON.stringify(data));
                 var option = {
                         title: {
-                            text: '今日充电次数曲线',
-                            color: '#ffffff',
+                            text: '今日充电次数曲线(次)',
+                            textStyle: {
+                              color: '#ffffff',
+                              fontSize: 16,
+                            }
                         },
                         tooltip:{
                             trigger: 'axis',
@@ -254,32 +221,56 @@
                             }
                         },
                         legend: {
-                            data:['今日', '昨日']
+                            data:['今日', '昨日'],
+                            textStyle:{
+                                color: '#ffffff',
+                            }
                         },
                         xAxis: {
                             type: 'category',
                             boundaryGap : false,
                             axisLabel:{
                                 interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
                             },
                             data: data.hour_list,
                         },
                         yAxis: {
-                            type: 'value'
+                            type: 'value',
+                            axisLabel:{
+                                interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
+                            },
                         },
                         series: [
-                            {
-                                name: '今日',
-                                type: 'line',
-                                smooth: true,
-                                data: data.today_count,
-                            },
                             {
                                 name: '昨日',
                                 type: 'line',
                                 smooth: true,
+                                itemStyle:{
+                                  color: '#ffffff',
+                                },
                                 data: data.yesterday_count,
-                            }
+                            },
+                            {
+                                name: '今日',
+                                type: 'line',
+                                smooth: true,
+                                 itemStyle:{
+                                  color: '#ff5346',
+                                },
+                                data: data.today_count,
+                            },
                         ]
                     };
                 today_counts.setOption(option);
@@ -290,7 +281,7 @@
             });
         }
 
-        var today_readings = echarts.init(document.getElementById('id_today_readings'), "dark");
+        var today_readings = echarts.init(document.getElementById('id_today_readings'));
 
         function today_readings_stats(){
             $.ajax({
@@ -302,8 +293,11 @@
                 console.log(JSON.stringify(data));
                 var option = {
                         title: {
-                            text: '今日充电量曲线',
-                            color: '#ffffff',
+                            text: '今日充电量曲线(KWH)',
+                            textStyle: {
+                              color: '#ffffff',
+                              fontSize: 16,
+                            }
                         },
                         tooltip:{
                             trigger: 'axis',
@@ -321,32 +315,56 @@
                             containLabel: true
                         },
                         legend: {
-                            data:['今日', '昨日']
+                            data:['今日', '昨日'],
+                            textStyle:{
+                                color: '#ffffff',
+                            }
                         },
                         xAxis: {
                             type: 'category',
                             boundaryGap : false,
                             axisLabel:{
                                 interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
                             },
                             data: data.hour_list,
                         },
                         yAxis: {
-                            type: 'value'
+                            type: 'value',
+                            axisLabel:{
+                                interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
+                            },
                         },
                         series: [
-                            {
-                                name: '今日',
-                                type: 'line',
-                                smooth: true,
-                                data: data.today_readings,
-                            },
                             {
                                 name: '昨日',
                                 type: 'line',
                                 smooth: true,
+                                itemStyle:{
+                                  color: '#ffffff',
+                                },
                                 data: data.yesterday_readings,
-                            }
+                            },
+                            {
+                                name: '今日',
+                                type: 'line',
+                                smooth: true,
+                                itemStyle:{
+                                  color: '#ff5346',
+                                },
+                                data: data.today_readings,
+                            },
                         ]
                     };
                 today_readings.setOption(option);
@@ -357,7 +375,7 @@
             });
         }
 
-        var today_money = echarts.init(document.getElementById('id_today_money'), "dark");
+        var today_money = echarts.init(document.getElementById('id_today_money'));
 
         function today_money_stats(){
             $.ajax({
@@ -369,7 +387,11 @@
                 console.log(JSON.stringify(data));
                 var option = {
                         title: {
-                            text: '今日充电金额曲线',
+                            text: '今日充电金额曲线(元)',
+                            textStyle: {
+                              color: '#ffffff',
+                              fontSize: 16,
+                            }
                         },
                         tooltip:{
                             trigger: 'axis',
@@ -381,30 +403,54 @@
                             }
                         },
                         legend: {
-                            data:['今日', '昨日']
+                            data:['今日', '昨日'],
+                            textStyle:{
+                                color: '#ffffff',
+                            }
                         },
                         xAxis: {
                             type: 'category',
                             boundaryGap : false,
                             axisLabel:{
                                 interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
                             },
                             data: data.hour_list,
                         },
                         yAxis: {
-                            type: 'value'
+                            type: 'value',
+                            axisLabel:{
+                                interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
+                            },
                         },
                         series: [
                             {
                                 name: '昨日',
                                 type: 'line',
                                 smooth: true,
+                                itemStyle:{
+                                  color: '#ffffff',
+                                },
                                 data: data.yesterday_money,
                             },
                             {
                                 name: '今日',
                                 type: 'line',
                                 smooth: true,
+                                itemStyle:{
+                                  color: '#ff5346',
+                                },
                                 data: data.today_money,
                             },
                         ]
@@ -417,187 +463,129 @@
             });
         }
 
+        var today_power = echarts.init(document.getElementById('id_today_power'));
 
+        function today_power_stats(){
+            $.ajax({
+              type: 'GET',
+              url: '/stats/big_today_power_stats/',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                console.log(JSON.stringify(data));
+                var option = {
+                        title: {
+                            text: '今日充电电力曲线(KW)',
+                            textStyle: {
+                              color: '#ffffff',
+                              fontSize: 16,
+                            }
+                        },
+                        tooltip:{
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'cross',
+                                label: {
+                                    backgroundColor: '#6a7985'
+                                }
+                            }
+                        },
+                        legend: {
+                            data:['今日', '昨日'],
+                            textStyle:{
+                                color: '#ffffff',
+                            }
+                        },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap : false,
+                            axisLabel:{
+                                interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
+                            },
+                            data: data.hour_list,
+                        },
+                        yAxis: {
+                            type: 'value',
+                            axisLabel:{
+                                interval:1,
+                                color: '#ffffff',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#ffffff',
+                                },
+                            },
+                        },
+                        series: [
+                            {
+                                name: '昨日',
+                                type: 'line',
+                                smooth: true,
+                                itemStyle:{
+                                  color: '#ffffff',
+                                },
+                                data: data.yesterday_power,
+                            },
+                            {
+                                name: '今日',
+                                type: 'line',
+                                smooth: true,
+                                itemStyle:{
+                                  color: '#ff5346',
+                                },
+                                data: data.today_power,
+                            },
+                        ]
+                    };
+                today_power.setOption(option);
+              },
+              error: function(error){
+                console.log(JSON.stringify(error));
+              }
+            });
+        }
         $(document).ready(function () {
             today_counts.resize();
             today_readings.resize();
             today_money.resize();
-            myChart6.resize();
-            myChart7.resize();
-            myChart8.resize();
-        })
+            today_power.resize();
+        });
         window.addEventListener("resize", function () {
             today_counts.resize();
             today_readings.resize();
             today_money.resize();
-            myChart7.resize();
-            myChart8.resize();
+            today_power.resize();
         });
-    </script>
-    <script type="text/javascript">
-        var v0 = 1000;
-        var v1 = 353;
-        var v2 = 178;
-        var v3 = 68;
 
-        var myChart6 = echarts.init(document.getElementById('echarts6'));
-        option6 = {
-            series: [{
-                type: 'pie',
-                radius: ['70%', '80%'],
-                color: '#0088cc',
-                label: {
-                    normal: {
-                        position: 'center'
-                    }
-                },
-                data: [{
-                    value: v1,
-                    name: '新增会员',
-                    label: {
-                        normal: {
-                            formatter: v1 + '',
-                            textStyle: {
-                                fontSize: 20,
-                                color: '#fff',
-                            }
-                        }
-                    }
-                },
-                {
-                    value: v0,
-                    name: '老会员',
-                    label: {
-                        normal: {
-                            formatter: function (params) {
-                                return '占比' + Math.round(v1 / v0 * 100) + '%'
-                            },
-                            textStyle: {
-                                color: '#aaa',
-                                fontSize: 12
-                            }
-                        }
-                    },
-                    itemStyle: {
-                        normal: {
-                            color: 'rgba(255,255,255,.2)'
-                        },
-                        emphasis: {
-                            color: '#fff'
-                        }
-                    },
-                }]
-            }]
+        function station_device_stats(){
+            $.ajax({
+              type: 'GET',
+              url: '/stats/big_device_stats/',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                {#console.log(JSON.stringify(data));#}
+                $("#id_device_stats").find("li").remove();
+                $.each(data, function (index, item) {
+                    console.log(JSON.stringify(item));
 
-        };
+                    $("#id_device_stats").append(`<li>
+                                                     <span>${item.station__name}</span><span>${item.dc_device}</span><span>${item.ac_device}</span>
+                                                </li>`);
+                })
+              },
+              error: function(error){
+                console.log(JSON.stringify(error));
 
-        var myChart7 = echarts.init(document.getElementById('echarts7'));
-        option7 = {
-            series: [{
-                type: 'pie',
-                radius: ['70%', '80%'],
-                color: '#fccb00',
-                label: {
-                    normal: {
-                        position: 'center'
-                    }
-                },
-                data: [{
-                    value: v2,
-                    name: '新增领卡会员',
-                    label: {
-                        normal: {
-                            formatter: v2 + '',
-                            textStyle: {
-                                fontSize: 20,
-                                color: '#fff',
-                            }
-                        }
-                    }
-                },
-                {
-                    value: v0,
-                    name: '总领卡会员',
-                    label: {
-                        normal: {
-                            formatter: function (params) {
-                                return '占比' + Math.round(v2 / v0 * 100) + '%'
-                            },
-                            textStyle: {
-                                color: '#aaa',
-                                fontSize: 12
-                            }
-                        }
-                    },
-                    itemStyle: {
-                        normal: {
-                            color: 'rgba(255,255,255,.2)'
-                        },
-                        emphasis: {
-                            color: '#fff'
-                        }
-                    },
-                }]
-            }]
-        };
-
-
-        var myChart8 = echarts.init(document.getElementById('echarts8'));
-        option8 = {
-
-
-            series: [{
-
-                type: 'pie',
-                radius: ['70%', '80%'],
-                color: '#62b62f',
-                label: {
-                    normal: {
-                        position: 'center'
-                    }
-                },
-                data: [{
-                    value: v3,
-                    name: '女消费',
-                    label: {
-                        normal: {
-                            formatter: v3 + '',
-                            textStyle: {
-                                fontSize: 20,
-                                color: '#fff',
-                            }
-                        }
-                    }
-                }, {
-                    value: v0,
-                    name: '男消费',
-                    label: {
-                        normal: {
-                            formatter: function (params) {
-                                return '占比' + Math.round(v2 / v0 * 100) + '%'
-                            },
-                            textStyle: {
-                                color: '#aaa',
-                                fontSize: 12
-                            }
-                        }
-                    },
-                    itemStyle: {
-                        normal: {
-                            color: 'rgba(255,255,255,.2)'
-                        },
-                        emphasis: {
-                            color: '#fff'
-                        }
-                    },
-                }]
-            }]
-        };
-        setTimeout(function () {
-            myChart6.setOption(option6);
-            myChart7.setOption(option7);
-            myChart8.setOption(option8);
-        }, 500);
+              }
+            });
+        }
 
     </script>
 
