@@ -108,7 +108,7 @@ class ObtainAuthToken(APIView):
         print("ObtainAuthToken:", res)
 
         Data = res.get("Data")
-        dict_data = data_decode(Data)
+        dict_data = data_decode(Data)       # 解码
         OperatorID = dict_data.get("OperatorID")
         OperatorSecret = dict_data.get("OperatorSecret")
         # OperatorID = request.POST.get("OperatorID")
