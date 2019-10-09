@@ -44,16 +44,6 @@ def notification_start_charge_result(start_charge_seq, connector_id):
         Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
         # Msg = "Order Not Exists"
 
-    # encrypt_data = data_encode(**Data)  # 数据加密
-    # # 数据签名, 用Ret+Msg+Data生成返回签名
-    # sig_data = "{0}{1}{2}".format(str(Ret), Msg, encrypt_data)
-    # ret_sig = get_hmac_md5(settings.SIGSECRET, sig_data)
-    # result = {
-    #     "Ret": Ret,
-    #     "Msg": Msg,
-    #     "Data": encrypt_data,
-    #     "Sig": ret_sig,
-    # }
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     status = echarge.notification_start_charge_result(**Data)
     if status > 0:
@@ -70,7 +60,7 @@ def notification_equip_charge_status():
     使用要求：充电桩开始充电后，均须每间隔50秒向市级平台e充网推送一次充电状态数据
     :return:
     """
-    orders = Order.objects.filter(Q(status=None) | Q(status=0) | Q(status=1), start_charge_seq__isnull=False)
+    orders = Order.objects.select_related("charg_pile").filter(Q(status=None) | Q(status=0) | Q(status=1), start_charge_seq__isnull=False)
 
     for order in orders:
         result = {}
@@ -127,16 +117,6 @@ def notification_stop_charge_result(start_charge_seq, connector_id):
         Data["StartChargeSeqStat"] = 5
         # Msg = "Order Not Exists"
 
-    # encrypt_data = data_encode(**Data)  # 数据加密
-    # # 数据签名, 用Ret+Msg+Data生成返回签名
-    # sig_data = "{0}{1}{2}".format(str(Ret), Msg, encrypt_data)
-    # ret_sig = get_hmac_md5(settings.SIGSECRET, sig_data)
-    # result = {
-    #     "Ret": Ret,
-    #     "Msg": Msg,
-    #     "Data": encrypt_data,
-    #     "Sig": ret_sig,
-    # }
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     status = echarge.notification_stop_charge_result(**Data)
     if status > 0:

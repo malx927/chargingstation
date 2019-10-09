@@ -327,12 +327,12 @@ def server_send_charging_cmd(*args, **kwargs):
     # 枪口号
     gun_num = kwargs.get("gun_num", 0)
     b_gun_num = bytes([gun_num])
-    # 充电类型（来至前台）
+    # 充电类型（来至前台） 根据前台用户信息判断 000充满为止，001按金额，010按分钟数，011按SOC 100按电量
     charg_type = kwargs.get("charging_type", 0)
     subscribe_min = kwargs.get("subscribe_min", 0)
     b_charging_type = bytes([charg_type << 7 | subscribe_min & 0x7f])
 
-    # 充电策略 1、充电模式(后台or本地离线)  根据前台用户信息判断 000充满为止，001按金额，010按分钟数，011按SOC 100按电量
+    # 充电策略 1、充电模式(后台or本地离线)
     charging_category = kwargs.get("charging_category", 0)  # D15-D14
     charging_way = kwargs.get("charging_way", 0)    # D13－D11
     # 充电策略是否使用(D0：1使用充电策略，0系统默认策略)
@@ -860,6 +860,9 @@ def save_pile_charg_status_to_db(**data):
         "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
         "stop_code": 0,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
     }
+
+    if order.openid == settings.ECHARGEUSER:    # E充网用户直接返回
+        return
 
     try:
         charg_user = UserInfo.objects.get(openid=order.openid)

@@ -342,7 +342,7 @@ class StartChargeAPIView(APIView):
 
         # 创建订单(充满为止)
         charg_mode = 0
-        openid = "echargeuser"
+        openid = settings.ECHARGEUSER
         name = u'E充网用户'
         out_trade_no = '{0}{1}{2}{3}'.format('C', gun_num, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
         charg_pile = pile_gun.charg_pile
@@ -396,8 +396,6 @@ class StartChargeAPIView(APIView):
 
         encrypt_data = data_encode(**Data)   # 数据加密
         # 数据签名, 用Ret+Msg+Data生成返回签名
-        Ret = 0
-        Msg = ""
         sig_data = "{0}{1}{2}".format(str(Ret), Msg, encrypt_data)
         ret_sig = get_hmac_md5(settings.SIGSECRET, sig_data)
         result = {
