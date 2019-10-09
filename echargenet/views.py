@@ -322,7 +322,7 @@ class StartChargeAPIView(APIView):
         # 查询电桩状态
         pile_sn = ConnectorID[:-1]
         gun_num = ConnectorID[-1]
-        pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
+        pile_gun = ChargingGun.objects.select_related().filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         Ret = 0
         Msg = ""
         Data = {
@@ -334,7 +334,7 @@ class StartChargeAPIView(APIView):
             Data["FailReason"] = 1
             result = get_errors(Ret, Msg, **Data)
             return Response(result)
-        if pile_gun.work_status in [2, 9]:    # 1 离线、 4故障状态 = 设备离线
+        if pile_gun.work_status in [2, 9]:    # 2 离线、 9故障状态 = 设备离线
             Data["SuccStat"] = 1
             Data["FailReason"] = 2
             result = get_errors(Ret, Msg, **Data)
@@ -347,7 +347,7 @@ class StartChargeAPIView(APIView):
         out_trade_no = '{0}{1}{2}{3}'.format('C', gun_num, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
         charg_pile = pile_gun.charg_pile
         params = {
-            "gun_num": int(pile_gun.gun_num),
+            "gun_num": pile_gun.gun_num,
             "openid": openid,
             "name": name,
             "charg_mode": charg_mode,
