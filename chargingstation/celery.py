@@ -32,7 +32,7 @@ app.conf.update(
         },
         'notification_charge_order_info_for_bonus_task': {
             'task': 'echargenet.tasks.notification_charge_order_info_for_bonus',
-            'schedule': timedelta(seconds=5),
+            'schedule': timedelta(seconds=50),
         },
         'notification_connector_status_task': {
             'task': 'echargenet.tasks.notification_connector_status',
