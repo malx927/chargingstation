@@ -158,10 +158,11 @@ class EchargeNet(object):
         r = self.connect_redis()
         access_token = r.get(self.ACCESS_TOKEN_KEY)
         b_expires_at = r.get(self.ACCESS_TOKEN_EXPIRES_AT)
-
+        print("161", access_token, b_expires_at)
         if access_token and b_expires_at:
             timestamp = time.time()
             expires_at = int(b_expires_at)
+            print(timestamp, expires_at)
             if expires_at - timestamp > 60:
                 res = {
                     "success": True,
@@ -175,6 +176,7 @@ class EchargeNet(object):
         }
         url = '{0}{1}'.format(self.E_CHARGE_URL, 'query_token')
         result = self._post(url, **data)
+        print("178", result)
         if "Ret" in result and result["Ret"] == 0:
             # 解密
             ret_crypt_data = result["Data"]
@@ -185,6 +187,7 @@ class EchargeNet(object):
                 # 设置token
                 access_token = dict_decrpt_data["AccessToken"]
                 token_available_time = dict_decrpt_data["TokenAvailableTime"]
+                print(190, access_token, token_available_time)
                 r.set(self.ACCESS_TOKEN_KEY, access_token, token_available_time)
                 expires_at = int(time.time()) + token_available_time
                 r.set(self.ACCESS_TOKEN_EXPIRES_AT, expires_at)
@@ -220,11 +223,15 @@ class EchargeNet(object):
             print("access token error!")
             return 4002
 
-        ConnectorStatusInfo = {
-            "ConnectorID": connector_id,
-            "Status": status
+        notification_stationStatusData = {
+                    "ConnectorStatusInfo": {
+                        "ConnectorID": connector_id,
+                        "Status": status,
+                    }
         }
-        result = self._post(url, token, **ConnectorStatusInfo)
+
+        print(230, notification_stationStatusData)
+        result = self._post(url, token, **notification_stationStatusData)
         print("notification_station_status:", result)
 
         if "Ret" in result and result["Ret"] == 0:

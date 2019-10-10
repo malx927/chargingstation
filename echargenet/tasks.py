@@ -1,6 +1,7 @@
 #-*-coding:utf-8-*-
 from __future__ import absolute_import, unicode_literals
 
+import decimal
 import json
 import random
 from datetime import datetime, timedelta
@@ -79,13 +80,14 @@ def notification_equip_charge_status():
 
         result["CurrentA"] = 0
         result["VoltageA"] = 0
-        result["Soc"] = order.end_soc
+        result["Soc"] = float(order.end_soc)
         result["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
         result["EndTime"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
-        result["TotalPower"] = order.get_total_reading()
-        result["TotalMoney"] = order.consum_money
+        result["TotalPower"] = float(order.get_total_reading())
+        result["TotalMoney"] = float(order.consum_money.quantize(decimal.Decimal("0.01")))
 
         echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
+        print("tasks.py:90:", result)
         status = echarge.notification_equip_charge_status(**result)
         if status > 0:
             print("推送充电状态失败!", status)
@@ -105,8 +107,7 @@ def notification_stop_charge_result(start_charge_seq, connector_id):
         "StartChargeSeq": start_charge_seq,
         "ConnectorID": connector_id,
     }
-    # Ret = 0
-    # Msg = ""
+
     try:
         sleep(5)
         order = Order.objects.get(start_charge_seq=start_charge_seq)
@@ -140,8 +141,6 @@ def notification_charge_order_info_for_bonus():
     """
     orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), start_charge_seq__isnull=False, status=2)
     result ={}
-    # Ret = 0
-    # Msg = ""
     for order in orders:
         if order.begin_time is None or order.end_time is None:
             continue
@@ -160,16 +159,16 @@ def notification_charge_order_info_for_bonus():
         result["ConnectorID"] = ConnectorID
         result["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
         result["EndTime"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
-        result["ChargeModel"] = 0
-        result["TotalPower"] = str(order.get_total_reading())
-        result["TotalMoney"] = str(order.consum_money)
+        result["ChargeModel"] = 3
+        result["TotalPower"] = float(order.get_total_reading())
+        result["TotalMoney"] = float(order.consum_money.quantize(decimal.Decimal("0.01")))
         result["UserName"] = order.name
         result["StationID"] = str(order.charg_pile.station.id)
-        result["EquipmentID"] = order.charg_pile.pile_sn
-        result["ConnectorPower"] = gun.power if gun is not None else 0
-        result["ChargeLast"] = order.total_seconds()
-        result["MeterValueStart"] = str(order.begin_reading)
-        result["MeterValueEnd"] = str(order.end_reading)
+        result["EquipmentID"] = str(order.charg_pile.id)
+        result["ConnectorPower"] = float(gun.power) if gun is not None else 0
+        result["ChargeLast"] = int(order.total_seconds())
+        result["MeterValueStart"] = float(order.begin_reading.quantize(decimal.Decimal("0.01")))
+        result["MeterValueEnd"] = float(order.end_reading.quantize(decimal.Decimal("0.01")))
         if order.charg_status.id == 91:
             result["StopReason"] = 0    # 用户手动停止充电
         elif order.charg_status.id in [95, 96]:
@@ -178,17 +177,9 @@ def notification_charge_order_info_for_bonus():
             result["StopReason"] = 4    # 连接器断开
         elif order.charg_status.id in [93, 94, 97]:
             result["StopReason"] = 1    # 客户归属地运营商平台停止充
-
-        # encrypt_data = data_encode(**result)  # 数据加密
-        # # 数据签名, 用Ret+Msg+Data生成返回签名
-        # sig_data = "{0}{1}{2}".format(str(Ret), Msg, encrypt_data)
-        # ret_sig = get_hmac_md5(settings.SIGSECRET, sig_data)
-        # result = {
-        #     "Ret": Ret,
-        #     "Msg": Msg,
-        #     "Data": encrypt_data,
-        #     "Sig": ret_sig,
-        # }
+        else:
+            result["StopReason"] = 3  # 充电机设备故障
+        print("task.py:183:", result)
         echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
         ret_data = echarge.notification_charge_order_info_for_bonus(**result)
 
@@ -197,9 +188,8 @@ def notification_charge_order_info_for_bonus():
             ret_crypt_data = ret_data["Data"]
             ret_decrypt_data = data_decode(ret_crypt_data)
             # 获取到code值
-            dict_decrpt_data = json.loads(ret_decrypt_data)
-            print(dict_decrpt_data["StartChargeSeq"])
-            ConfirmResult = dict_decrpt_data["ConfirmResult"]
+            print(ret_decrypt_data["StartChargeSeq"])
+            ConfirmResult = ret_decrypt_data["ConfirmResult"]
         else:
             ConfirmResult = 99
 
@@ -207,9 +197,9 @@ def notification_charge_order_info_for_bonus():
         order.report_time = datetime.now()
         order.save()
         if ConfirmResult > 0:
-            print("推送充电订单信息失败!", ConfirmResult)
+            print("notification_charge_order_info_for_bonus failure:", ConfirmResult)
         else:
-            print("推送充电订单信息成功!", ConfirmResult)
+            print("notification_charge_order_info_for_bonus success:", ConfirmResult)
 
 
 # 定时任务
