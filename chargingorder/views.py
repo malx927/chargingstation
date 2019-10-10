@@ -227,7 +227,8 @@ class RechargeView(View):
 
         openid = kwargs.get("openid", None)
         # 添加到用户信息里
-        UserInfo.objects.filter(openid=openid).update(out_trade_no=order.out_trade_no, last_charg_time=order.create_time)
+        if openid:
+            UserInfo.objects.filter(openid=openid).update(out_trade_no=order.out_trade_no, last_charg_time=order.create_time)
         return order
 
     def get_charging_gun(self, request):
