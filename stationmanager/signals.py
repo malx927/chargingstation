@@ -135,13 +135,11 @@ def update_connector_info(sender, instance, created, **kwargs):
         connector_type = 0
         if instance.work_status == 9:
             connector_type = 0          # 离网
-        elif instance.work_status == 0:
+        elif instance.work_status == 0 and instance.charg_status.id in [0, 1]:
             connector_type = 1          # 空闲
-        elif instance.work_status == 1 and 5 >= instance.charg_status.id >= 0:
+        elif instance.work_status == 0 and instance.charg_status.id == 2:
             connector_type = 2
-        elif instance.work_status == 3:
-            connector_type = 2
-        elif instance.work_status == 1 and instance.charg_status.id == 6:
+        elif instance.work_status == 1:
             connector_type = 3
         elif instance.work_status == 2:
             connector_type = 255
