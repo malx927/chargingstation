@@ -343,8 +343,11 @@ class StartChargeAPIView(APIView):
         # 创建订单(充满为止)
         charg_mode = 0
         openid = settings.ECHARGEUSER
-        name = u'E充网用户'
-        out_trade_no = '{0}{1}{2}{3}'.format('C', gun_num, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
+        name = openid
+        if StartChargeSeq is None:
+            out_trade_no = '{0}{1}{2}{3}'.format('C', gun_num, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
+        else:
+            out_trade_no = StartChargeSeq
         charg_pile = pile_gun.charg_pile
         params = {
             "gun_num": pile_gun.gun_num,
@@ -354,14 +357,15 @@ class StartChargeAPIView(APIView):
             "charg_type": 0,  # 0后台 01本地离线
             "out_trade_no": out_trade_no,
             "charg_pile": charg_pile,
-            "start_charge_seq": StartChargeSeq,
+            # "start_charge_seq": StartChargeSeq,
         }
-        order = Order.objects.create(**params)
-
+        # order = Order.objects.create(**params)
+        ret = Order.objects.update_or_create(start_charge_seq=StartChargeSeq, defaults=params)
+        order = ret[0]
         out_trade_no = order.out_trade_no
         data = {
             'pile_sn': charg_pile.pile_sn,
-            'gun_num': order.gun_num,
+            'gun_num': int(order.gun_num),
             'out_trade_no': out_trade_no,
             'openid': order.openid,
             'charging_type': 0,  # 充电类型 1预约，0即时
@@ -385,7 +389,10 @@ class StartChargeAPIView(APIView):
         sleep(0.2)
         try:
             new_order = Order.objects.get(out_trade_no=out_trade_no)
-            Data["StartChargeSeqStat"] = get_order_status(new_order.charg_status.id)
+            if new_order.charg_status_id:
+                Data["StartChargeSeqStat"] = get_order_status(new_order.charg_status_id)
+            else:
+                Data["StartChargeSeqStat"] = get_order_status(pile_gun.charg_status_id)
 
             Data["SuccStat"] = 0
             Data["FailReason"] = 0
@@ -404,8 +411,7 @@ class StartChargeAPIView(APIView):
             "Data": encrypt_data,
             "Sig": ret_sig,
         }
-        # 推送启动充电结果 异步延时5秒
-        notification_start_charge_result.delay(order.start_charge_seq, ConnectorID)
+
         return Response(result)
 
 
@@ -451,11 +457,11 @@ class StopChargeAPIView(APIView):
             return Response(result)
 
         # 查询订单
-        try:
-            order = Order.objects.get(start_charge_seq=StartChargeSeq)
+        order = Order.objects.filter(start_charge_seq=StartChargeSeq).first()
+        if order:
             stop_data = {
                 "pile_sn": order.charg_pile.pile_sn,
-                "gun_num": order.gun_num,
+                "gun_num": int(order.gun_num),
                 "openid": order.openid,
                 "out_trade_no": order.out_trade_no,
                 "consum_money": int(order.consum_money.quantize(Decimal("0.01")) * 100),
@@ -464,11 +470,11 @@ class StopChargeAPIView(APIView):
             }
             server_send_stop_charging_cmd(**stop_data)
             sleep(0.2)
-            Data["StartChargeSeqStat"] = get_order_status(order.charg_status.id)
+            Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
 
             Data["SuccStat"] = 0
             Data["FailReason"] = 0
-        except Order.DoesNotExist as ex:
+        else:
             Data["StartChargeSeqStat"] = 5
             Data["SuccStat"] = 1
             Data["FailReason"] = 4
@@ -514,12 +520,12 @@ class EquipChargeStatusAPIView(APIView):
             Data = {
                "StartChargeSeq": StartChargeSeq,
             }
-            stat = get_order_status(order.charg_status.id)
+            stat = get_order_status(order.charg_status_id)
             Data["StartChargeSeqStat"] = stat
 
             Data["ConnectorID"] = "{0}{1}".format(order.charg_pile.pile_sn, order.gun_num)
 
-            connector_status = get_equipment_connector_status(gun.work_status, order.charg_status.id)
+            connector_status = get_equipment_connector_status(gun.work_status, order.charg_status_id)
             Data["ConnectorStatus"] = connector_status
             Data["CurrentA"] = 0
             Data["VoltageA"] = 0

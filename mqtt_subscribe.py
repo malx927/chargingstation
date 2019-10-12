@@ -21,6 +21,7 @@ from django.db.models import F, Sum, DecimalField
 
 # logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
 #                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
+from echargenet.utils import get_order_status
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 # 导入django model
@@ -41,6 +42,7 @@ from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
 from wxchat.models import UserInfo, UserAcountHistory
+from echargenet.tasks import notification_start_charge_result
 from wxchat.utils import send_charging_start_message_to_user
 from stationmanager.signals import update_operator_info
 from stationmanager.signals import operator_info_init
@@ -419,6 +421,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
     update_gun_order_status(**data)
     # 清除发送充电命令超时判断
     ChargingCmdRecord.objects.filter(out_trade_no=out_trade_no, pile_sn=pile_sn, cmd_flag="start").delete()
+    # notification_start_charge_result.delay()
 
     logging.info("Leave pile_reply_charging_cmd_handler")
 
@@ -480,24 +483,33 @@ def update_gun_order_status(**data):
             "begin_time": order.begin_time.strftime('%Y-%m-%d %H:%M:%S')
         }
         logging.info(send_data)
+        if order.start_charge_seq:
+            ConnectorID = "{}{}".format(order.charg_pile.pile_sn, order.gun_num)
+            Data = {
+                "StartChargeSeq": order.start_charge_seq,
+                "ConnectorID": ConnectorID,
+            }
+            if order.begin_time:
+                Data["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                Data["StartTime"] = datetime.datetime.now().strptime("%Y-%m-%d %H:%M:%S")
+            if order.charg_status_id:
+                Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
+            else:
+                Data["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
+
+            logging.info(Data)
+            notification_start_charge_result(**Data)
+
     except Order.DoesNotExist as ex:
         logging.warning(ex)
         send_data = {"return_code": "fail", "cmd": "04", "message": "订单不存在"}
+
     except FaultCode.DoesNotExist as ex:
         logging.warning(ex)
         send_data = {"return_code": "fail", "cmd": "04", "message": "状态码错误"}
-    # 通知前端
-    # if work_status != 1:
-    #     stop_data = {
-    #         "pile_sn": pile_sn,
-    #         "gun_num": gun_num,
-    #         "out_trade_no": out_trade_no,
-    #         "consum_money":  0,
-    #         "total_reading": 0,
-    #         "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结 束或不存在
-    #         "fault_code": charg_status,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
-    #     }
-    #     server_send_stop_charging_cmd(**stop_data)
+
+
 
     send_data_to_client(pile_sn, gun_num, **send_data)
 
