@@ -60,7 +60,7 @@ def notification_start_charge_result(start_charge_seq, connector_id):
         else:
             Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
 
-        Data["StartChargeSeqStat"] = get_order_status(order.charg_status.id)
+        Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
 
     except Order.DoesNotExist as ex:
         Data["StartChargeSeqStat"] = 5
@@ -103,8 +103,8 @@ def notification_equip_charge_status():
         result["ConnectorID"] = ConnectorID
         result["StartChargeSeq"] = order.start_charge_seq
 
-        result["StartChargeSeqStat"] = get_order_status(order.charg_status.id)
-        result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, order.charg_status.id)
+        result["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
+        result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, order.charg_status_id)
 
         # A 相电流  A 相电压
         if order.begin_time is None or order.end_time is None:
@@ -144,7 +144,7 @@ def notification_stop_charge_result(start_charge_seq, connector_id):
         sleep(5)
         order = Order.objects.get(start_charge_seq=start_charge_seq)
 
-        Data["StartChargeSeqStat"] = get_order_status(order.charg_status.id)
+        Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
 
     except Order.DoesNotExist as ex:
         Data["StartChargeSeqStat"] = 5
@@ -213,13 +213,13 @@ def notification_charge_order_info_for_bonus():
         result["ChargeLast"] = order.total_seconds()
         result["MeterValueStart"] = str(order.begin_reading)
         result["MeterValueEnd"] = str(order.end_reading)
-        if order.charg_status.id == 91:
+        if order.charg_status_id == 91:
             result["StopReason"] = 0    # 用户手动停止充电
-        elif order.charg_status.id in [95, 96]:
+        elif order.charg_status_id in [95, 96]:
             result["StopReason"] = 3    # 充电机设备故障
-        elif order.charg_status.id in [98, 92]:
+        elif order.charg_status_id in [98, 92]:
             result["StopReason"] = 4    # 连接器断开
-        elif order.charg_status.id in [93, 94, 97]:
+        elif order.charg_status_id in [93, 94, 97]:
             result["StopReason"] = 1    # 客户归属地运营商平台停止充
 
         # encrypt_data = data_encode(**result)  # 数据加密

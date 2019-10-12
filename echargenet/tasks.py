@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 import decimal
 import json
+import logging
 import random
 from datetime import datetime, timedelta
 from time import sleep
@@ -18,39 +19,36 @@ from stationmanager.models import ChargingGun
 
 
 @shared_task
-def notification_start_charge_result(start_charge_seq, connector_id):
+def notification_start_charge_result(**data):
     """
     接口名称：notification_start_charge_result
     使用要求：充电桩实际启动成功或失败后，应立即将启动结果信息同步推送至市级平台e充网，时
     间应控制在启动命令下发后50秒内
     """
-    Data = {
-        "StartChargeSeq": start_charge_seq,
-        "ConnectorID": connector_id,
-    }
-    # Ret = 0
-    # Msg = ""
-    try:
-        sleep(5)
-        order = Order.objects.get(start_charge_seq=start_charge_seq)
-        if order.begin_time:
-            Data["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
+    # Data = {
+    #     "StartChargeSeq": start_charge_seq,
+    #     "ConnectorID": connector_id,
+    # }
+    # try:
+    #     order = Order.objects.get(start_charge_seq=start_charge_seq)
+    #     if order.begin_time:
+    #         Data["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
+    #     else:
+    #         Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
+    #
+    #     Data["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
+    #
+    # except Order.DoesNotExist as ex:
+    #     Data["StartChargeSeqStat"] = 5
+    #     Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
 
-        Data["StartChargeSeqStat"] = get_order_status(order.charg_status.id)
-
-    except Order.DoesNotExist as ex:
-        Data["StartChargeSeqStat"] = 5
-        Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
-        # Msg = "Order Not Exists"
-
+    logging.info(data)
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
-    status = echarge.notification_start_charge_result(**Data)
+    status = echarge.notification_start_charge_result(**data)
     if status > 0:
-        print("推送启动充电结果失败!", status)
+        logging.info("notification_start_charge_result failure:", status)
     else:
-        print("推送启动充电结果成功!", status)
+        print("notification_start_charge_result succcess:", status)
 
 
 # 定时任务
@@ -71,8 +69,12 @@ def notification_equip_charge_status():
         result["ConnectorID"] = ConnectorID
         result["StartChargeSeq"] = order.start_charge_seq
 
-        result["StartChargeSeqStat"] = get_order_status(order.charg_status.id)
-        result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, order.charg_status.id)
+        if order.charg_status_id:
+            result["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
+            result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, order.charg_status_id)
+        else:
+            result["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
+            result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, order.charg_pile.charg_status_id)
 
         # A 相电流  A 相电压
         if order.begin_time is None or order.end_time is None:
@@ -111,8 +113,10 @@ def notification_stop_charge_result(start_charge_seq, connector_id):
     try:
         sleep(5)
         order = Order.objects.get(start_charge_seq=start_charge_seq)
-
-        Data["StartChargeSeqStat"] = get_order_status(order.charg_status.id)
+        if order.charg_status_id:
+            Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
+        else:
+            Data["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
 
     except Order.DoesNotExist as ex:
         Data["StartChargeSeqStat"] = 5
@@ -166,16 +170,16 @@ def notification_charge_order_info_for_bonus():
         result["StationID"] = str(order.charg_pile.station.id)
         result["EquipmentID"] = str(order.charg_pile.id)
         result["ConnectorPower"] = float(gun.power) if gun is not None else 0
-        result["ChargeLast"] = int(order.total_seconds())
+        result["ChargeLast"] = int(order.total_seconds()) if order.total_seconds() > 0 else 0
         result["MeterValueStart"] = float(order.begin_reading.quantize(decimal.Decimal("0.01")))
         result["MeterValueEnd"] = float(order.end_reading.quantize(decimal.Decimal("0.01")))
-        if order.charg_status.id == 91:
+        if order.charg_status_id == 91:
             result["StopReason"] = 0    # 用户手动停止充电
-        elif order.charg_status.id in [95, 96]:
+        elif order.charg_status_id in [95, 96]:
             result["StopReason"] = 3    # 充电机设备故障
-        elif order.charg_status.id in [98, 92]:
+        elif order.charg_status_id in [98, 92]:
             result["StopReason"] = 4    # 连接器断开
-        elif order.charg_status.id in [93, 94, 97]:
+        elif order.charg_status_id in [93, 94, 97]:
             result["StopReason"] = 1    # 客户归属地运营商平台停止充
         else:
             result["StopReason"] = 3  # 充电机设备故障
