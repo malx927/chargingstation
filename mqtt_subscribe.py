@@ -42,7 +42,7 @@ from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
 from wxchat.models import UserInfo, UserAcountHistory
-from echargenet.tasks import notification_start_charge_result
+from echargenet.tasks import notification_start_charge_result, notification_stop_charge_result
 from wxchat.utils import send_charging_start_message_to_user
 from stationmanager.signals import update_operator_info
 from stationmanager.signals import operator_info_init
@@ -483,7 +483,7 @@ def update_gun_order_status(**data):
             "begin_time": order.begin_time.strftime('%Y-%m-%d %H:%M:%S')
         }
         logging.info(send_data)
-        if order.start_charge_seq:
+        if order.start_charge_seq and len(order.start_charge_seq) > 0:
             ConnectorID = "{}{}".format(order.charg_pile.pile_sn, order.gun_num)
             Data = {
                 "StartChargeSeq": order.start_charge_seq,
@@ -508,8 +508,6 @@ def update_gun_order_status(**data):
     except FaultCode.DoesNotExist as ex:
         logging.warning(ex)
         send_data = {"return_code": "fail", "cmd": "04", "message": "状态码错误"}
-
-
 
     send_data_to_client(pile_sn, gun_num, **send_data)
 
@@ -1177,6 +1175,20 @@ def pile_charging_stop_handler(topic, byte_msg):
         }
         logging.info(stop_data)
         server_send_stop_charging_cmd(**stop_data)
+    # 判断是否为E充网充电
+    if order.start_charge_seq and len(order.start_charge_seq) > 0:
+        # 推送停止充电结果
+        Data = {
+            "StartChargeSeq": order.start_charge_seq,
+            "ConnectorID": "{}{}".format(pile_sn, gun_num),
+        }
+        if order.charg_status_id:
+            Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
+        else:
+            Data["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
+
+        notification_stop_charge_result(**Data)
+
     # 通知前端
     if order:
         send_data = {

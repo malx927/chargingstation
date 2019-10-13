@@ -489,8 +489,7 @@ class StopChargeAPIView(APIView):
             "Data": encrypt_data,
             "Sig": ret_sig,
         }
-        # 推送停止充电结果 异步延时5秒
-        notification_stop_charge_result.delay(StartChargeSeq, ConnectorID)
+
         return Response(result)
 
 

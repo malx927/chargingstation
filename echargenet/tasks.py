@@ -98,42 +98,26 @@ def notification_equip_charge_status():
 
 
 @shared_task
-def notification_stop_charge_result(start_charge_seq, connector_id):
+def notification_stop_charge_result(**data):
     """
     接口名称：notification_stop_charge_result
     当充电桩实际停止充电后须立即推送结果信息到市级平台e充网，从充电桩收到停止命
     令到向市级平台e充网推送充电停止结果时间间隔控制在50秒内
     :return:
     """
-    Data = {
-        "StartChargeSeq": start_charge_seq,
-        "ConnectorID": connector_id,
-    }
-
-    try:
-        sleep(5)
-        order = Order.objects.get(start_charge_seq=start_charge_seq)
-        if order.charg_status_id:
-            Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
-        else:
-            Data["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
-
-    except Order.DoesNotExist as ex:
-        Data["StartChargeSeqStat"] = 5
-        # Msg = "Order Not Exists"
-
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
-    status = echarge.notification_stop_charge_result(**Data)
+    status = echarge.notification_stop_charge_result(**data)
     if status > 0:
-        print("推送停止充电结果失败!", status)
+        logging.info("notification_stop_charge_result failure", status)
     else:
-        print("推送停止充电结果成功!", status)
+        logging.info("notification_stop_charge_result success", status)
 
+    connector_id = data.get("ConnectorID")
     connector_status = echarge.notification_station_status(connector_id, 0)  # 设置为空闲状态
     if status > 0:
-        print("设备状态变化推送失败!", connector_status)
+        print("118:notification_station_status failure", connector_status)
     else:
-        print("设备状态变化推送成功!", connector_status)
+        print("120:notification_station_status success", connector_status)
 
 
 @shared_task
