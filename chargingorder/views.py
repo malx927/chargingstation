@@ -132,7 +132,7 @@ class RechargeView(View):
             return render(request, template_name="chargingorder/charging_pile_status.html", context={"pile_gun": gun})
 
         charg_mode = request.POST.get('charg_mode', "0")  # 用户选择的充电方式
-
+        order = None
         if int(charg_mode) == 0:  # 充满为止
             order = self.full_recharge(request, *args, **kwargs)
         elif int(charg_mode) == 1:  # 按金额充电
@@ -197,7 +197,7 @@ class RechargeView(View):
         if name is None or len(name) == 0:
             name = request.session.get("nickname", '')  # 用户名称
 
-        out_trade_no = '{0}{1}{2}{3}'.format('C', gun_num, datetime.now().strftime('%Y%m%d%H%M%S'),
+        out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.now().strftime('%Y%m%d%H%M%S'),
                                              random.randint(10000, 100000))
 
         gun = self.get_charging_gun(request)

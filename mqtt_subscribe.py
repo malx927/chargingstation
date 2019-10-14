@@ -464,7 +464,7 @@ def update_gun_order_status(**data):
     begin_time = data.get("begin_time", None)
     status = data.get("status", 0)
     # 更新枪口的充电状态
-    update_charging_gun_status(pile_sn, gun_num, charg_status)
+    gun = update_charging_gun_status(pile_sn, gun_num, charg_status)
     # 更新订单状态和初始表值
     try:
         fault_code = FaultCode.objects.get(pk=charg_status)
@@ -493,10 +493,10 @@ def update_gun_order_status(**data):
                 Data["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
             else:
                 Data["StartTime"] = datetime.datetime.now().strptime("%Y-%m-%d %H:%M:%S")
-            if order.charg_status_id:
+            if order.charg_status:
                 Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
             else:
-                Data["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
+                Data["StartChargeSeqStat"] = get_order_status(gun.charg_status_id)
 
             logging.info(Data)
             notification_start_charge_result(**Data)
@@ -1182,10 +1182,13 @@ def pile_charging_stop_handler(topic, byte_msg):
             "StartChargeSeq": order.start_charge_seq,
             "ConnectorID": "{}{}".format(pile_sn, gun_num),
         }
-        if order.charg_status_id:
-            Data["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
+        if order.charg_status:
+            Data["StartChargeSeqStat"] = 4
         else:
-            Data["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
+            Data["StartChargeSeqStat"] = 5
+
+        Data["SuccStat"] = 0
+        Data["FailReason"] = 0
 
         notification_stop_charge_result(**Data)
 

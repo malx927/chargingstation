@@ -69,12 +69,12 @@ def notification_equip_charge_status():
         result["ConnectorID"] = ConnectorID
         result["StartChargeSeq"] = order.start_charge_seq
 
-        if order.charg_status_id:
+        if order.charg_status:
             result["StartChargeSeqStat"] = get_order_status(order.charg_status_id)
             result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, order.charg_status_id)
         else:
-            result["StartChargeSeqStat"] = get_order_status(order.charg_pile.charg_status_id)
-            result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, order.charg_pile.charg_status_id)
+            result["StartChargeSeqStat"] = get_order_status(gun.charg_status_id)
+            result["ConnectorStatus"] = get_equipment_connector_status(gun.work_status, gun.charg_status_id)
 
         # A 相电流  A 相电压
         if order.begin_time is None or order.end_time is None:
@@ -127,7 +127,7 @@ def notification_charge_order_info_for_bonus():
     使用要求：自充电桩停止充电并生成订单后，订单须在150秒内上报到市级平台e充网，如上报失败
     须按照以下频率推送订单信息(150/300/…./1800/3600/….，单位秒)
     """
-    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), start_charge_seq__isnull=False, status=2)
+    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), status=2)
     result ={}
     for order in orders:
         if order.begin_time is None or order.end_time is None:
@@ -147,7 +147,11 @@ def notification_charge_order_info_for_bonus():
         result["ConnectorID"] = ConnectorID
         result["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
         result["EndTime"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
-        result["ChargeModel"] = 3
+        if order.start_charge_seq:
+            result["ChargeModel"] = 1
+        else:
+            result["ChargeModel"] = 3
+
         result["TotalPower"] = float(order.get_total_reading())
         result["TotalMoney"] = float(order.consum_money.quantize(decimal.Decimal("0.01")))
         result["UserName"] = order.name
