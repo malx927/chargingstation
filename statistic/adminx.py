@@ -51,6 +51,23 @@ class YearStatsAdmin(object):
         return media
 
 
+class BigScreenAdmin(object):
+    """数据大屏分析"""
+    list_display = []
+    object_list_template = "statistic/bigscreen.html"
+
+    # def get_media(self):
+    #     media = super(YearStatsAdmin, self).get_media()
+    #     media.add_css({"screen": ["xadmin/vendor/bootstrap-datepicker/css/datepicker.css"]})
+    #     media.add_css({'screen': ['xadmin/vendor/select2/select2.css']})
+    #     media.add_css({'screen': ['xadmin/vendor/selectize/selectize.css']})
+    #     media.add_css({'screen': ['xadmin/vendor/selectize/selectize.bootstrap3.css']})
+    #     media.add_js([self.static('xadmin/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js')])
+    #     media.add_js([self.static('xadmin/vendor/bootstrap-datepicker/js/locales/bootstrap-datepicker.zh-CN.js')])
+    #     return media
+
+
 xadmin.site.register(DayStats, DayStatsAdmin)
 xadmin.site.register(MonthStats, MonthStatsAdmin)
 xadmin.site.register(YearStats, YearStatsAdmin)
+xadmin.site.register(BigScreen, BigScreenAdmin)

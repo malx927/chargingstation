@@ -35,3 +35,15 @@ class YearStats(models.Model):
 
     def __str__(self):
         return self.Meta.verbose_name
+
+
+class BigScreen(models.Model):
+    """
+    数据大屏
+    """
+    class Meta:
+        verbose_name = "数据大屏显示"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.Meta.verbose_name
