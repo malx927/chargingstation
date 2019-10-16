@@ -53,7 +53,7 @@ class TodayChargingCountAPIView(APIView):
         cur_date = datetime.datetime.now().date()
         cur_hour = datetime.datetime.now().hour + 1
         # 今天合计数据
-        total_results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_date).count()
+        total_results = Order.objects.filter(status=2, begin_time__date=cur_date).count()
         # 今天分时数据
         today_results = self.get_hour_data(cur_date, cur_hour)
         # 昨天分时数据
@@ -70,7 +70,7 @@ class TodayChargingCountAPIView(APIView):
 
     def get_hour_data(self, current_date, limit_hour=24):
         """分时统计数据"""
-        results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=current_date)\
+        results = Order.objects.filter(status=2, begin_time__date=current_date)\
             .extra(select={'hour': "HOUR(begin_time)"})\
             .values("hour").annotate(count=Count("id")).order_by("hour")
         dict_results = {k: 0 for k in range(limit_hour)}
@@ -86,7 +86,7 @@ class TodayChargingReadingsAPIView(APIView):
         cur_date = datetime.datetime.now().date()
         cur_hour = datetime.datetime.now().hour + 1
         # 今天合计数据
-        total_results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_date)\
+        total_results = Order.objects.filter(status=2, begin_time__date=cur_date)\
             .aggregate(total_readings=Sum("total_readings"))
         print("total_results:", total_results)
         total_readings = total_results.get("total_readings", 0)
@@ -108,7 +108,7 @@ class TodayChargingReadingsAPIView(APIView):
 
     def get_hour_readings_data(self, current_date, limit_hour=24):
         """分时统计数据"""
-        results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=current_date)\
+        results = Order.objects.filter(status=2, begin_time__date=current_date)\
             .extra(select={'hour': "HOUR(begin_time)"})\
             .values("hour").annotate(readings=Sum("total_readings")).order_by("hour")
         dict_results = {k: 0 for k in range(limit_hour)}
@@ -124,7 +124,7 @@ class TodayChargingMoneyAPIView(APIView):
         cur_date = datetime.datetime.now().date()
         cur_hour = datetime.datetime.now().hour + 1
         # 今天合计数据
-        total_results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_date)\
+        total_results = Order.objects.filter(status=2, begin_time__date=cur_date)\
             .aggregate(total_money=Sum("consum_money"))
         total_money = total_results.get("total_money", 0)
         if total_money is None:
@@ -145,7 +145,7 @@ class TodayChargingMoneyAPIView(APIView):
 
     def get_hour_money_data(self, current_date, limit_hour=24):
         """分时统计数据"""
-        results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=current_date)\
+        results = Order.objects.filter(status=2, begin_time__date=current_date)\
             .extra(select={'hour': "HOUR(begin_time)"})\
             .values("hour").annotate(money=Sum("consum_money")).order_by("hour")
         dict_results = {k: 0 for k in range(limit_hour)}
