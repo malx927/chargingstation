@@ -16,8 +16,8 @@ from stationmanager.models import ChargingPile
 class BigScreenChargStatsAPIView(APIView):
     """大累计充电次数、累计充电电量、充电桩总数"""
     def get(self, request, *args, **kwargs):
-        results = Order.objects.filter(status=2, pay_time__isnull=False, cash_fee__gt=0).\
-            aggregate(accum_readings=Sum("total_readings"), accum_counts=Count("id"), accum_fees=Sum("cash_fee"))
+        results = Order.objects.filter(status=2, consum_money__gt=0).\
+            aggregate(accum_readings=Sum("total_readings"), accum_counts=Count("id"), accum_fees=Sum("consum_money"))
 
         device_counts = ChargingPile.objects.count()
 
@@ -125,7 +125,7 @@ class TodayChargingMoneyAPIView(APIView):
         cur_hour = datetime.datetime.now().hour + 1
         # 今天合计数据
         total_results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=cur_date)\
-            .aggregate(total_money=Sum("cash_fee"))
+            .aggregate(total_money=Sum("consum_money"))
         total_money = total_results.get("total_money", 0)
         if total_money is None:
             total_money = 0
@@ -147,7 +147,7 @@ class TodayChargingMoneyAPIView(APIView):
         """分时统计数据"""
         results = Order.objects.filter(status=2, pay_time__isnull=False, begin_time__date=current_date)\
             .extra(select={'hour': "HOUR(begin_time)"})\
-            .values("hour").annotate(money=Sum("cash_fee")).order_by("hour")
+            .values("hour").annotate(money=Sum("consum_money")).order_by("hour")
         dict_results = {k: 0 for k in range(limit_hour)}
         for item in results:
             key = item["hour"]
