@@ -167,7 +167,7 @@ class OrderRecordAdmin(object):
     list_filter = ['begin_time', 'order']
     date_hierarchy = 'begin_time'
     list_per_page = 30
-    model_icon = 'fa fa-hourglass-start'
+    model_icon = 'fa fa-file-text'
 
     form_layout = (
             Fieldset(
@@ -216,7 +216,7 @@ class OrderChargDetailAdmin(object):
                     'voltage', 'current', 'output_voltage', 'output_current']
     search_fields = ['out_trade_no', 'pile_sn']
     list_per_page = 50
-    model_icon = 'fa fa-reply-all'
+    model_icon = 'fa fa-file-text'
 
 
 xadmin.site.register(OrderChargDetail, OrderChargDetailAdmin)

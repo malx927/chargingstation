@@ -13,7 +13,7 @@ class GroupClientsAdmin(object):
     """
     list_display = ['name', 'contact_man', 'telephone', 'address', 'bank_name', 'account_name', 'account_number', 'tax_number', 'legal_person', ]
     search_fields = ['name', 'telephone', 'account_name', 'legal_person']
-    model_icon = 'fa fa-paypal'
+    model_icon = 'fa fa-weixin'
     form_layout = (
         Main(
             Fieldset('基本信息',
@@ -135,7 +135,7 @@ class WxUnifiedOrderResultAdmin(object):
                     'prepay_id', 'code_url')
     search_fields = ['prepay_id']
     list_per_page = 50
-    model_icon = 'fa fa-file-text-o'
+    model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(WxUnifiedOrderResult, WxUnifiedOrderResultAdmin)
@@ -147,7 +147,7 @@ class WxPayResultAdmin(object):
                     'is_subscribe', 'trade_type', 'total_fee', 'cash_fee', 'transaction_id', 'out_trade_no')
     search_fields = ['transaction_id', 'out_trade_no']
     list_per_page = 50
-    model_icon = 'fa fa-check-square'
+    model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(WxPayResult, WxPayResultAdmin)
@@ -156,6 +156,7 @@ xadmin.site.register(WxPayResult, WxPayResultAdmin)
 class MenuAdmin(object):
     list_display = []
     object_list_template = "wxchat/menu.html"
+    model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(Menu, MenuAdmin)
@@ -168,7 +169,7 @@ class RechargeRecordAdmin(object):
     list_display = ('out_trade_no', 'name', 'account_number', 'recharge_type', 'pay_bank', 'total_fee', 'cash_fee', 'status')
     search_fields = ['out_trade_no', 'name']
     list_per_page = 50
-    model_icon = 'fa fa-check-square'
+    model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(RechargeRecord, RechargeRecordAdmin)
@@ -178,7 +179,7 @@ class RechargeListAdmin(object):
     """用户充值设置"""
     list_display = ('money', 'create_at')
     list_per_page = 50
-    model_icon = 'fa fa-check-square'
+    model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(RechargeList, RechargeListAdmin)
@@ -188,7 +189,7 @@ class UserCollectionAdmin(object):
     """用户收藏设置"""
     list_display = ['openid', 'station', 'create_at']
     list_per_page = 50
-    model_icon = 'fa fa-check-square'
+    model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(UserCollection, UserCollectionAdmin)
@@ -201,7 +202,7 @@ class UserAcountHistoryAdmin(object):
     list_display = ['name', 'openid', 'total_money', 'consume_money', 'binding_amount', 'account_balance', 'create_time']
     readonly_fields = ['name', 'openid', 'total_money', 'consume_money', 'binding_amount']
     list_per_page = 50
-    model_icon = 'fa fa-check-square'
+    model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(UserAcountHistory, UserAcountHistoryAdmin)

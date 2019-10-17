@@ -139,7 +139,7 @@
                         <div class="StateBox">
                             <div class="StateTit"><span>充电站名称</span><span>本月累计(元)</span><span>本年累计(元)</span></div>
                             <div style="min-height: 2.0rem">
-                                <ul class="line" id="id_device_stats">
+                                <ul class="line" id="id_money_stats">
                                 </ul>
                             </div>
                         </div>
@@ -164,7 +164,7 @@
             today_money_stats();
             today_power_stats();
             station_device_stats();
-
+            station_money_stats();
         })
         function get_charging_stats(){
             $.ajax({
@@ -212,6 +212,7 @@
             today_money_stats();
             today_power_stats();
             station_device_stats();
+            station_money_stats()
         }, 10000);
 
         var today_counts = echarts.init(document.getElementById('id_today_counts'));
@@ -244,6 +245,7 @@
                         },
                         legend: {
                             data:['今日', '昨日'],
+                            x: 'right',
                             textStyle:{
                                 color: '#ffffff',
                             }
@@ -339,6 +341,7 @@
                         },
                         legend: {
                             data:['今日', '昨日'],
+                             x: 'right',
                             textStyle:{
                                 color: '#ffffff',
                             }
@@ -428,6 +431,7 @@
                         },
                         legend: {
                             data:['今日', '昨日'],
+                             x: 'right',
                             textStyle:{
                                 color: '#ffffff',
                             }
@@ -517,6 +521,7 @@
                         },
                         legend: {
                             data:['今日', '昨日'],
+                             x: 'right',
                             textStyle:{
                                 color: '#ffffff',
                             }
@@ -612,6 +617,29 @@
             });
         }
 
+        function station_money_stats(){
+            $.ajax({
+              type: 'GET',
+              url: '/stats/big_current_month_year_stats/',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                {#console.log(JSON.stringify(data));#}
+                $("#id_money_stats").find("li").remove();
+                $.each(data, function (index, item) {
+                    console.log(JSON.stringify(item));
+
+                    $("#id_money_stats").append(`<li>
+                                                     <span>${item.station_name}</span><span>${item.month_money.toFixed(2)}</span><span>${item.year_money.toFixed(2)}</span>
+                                                </li>`);
+                })
+              },
+              error: function(error){
+                console.log(JSON.stringify(error));
+
+              }
+            });
+        }
     </script>
 
     <script type="text/javascript" src="{% static 'statistic/js/jquery.waypoints.min.js' %}"></script>

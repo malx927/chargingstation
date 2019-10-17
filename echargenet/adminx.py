@@ -11,7 +11,7 @@ class OperatorInfoAdmin(object):
     """
     list_display = ["OperatorID", "OperatorName", "OperatorTel1", "OperatorTel2", "OperatorRegAddress", "OperatorNote"]
     search_fields = ["OperatorName"]
-    model_icon = 'fa fa-sitemap'
+    model_icon = 'fa fa-random'
     list_export = ('xls', 'xml', 'json')
 
 
@@ -22,7 +22,7 @@ class StationInfoAdmin(object):
     list_display = ["StationID", "OperatorID", "EquipmentOwnerID", "StationName", "CountryCode", "AreaCode", "Address"]
     search_fields = ['StationName']
     list_filter = ['OperatorID']
-    model_icon = 'fa fa-building'
+    model_icon = 'fa fa-random'
     relfield_style = 'fk_ajax'
 
 
@@ -35,7 +35,7 @@ class EquipmentInfoAdmin(object):
     """
     list_display = ["EquipmentID", "EquipmentName", "StationID",  "EquipmentType", "Power"]
     list_display_links = ["EquipmentID", "EquipmentName"]
-    model_icon = 'fa fa-battery-half'
+    model_icon = 'fa fa-random'
 
 
 xadmin.site.register(EquipmentInfo, EquipmentInfoAdmin)

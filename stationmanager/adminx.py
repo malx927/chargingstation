@@ -122,7 +122,7 @@ class StationAdmin(object):
     list_display = ['name', 'seller', 'province_city_district', 'address',  'telephone',  'station_status', 'station_type']
     search_fields = ['name',  'address', 'seller.name', 'telephone', 'telephone1']
     list_filter = ['seller', 'dicount']
-    model_icon = 'fa fa-building'
+    model_icon = 'fa fa-sitemap'
     relfield_style = 'fk_ajax'
     inlines = [StationImageInline]
 
@@ -269,7 +269,7 @@ class ChargingPileAdmin(object):
     list_filter = ['pile_type', 'station', 'pile_mode', 'business_mode']
     readonly_fields = ['group', 'user']
 
-    model_icon = 'fa fa-battery-half'
+    model_icon = 'fa fa-sitemap'
     show_all_rel_details = False
     list_editable = ['pile_type', 'pile_sn']
     refresh_times = [3, 5]  # 计时刷新
@@ -382,7 +382,7 @@ class ChargingGunAdmin(object):
     search_fields = ['gun_num', 'charg_pile__pile_sn']
     list_display_links = ['gun_num', 'charg_pile']
     list_filter = ['charg_pile', 'work_status', 'cc_status', 'cp_status']
-    model_icon = 'fa fa-random'
+    model_icon = 'fa fa-sitemap'
     show_all_rel_details = False
     # save_as = True
     # save_on_top = True
@@ -467,7 +467,7 @@ class FaultChargingGunAdmin(object):
     search_fields = ['gun_num', 'charg_pile__pile_sn']
     list_display_links = ['gun_num', 'charg_pile']
     list_filter = ['charg_pile', 'work_status', 'charg_status']
-    model_icon = 'fa fa-random'
+    model_icon = 'fa fa-sitemap'
     show_all_rel_details = False
 
     def queryset(self):
@@ -507,7 +507,7 @@ class ChargingPriceAdmin(object):
     充电价格表
     """
     list_display = ['station', 'type', 'parking_fee', 'default_flag']
-    model_icon = 'fa fa-sliders'
+    model_icon = 'fa fa-sitemap'
 
     form_layout = (
         Fieldset(
@@ -559,7 +559,7 @@ class PowerModuleStatusAdmin(object):
     search_fields = ['pile_sn', 'pile__name', 'pile__pile_sn', 'status', 'name']
     list_filter = ['pile', 'status', 'update_time']
     relfield_style = 'fk-ajax'
-    model_icon = 'fa fa-list-ol'
+    model_icon = 'fa fa-sitemap'
 
 
 xadmin.site.register(PowerModuleStatus, PowerModuleStatusAdmin)

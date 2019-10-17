@@ -24,13 +24,13 @@ class PileTypeAdmin(object):
 class FaultCodeAdmin(object):
     list_display = ['id', 'name', 'remark']
     search_fields = ['name']
-    model_icon = 'fa fa-bug'
+    model_icon = 'fa fa-star'
 
 
 class PriceTypeAdmin(object):
     list_display = ['id', 'name']
     search_fields = ['name']
-    model_icon = 'fa fa-rss-square'
+    model_icon = 'fa fa-star'
 
 
 class AreaCodeAdmin(object):
@@ -39,7 +39,7 @@ class AreaCodeAdmin(object):
     """
     list_display = ['code', 'name']
     search_fields = ['code', 'name']
-    model_icon = 'fa fa-rss-square'
+    model_icon = 'fa fa-star'
     list_per_page = 50
 
 

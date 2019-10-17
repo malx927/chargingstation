@@ -190,3 +190,28 @@ class TodayChargingPowerAPIView(APIView):
             key = item["hour"]
             dict_results[key] = item["power"]
         return dict_results
+
+
+class CurrentMonthYearAccumAPIView(APIView):
+    """当前月、年金额统计"""
+    def get(self, request, *args, **kwargs):
+        current_month = datetime.datetime.now().month
+        current_year = datetime.datetime.now().year
+        # 月累计
+        month_results = Order.objects.select_related("charg_pile").filter(status=2, begin_time__month=current_month)\
+            .values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name"))\
+            .annotate(month_money=Sum("consum_money")).order_by("station_id")
+        # 年累计
+        year_results = Order.objects.select_related("charg_pile").filter(status=2, begin_time__year=current_year) \
+            .values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
+            .annotate(year_money=Sum("consum_money")).order_by("station_id")
+        result_dict = {}
+        for result in month_results:
+            result_dict[result["station_id"]] = result
+
+        for res in year_results:
+            station_id = res["station_id"]
+            result_dict[station_id]["year_money"] = res["year_money"]
+        print(sorted(result_dict.values()))
+        return Response(result_dict.values())
+
