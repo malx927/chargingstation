@@ -110,8 +110,8 @@ def get_hmac_md5(key, data):
 
 
 class EchargeNet(object):
-    E_CHARGE_URL = 'http://hlht.test.zc3u.com/evcs/20160701/'   # 测试环境
-    # E_CHARGE_URL = 'http://hlht.zc3u.com/evcs/20160701/'   # 运行环境
+    # E_CHARGE_URL = 'http://hlht.test.zc3u.com/evcs/20160701/'   # 测试环境
+    E_CHARGE_URL = 'http://hlht.zc3u.com/evcs/20160701/'   # 运行环境
     HEADERS = {'content-type': 'application/json;charset=utf-8'}
     ACCESS_TOKEN_KEY = "{0}_{1}".format(settings.OPERATORID, "access_token")
     ACCESS_TOKEN_EXPIRES_AT = "{0}_{1}".format(settings.OPERATORID, "access_token_expires_at")
