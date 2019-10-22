@@ -145,7 +145,7 @@ def notification_charge_order_info_for_bonus():
             gun = None
 
         ConnectorID = '{}{}'.format(order.charg_pile.pile_sn, order.gun_num)
-        result["StartChargeSeq"] = order.start_charge_seq
+        result["StartChargeSeq"] = order.out_trade_no
         result["ConnectorID"] = ConnectorID
         result["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
         result["EndTime"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
