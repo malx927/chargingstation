@@ -20,9 +20,9 @@ unpad = lambda s: s[:-ord(s[len(s) - 1:])]
 def get_order_status(charg_status):
     if charg_status is None:
         return 5
-    if 3 >= charg_status >= 1:
+    if 2 >= charg_status >= 1:
         return 1        # 启动中
-    elif 6 >= charg_status >= 4:
+    elif 6 >= charg_status >= 3:
         return 2        # 充电中
     elif charg_status == 7:
         return 3        # 停止中
