@@ -83,6 +83,8 @@ def notification_equip_charge_status():
         result["CurrentA"] = 0
         result["VoltageA"] = 0
         result["Soc"] = float(order.end_soc)
+        result["ChargeModel"] = 1
+
         result["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
         result["EndTime"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
         result["TotalPower"] = float(order.get_total_reading())
