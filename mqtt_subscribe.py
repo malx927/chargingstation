@@ -475,7 +475,9 @@ def update_gun_order_status(**data):
         order.begin_time = begin_time
         order.status = status
         order.save()
-        send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
+        if order.name != settings.ECHARGEUSER:
+            send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
+
         send_data = {
             "return_code": "success",
             "cmd": "04",        # 充电命令

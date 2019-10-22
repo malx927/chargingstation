@@ -82,6 +82,7 @@ def update_equipment_info(sender, instance, created, **kwargs):
         try:
             EquipmentID = instance.id
             StationID = instance.station.id
+            is_subsidy = instance.is_subsidy
             station_info = StationInfo.objects.get(StationID=str(StationID))
             if instance.pile_type.id in [1, 2]:
                 EquipmentType = 1
@@ -97,6 +98,7 @@ def update_equipment_info(sender, instance, created, **kwargs):
                 "EquipmentType": EquipmentType,
                 "Power": instance.power,
                 "StationID": station_info,
+                "is_subsidy": is_subsidy,
             }
 
             EquipmentInfo.objects.update_or_create(EquipmentID=str(EquipmentID), defaults=defaults)
