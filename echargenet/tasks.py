@@ -200,7 +200,7 @@ def notification_charge_order_info_for_bonus():
 @shared_task
 def notification_connector_status():
     """定时推送设备接口状态"""
-    connectors = ConnectorInfo.objects.all()
+    connectors = ConnectorInfo.objects.filter(EquipmentID__is_subsidy=1)
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     for connector in connectors:
         status = echarge.notification_station_status(connector.ConnectorID, connector.Status)
