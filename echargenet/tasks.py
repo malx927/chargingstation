@@ -83,6 +83,8 @@ def notification_equip_charge_status():
         result["CurrentA"] = 0
         result["VoltageA"] = 0
         result["Soc"] = float(order.end_soc)
+        result["ChargeModel"] = 1
+
         result["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
         result["EndTime"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
         result["TotalPower"] = float(order.get_total_reading())
@@ -143,7 +145,7 @@ def notification_charge_order_info_for_bonus():
             gun = None
 
         ConnectorID = '{}{}'.format(order.charg_pile.pile_sn, order.gun_num)
-        result["StartChargeSeq"] = order.start_charge_seq
+        result["StartChargeSeq"] = order.out_trade_no
         result["ConnectorID"] = ConnectorID
         result["StartTime"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
         result["EndTime"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -198,7 +200,7 @@ def notification_charge_order_info_for_bonus():
 @shared_task
 def notification_connector_status():
     """定时推送设备接口状态"""
-    connectors = ConnectorInfo.objects.all()
+    connectors = ConnectorInfo.objects.filter(EquipmentID__is_subsidy=1)
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     for connector in connectors:
         status = echarge.notification_station_status(connector.ConnectorID, connector.Status)

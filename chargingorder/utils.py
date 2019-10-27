@@ -227,6 +227,7 @@ def user_account_deduct_money(order):
             order.cash_fee = consum_money
             order.balance = user.account_balance()
             order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
-            send_charging_end_message_to_user(order)
+            if order.name != settings.ECHARGEUSER:
+                send_charging_end_message_to_user(order)
         except UserInfo.DoesNotExist as ex:
             logging.warning(ex)
