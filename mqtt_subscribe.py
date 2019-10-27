@@ -1089,7 +1089,8 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
     server_publish(pile_sn, b_reply_proto)   # 发送主题
     # 保存停止充电指令
-    save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "stop")
+    if stop_code == 0:
+        save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "stop")
     logging.info("Leave server_send_stop_charging_cmd function")
 
 
