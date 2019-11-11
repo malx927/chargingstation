@@ -30,4 +30,5 @@ urlpatterns = [
     url(r'^MP_verify_6ZHqlaeJeyI9V6QU\.txt$', TemplateView.as_view(template_name='MP_verify_6ZHqlaeJeyI9V6QU.txt', content_type='text/plain')),
     url('^favicon\.ico$', RedirectView.as_view(url='static/favicon.ico')),
     url('^stats/', include("statistic.urls")),
+    url('^cards/', include("cards.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
