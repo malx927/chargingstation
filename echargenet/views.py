@@ -345,7 +345,7 @@ class StartChargeAPIView(APIView):
         openid = settings.ECHARGEUSER
         name = openid
         if StartChargeSeq is None:
-            out_trade_no = '{0}{1}{2}{3}'.format('C', gun_num, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
+            out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
         else:
             out_trade_no = StartChargeSeq
         charg_pile = pile_gun.charg_pile
@@ -357,7 +357,7 @@ class StartChargeAPIView(APIView):
             "charg_type": 0,  # 0后台 01本地离线
             "out_trade_no": out_trade_no,
             "charg_pile": charg_pile,
-            # "start_charge_seq": StartChargeSeq,
+            "start_model": 2,
         }
         # order = Order.objects.create(**params)
         ret = Order.objects.update_or_create(start_charge_seq=StartChargeSeq, defaults=params)

@@ -17,6 +17,7 @@ import websockets
 from concurrent.futures import ThreadPoolExecutor
 import paho.mqtt.client as mqtt
 from asgiref.sync import async_to_sync
+from cards.models import ChargingCard, CardUser
 from django.db.models import F, Sum, DecimalField
 
 # logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
@@ -155,8 +156,8 @@ def message_dispatch(topic, byte_msg):
     if byte_command == CMD_PILE_STATUS:     # 充电桩状态上报
         pile_status_handler_v12(topic, byte_msg)
 
-    elif byte_command == CMD_PILE_PARAMS:   # 充电桩向服务器上报桩参数
-       pass
+    elif byte_command == CMD_CARD_CHARGING_REQUEST:   # 储值卡充电请求'0x83'
+       pile_card_charging_request_hander(topic, byte_msg)
 
     elif byte_command == CMD_PILE_CHARG_REPLY:   # 充电桩回复充电指令 '\x04'
         pile_reply_charging_cmd_handler(topic, byte_msg)
@@ -177,6 +178,86 @@ def message_dispatch(topic, byte_msg):
         pass
 
     logging.info("*****************leave message_dispach****************")
+
+
+# 83(0x83)
+def pile_card_charging_request_hander(topic, byte_msg):
+    """桩端向后台请求充电"""
+    logging.info("0x83 Enter pile_card_charging_request_hander")
+    pile_sn = get_pile_sn(byte_msg)
+    gun_num = byte_msg[0]
+    logging.info("充电桩Sn编码:{}-{}".format(pile_sn, gun_num))
+
+    card_type = byte_msg[38]
+    logging.info('用户识别卡方式: {}'.format(card_type))
+
+    card_num = byte_msg[39:71].decode('utf-8').strip('\000')
+    logging.info('卡号: {}'.format(card_num))
+
+    cur_time = datetime.datetime.now().date()
+
+    if card_type == 1:  # IC卡
+        password = byte2integer(byte_msg, 71, 79).decode('utf-8').strip('\000')
+        card = ChargingCard.objects.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1, card_num=card_num, password=password).first()
+    else:               # 手机
+        password = byte2integer(byte_msg, 71, 87).decode('utf-8').strip('\000')
+        try:
+            user = CardUser.objects.get(telephone=card_num, password=password, is_active=1)
+            card = user.chargingcard_set.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1,
+                                               card_num=card_num, password=password).order_by("-money").first()
+        except CardUser.DoesNotExist as ex:
+            logging.info(ex)
+            return
+
+    if not card:
+        logging.info("card number or user does not exits")
+        return
+
+    if card.money > settings.ACCOUNT_BALANCE:
+        # 创建订单(充满为止), 发送充电命令
+        openid = card.card_num
+        name = card.user.name if card.user else openid
+        out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
+
+        pile_gun = ChargingGun.objects.select_related("charg_pile").filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
+        charg_pile = pile_gun.charg_pile
+        params = {
+            "gun_num": gun_num,
+            "openid": openid,
+            "name": name,
+            "charg_mode": 0,
+            "charg_type": 0,  # 0后台 01本地离线
+            "out_trade_no": out_trade_no,
+            "charg_pile": charg_pile,
+            "start_model": 1,   # 储值卡启动
+        }
+        order = Order.objects.create(**params)
+        out_trade_no = order.out_trade_no
+        data = {
+            'pile_sn': pile_sn,
+            'gun_num': int(order.gun_num),
+            'out_trade_no': out_trade_no,
+            'openid': order.openid,
+            'charging_type': 0,  # 充电类型 1预约，0即时
+            'subscribe_min': 0,
+        }
+
+        charg_policy = charg_pile.charg_policy  # 充电策略是否使用(D0：1使用充电策略，0系统默认策略)(电站还是电桩为准)
+        data["use_policy_flag"] = charg_policy
+        # 1使用充电策略
+        if charg_policy == 1:
+            data["continue_charg_status"] = 0  # 断网可继续充电  1断网可继续充电，0不可以(那些用户？)
+            data["occupy_status"] = charg_pile.occupy_status  # 收取占位费 1收取占位费，0不收取
+            data["subscribe_status"] = charg_pile.subscribe_status  # 收取预约费
+            data["low_fee_status"] = charg_pile.low_offset  # 收取小电流补偿费
+            data["low_restrict_status"] = charg_pile.low_restrict  # 限制小电流输出
+
+        charging_policy_value = 0
+        data["charging_policy_value"] = charging_policy_value
+
+        server_send_charging_cmd(**data)
+
+    logging.info("0x83 Leave pile_card_charging_request_hander")
 
 
 # 1 (0x01)

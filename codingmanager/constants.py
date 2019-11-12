@@ -14,7 +14,7 @@ PILE_UPGRADE_FILEDATA = b'\x09'
 CMD_PILE_LOG_DATA = b'\x0a'
 CMD_PILE_VERSION_INFO = b'\x81'
 CMD_REQUEST_PILE_PARARMS = b'\x82'
-CMD_SET_PILE_PARARMS = b'\x83'
+CMD_CARD_CHARGING_REQUEST = b'\x83'
 CMD_SEND_CHARGING = b'\x84'
 CMD_REPLY_CHARGING = b'\x85'
 CMD_SEND_STOP_CHARG = b'\x86'
@@ -312,4 +312,10 @@ CONNECTOR_TYPE = (
 GUN_NUM = (
     ('0', '0'),
     ('1', '1'),
+)
+
+STARTUP_MODEL = (
+    (0, "微信启动"),
+    (1, "储值卡启动"),
+    (2, "E充网启动"),
 )

@@ -6,7 +6,7 @@ from xadmin.layout import Fieldset, Row, AppendedText
 
 class CardUserAdmin(object):
     """储值卡用户"""
-    list_display = ['name', 'password', 'telephone', 'address', 'bank', 'account', 'add_time']
+    list_display = ['name', 'password', 'telephone', 'address', 'bank', 'account', 'is_active', 'add_time']
     search_fields = ['name', 'telephone', 'address', 'bank', 'account']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
