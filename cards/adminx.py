@@ -18,7 +18,7 @@ xadmin.site.register(CardUser, CardUserAdmin)
 
 class ChargingCardAdmin(object):
     """储值卡"""
-    list_display = ['card_num', 'money', 'status', 'user', 'start_date', 'end_date', 'add_time']
+    list_display = ['card_num', 'money', 'status', 'user', 'start_date', 'end_date', 'add_time', 'startup']
     search_fields = ['card_num']
     list_filter = ['status', 'user', 'start_date']
     list_per_page = 50

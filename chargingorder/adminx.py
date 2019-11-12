@@ -31,7 +31,7 @@ class OrderAdmin(object):
                 Row('out_trade_no', 'name'),
                 Row('charg_pile', 'gun_num'),
                 Row('charg_mode', 'protocol'),
-                Row('charg_type', 'openid'),
+                Row('start_model', 'openid'),
                 Row(
                     AppendedText('total_fee', '元'),
                     AppendedText('charg_min_val', '分钟'),
@@ -95,6 +95,7 @@ class OrderAdmin(object):
             ),
             Fieldset(
                 '其他信息',
+                'charg_type',
                 'output_voltage',
                 'output_current',
                 'prev_reading',

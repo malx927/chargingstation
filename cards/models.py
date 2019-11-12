@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 
 
 class CardUser(models.Model):
@@ -44,3 +45,16 @@ class ChargingCard(models.Model):
     class Meta:
         verbose_name = '储值卡'
         verbose_name_plural = verbose_name
+
+    def startup(self):
+        start_url = "/cards/cards_startup/?c_id={}&status={}".format(self.id, 1)
+        stop_url = "/cards/cards_startup/?c_id={}&status={}".format(self.id, 0)
+        charging_url = "/cards/charging_money/?c_id={}".format(self.id)
+        startup = " <a class='btn btn-xs btn-default' href='{}'>启用</a> ".format(start_url)
+        stop = " <a class='btn btn-xs btn-danger' href='{}'>禁用</a> ".format(stop_url)
+        charging = " <a class='btn btn-xs btn-success' href='{}'>充值</a>".format(charging_url)
+        return mark_safe(startup + stop + charging)
+
+    startup.short_description = "选项"
+
+    # self.get_model_url(Student, 'changelist'),
