@@ -1,6 +1,6 @@
 # coding=utf-8
 import xadmin
-from cards.models import CardUser, ChargingCard
+from cards.models import CardUser, ChargingCard, CardRecharge
 from xadmin.layout import Fieldset, Row, AppendedText
 
 
@@ -41,3 +41,22 @@ class ChargingCardAdmin(object):
 
 
 xadmin.site.register(ChargingCard, ChargingCardAdmin)
+
+
+class CardRechargeAdmin(object):
+    """储值卡"""
+    list_display = ['card', 'user', 'money', 'op_user', 'add_time']
+    search_fields = ['card__card_num']
+    list_filter = ['user']
+    list_per_page = 50
+    model_icon = 'fa fa-file-text'
+    show_all_rel_details = False
+
+    # def has_change_permission(self):
+    #     return False
+    #
+    # def has_delete_permission(self, obj=None):
+    #     return False
+
+
+xadmin.site.register(CardRecharge, CardRechargeAdmin)

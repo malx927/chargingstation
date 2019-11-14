@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.safestring import mark_safe
 
+from chargingstation import settings
+
 
 class CardUser(models.Model):
     """储值卡用户"""
@@ -57,4 +59,18 @@ class ChargingCard(models.Model):
 
     startup.short_description = "选项"
 
-    # self.get_model_url(Student, 'changelist'),
+
+class CardRecharge(models.Model):
+    """卡充值记录表"""
+    card = models.ForeignKey(ChargingCard, verbose_name="储蓄卡", on_delete=models.CASCADE)
+    user = models.ForeignKey(CardUser, verbose_name="处置卡用户", on_delete=models.CASCADE)
+    money = models.IntegerField(verbose_name="充值金额", default=0)
+    op_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作人', blank=True, null=True)
+    add_time = models.DateTimeField(verbose_name="充值时间", auto_now_add=True)
+
+    def __str__(self):
+        return self.card
+
+    class Meta:
+        verbose_name = '卡充值记录表'
+        verbose_name_plural = verbose_name
