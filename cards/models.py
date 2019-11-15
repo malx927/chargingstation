@@ -30,7 +30,7 @@ class ChargingCard(models.Model):
         (1, "启用"),
         (0, "禁用"),
     )
-    card_num = models.CharField(verbose_name="卡号", max_length=128)
+    card_num = models.CharField(verbose_name="卡号", max_length=128,unique=True)
     cipher = models.CharField(verbose_name="卡密钥", max_length=128)
     sec_num = models.CharField(verbose_name="备用卡号", max_length=128, blank=True, null=True)
     user = models.ForeignKey(CardUser, verbose_name="用户", blank=True, null=True, on_delete=models.SET_NULL)

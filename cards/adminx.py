@@ -24,13 +24,13 @@ class ChargingCardAdmin(object):
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
-
+    readonly_fields = ["money"]
     object_list_template = "cards/cards_model_list.html"
 
     form_layout = (
         Fieldset(
             '储值卡信息',
-            Row('card_num', AppendedText('money', '元')),
+            Row('card_num', 'money'),
             Row('status', 'user'),
             Row('sec_num', "cipher"),
         ),
@@ -38,7 +38,6 @@ class ChargingCardAdmin(object):
             '有效期限',
             Row('start_date', "end_date"),
         ),
-
     )
 
 
@@ -53,7 +52,6 @@ class CardRechargeAdmin(object):
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
-
 
 
 xadmin.site.register(CardRecharge, CardRechargeAdmin)

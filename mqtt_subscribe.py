@@ -17,7 +17,6 @@ import websockets
 from concurrent.futures import ThreadPoolExecutor
 import paho.mqtt.client as mqtt
 from asgiref.sync import async_to_sync
-from cards.models import ChargingCard, CardUser
 from django.db.models import F, Sum, DecimalField
 
 # logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
@@ -45,6 +44,7 @@ from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail
 from wxchat.models import UserInfo, UserAcountHistory
 from echargenet.tasks import notification_start_charge_result, notification_stop_charge_result
 from wxchat.utils import send_charging_start_message_to_user
+from cards.models import ChargingCard, CardUser
 from stationmanager.signals import update_operator_info
 from stationmanager.signals import operator_info_init
 from stationmanager.signals import operator_info_delete
@@ -185,26 +185,30 @@ def pile_card_charging_request_hander(topic, byte_msg):
     """桩端向后台请求充电"""
     logging.info("0x83 Enter pile_card_charging_request_hander")
     pile_sn = get_pile_sn(byte_msg)
-    gun_num = byte_msg[0]
-    logging.info("充电桩Sn编码:{}-{}".format(pile_sn, gun_num))
+    logging.info("充电桩Sn编码:{}".format(pile_sn))
 
     card_type = byte_msg[38]
     logging.info('用户识别卡方式: {}'.format(card_type))
+    # 保留四位
+    gun_num = byte_msg[43]   # 枪口号
+    logging.info("枪口号:{}".format(gun_num))
 
-    card_num = byte_msg[39:71].decode('utf-8').strip('\000')
+    oper_type = byte_msg[44]    # 操作类型(01:请求后台充电,02:请求后台停充)
+    logging.info("操作类型：{}".format(oper_type))
+
+    card_num = byte_msg[45:77].decode('utf-8').strip('\000')
     logging.info('卡号: {}'.format(card_num))
 
     cur_time = datetime.datetime.now().date()
 
+    password = byte2integer(byte_msg, 77, 93).decode('utf-8').strip('\000')
     if card_type == 1:  # IC卡
-        password = byte2integer(byte_msg, 71, 79).decode('utf-8').strip('\000')
         card = ChargingCard.objects.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1, card_num=card_num, password=password).first()
     else:               # 手机
-        password = byte2integer(byte_msg, 71, 87).decode('utf-8').strip('\000')
         try:
             user = CardUser.objects.get(telephone=card_num, password=password, is_active=1)
-            card = user.chargingcard_set.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1,
-                                               card_num=card_num, password=password).order_by("-money").first()
+            card = user.chargingcard_set.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1) \
+                .order_by("-money").first()
         except CardUser.DoesNotExist as ex:
             logging.info(ex)
             return
@@ -213,13 +217,30 @@ def pile_card_charging_request_hander(topic, byte_msg):
         logging.info("card number or user does not exits")
         return
 
-    if card.money > settings.ACCOUNT_BALANCE:
+    # 判断是否正在充电如果正在充电判断充电时间操作30s后，进行停充
+    order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num, openid=card_num, status__lt=0).first()
+    if order and oper_type == 2:
+        cur_dtime = datetime.datetime.now()
+        diff_seconds = (cur_dtime - order.begin_time).seconds
+        if diff_seconds > 30:
+            stop_data = {
+                "pile_sn": pile_sn,
+                "gun_num": gun_num,
+                "out_trade_no": order.out_trade_no,
+                "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
+                "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+                "stop_code": 0,  # 0 主动停止，1被动响应
+                "fault_code": 0,
+            }
+            server_send_stop_charging_cmd(**stop_data)
+
+    if oper_type == 1 and card.money > settings.ACCOUNT_BALANCE:
         # 创建订单(充满为止), 发送充电命令
         openid = card.card_num
         name = card.user.name if card.user else openid
         out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
 
-        pile_gun = ChargingGun.objects.select_related("charg_pile").filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
+        pile_gun = ChargingGun.objects.select_related("charg_pile").filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         charg_pile = pile_gun.charg_pile
         params = {
             "gun_num": gun_num,
@@ -957,48 +978,55 @@ def save_pile_charg_status_to_db(**data):
     if order.openid == settings.ECHARGEUSER:    # E充网用户直接返回
         return
 
-    try:
-        charg_user = UserInfo.objects.get(openid=order.openid)
-        sub_account = charg_user.is_sub_user()
-        if sub_account:
-            if sub_account.main_user.account_balance() - order.consum_money <= 10:  # 附属用户
+    if order.start_model == 1:  # 储蓄卡
+        card = ChargingCard.objects.filter(card_num=order.openid).first()
+        if card.money - - order.consum_money <= 0.2:
+            stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
+            logging.info(stop_data)
+            server_send_stop_charging_cmd(**stop_data)
+    else:
+        try:
+            charg_user = UserInfo.objects.get(openid=order.openid)
+            sub_account = charg_user.is_sub_user()
+            if sub_account:
+                if sub_account.main_user.account_balance() - order.consum_money <= 10:  # 附属用户
+                    # 发送停充指令
+                    stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
+                    logging.info(stop_data)
+                    server_send_stop_charging_cmd(**stop_data)
+            elif charg_user.account_balance() - order.consum_money <= 0.2:
                 # 发送停充指令
-                stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
+                stop_data["fault_code"] = 93    # 后台主动停止－帐号无费用
                 logging.info(stop_data)
                 server_send_stop_charging_cmd(**stop_data)
-        elif charg_user.account_balance() - order.consum_money <= 0.2:
+        except UserInfo.DoesNotExist as ex:
+            logging.warning(ex)
             # 发送停充指令
-            stop_data["fault_code"] = 93    # 后台主动停止－帐号无费用
+            stop_data["fault_code"] = 93        # 后台主动停止－用户停止
             logging.info(stop_data)
             server_send_stop_charging_cmd(**stop_data)
-    except UserInfo.DoesNotExist as ex:
-        logging.warning(ex)
-        # 发送停充指令
-        stop_data["fault_code"] = 93        # 后台主动停止－用户停止
-        logging.info(stop_data)
-        server_send_stop_charging_cmd(**stop_data)
 
-    if order.charg_mode == 1:     # (1, '按金额') 将剩余的钱转到用户帐上
-        if order.total_fee - order.consum_money <= 0:
-            stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
-            logging.info(stop_data)
-            server_send_stop_charging_cmd(**stop_data)
-    elif order.charg_mode == 2:     # (2, '按分钟数')
-        delta_time = (order.end_time - order.begin_time).seconds / 60
-        if delta_time >= order.charg_min_val:
-            stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
-            logging.info(stop_data)
-            server_send_stop_charging_cmd(**stop_data)
-    elif order.charg_mode == 3:     # (3, '按SOC')
-        if order.end_soc >= order.charg_soc_val:
-            stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
-            logging.info(stop_data)
-            server_send_stop_charging_cmd(**stop_data)
-    elif order.charg_mode == 4:     # (4, '按电量')
-        if order.end_reading - order.end_reading >= order.charg_reading_val:
-            stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
-            logging.info(stop_data)
-            server_send_stop_charging_cmd(**stop_data)
+        if order.charg_mode == 1:     # (1, '按金额') 将剩余的钱转到用户帐上
+            if order.total_fee - order.consum_money <= 0:
+                stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
+                logging.info(stop_data)
+                server_send_stop_charging_cmd(**stop_data)
+        elif order.charg_mode == 2:     # (2, '按分钟数')
+            delta_time = (order.end_time - order.begin_time).seconds / 60
+            if delta_time >= order.charg_min_val:
+                stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
+                logging.info(stop_data)
+                server_send_stop_charging_cmd(**stop_data)
+        elif order.charg_mode == 3:     # (3, '按SOC')
+            if order.end_soc >= order.charg_soc_val:
+                stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
+                logging.info(stop_data)
+                server_send_stop_charging_cmd(**stop_data)
+        elif order.charg_mode == 4:     # (4, '按电量')
+            if order.end_reading - order.end_reading >= order.charg_reading_val:
+                stop_data["fault_code"] = 94  # 后台主动停止－设定条件满足
+                logging.info(stop_data)
+                server_send_stop_charging_cmd(**stop_data)
 
 
 def calculate_order(**kwargs):
