@@ -19,7 +19,7 @@ class MyUserAdmin(object):
     ordering = ('username',)
     style_fields = {'user_permissions': 'm2m_transfer'}
     model_icon = 'fa fa-user'
-    relfield_style = 'fk-ajax'
+    # relfield_style = 'fk-ajax'
 
     def get_field_attrs(self, db_field, **kwargs):
         attrs = super(MyUserAdmin, self).get_field_attrs(db_field, **kwargs)
