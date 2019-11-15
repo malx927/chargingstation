@@ -57,4 +57,3 @@ class ChargingCard(models.Model):
 
     startup.short_description = "选项"
 
-    # self.get_model_url(Student, 'changelist'),
