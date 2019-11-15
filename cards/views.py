@@ -16,3 +16,17 @@ class CardsStartupView(View):
         c_id = request.GET.get("c_id")
         ChargingCard.objects.filter(pk=c_id).update(status=status)
         return redirect("/ydadmin/cards/chargingcard/")
+
+
+class RechargeMoneyView(View):
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        c_id = request.GET.get("c_id")
+        card = ChargingCard.objects.filter(pk=c_id)
+        if card:
+            pass
+        else:
+            pass
+
+        
+        return render(request, template_name="cards/card_recharge.html", context={"form": form})

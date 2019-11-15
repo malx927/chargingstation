@@ -51,17 +51,17 @@ class ChargingCard(models.Model):
     def startup(self):
         start_url = "/cards/cards_startup/?c_id={}&status={}".format(self.id, 1)
         stop_url = "/cards/cards_startup/?c_id={}&status={}".format(self.id, 0)
-        charging_url = "/cards/charging_money/?c_id={}".format(self.id)
+        charging_url = "/cards/recharge_money/?c_id={}".format(self.id)
         startup = " <a class='btn btn-xs btn-default' href='{}'>启用</a> ".format(start_url)
         stop = " <a class='btn btn-xs btn-danger' href='{}'>禁用</a> ".format(stop_url)
-        charging = " <a class='btn btn-xs btn-success' href='{}'>充值</a>".format(charging_url)
+        charging = " <button class='btn btn-xs btn-success' data-toggle='modal' data-target='#myModal' data-uri='{}'>充值</a>".format(charging_url)
         return mark_safe(startup + stop + charging)
 
     startup.short_description = "选项"
 
 
 class CardRecharge(models.Model):
-    """卡充值记录表"""
+    """充值记录表"""
     card = models.ForeignKey(ChargingCard, verbose_name="储蓄卡", on_delete=models.CASCADE)
     user = models.ForeignKey(CardUser, verbose_name="处置卡用户", on_delete=models.CASCADE)
     money = models.IntegerField(verbose_name="充值金额", default=0)
@@ -72,6 +72,6 @@ class CardRecharge(models.Model):
         return self.card
 
     class Meta:
-        verbose_name = '卡充值记录表'
+        verbose_name = '充值记录表'
         verbose_name_plural = verbose_name
 

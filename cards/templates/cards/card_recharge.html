@@ -1,0 +1,66 @@
+<form class="form-horizontal" id="id_form" method="post"  action="#">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="id_unit_name"><span class="red">*</span>{{ form.unit_name.label }}
+        </label>
+        <div class="col-sm-4">
+            {{ form.unit_name }}
+            <span class="text-danger">{{ form.unit_name.errors.0 }}</span>
+        </div>
+        <label class="col-sm-2 control-label" for="id_unit_type"><span class="red">*</span>{{ form.unit_type.label }}
+        </label>
+        <div class="col-sm-4">
+            {{ form.unit_type }}
+            <span class="text-danger">{{ form.unit_type.errors.0 }}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="id_telephone"><span class="red">*</span>{{ form.telephone.label }}
+        </label>
+        <div class="col-sm-4">
+            {{ form.telephone }}
+            <span class="text-danger">{{ form.telephone.errors.0 }}</span>
+        </div>
+        <label class="col-sm-2 control-label" for="id_person">{{ form.person.label }}</label>
+        <div class="col-sm-4">
+            {{ form.person }}
+            <span class="text-danger">{{ form.person.errors.0 }}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"
+               for="id_sign_begin"><span class="red">*</span>{{ form.sign_begin.label }}</label>
+        <div class="col-sm-4">
+            {{ form.sign_begin }}
+            <span class="text-danger">{{ form.sign_begin.errors.0 }}</span>
+        </div>
+        <label class="col-sm-2 control-label" for="id_sign_end"><span class="red">*</span>{{ form.sign_end.label }}
+        </label>
+        <div class="col-sm-4">
+            {{ form.sign_end }}
+            <span class="text-danger">{{ form.sign_end.errors.0 }}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label" for="id_scheme"><span
+                class="red">*</span>{{ form.scheme.label }}</label>
+        <div class="col-sm-4">
+            {{ form.scheme }}
+            <span class="text-danger">{{ form.scheme.errors.0 }}</span>
+        </div>
+        <label class="col-sm-2 control-label"
+               for="id_sign_begin"><span class="red">*</span>{{ form.address.label }}</label>
+        <div class="col-sm-4">
+            {{ form.address }}
+            <span class="text-danger">{{ form.address.errors.0 }}</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"
+               for="id_sign_begin"><span class="red">*</span>{{ form.lawyer.label }}</label>
+        <div class="col-sm-10">
+            {{ form.lawyer }}
+            <span class="text-danger">{{ form.lawyer.errors.0 }}</span>
+        </div>
+    </div>
+</form>
