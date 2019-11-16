@@ -1,3 +1,4 @@
+from cards.forms import CardRechargeForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -22,11 +23,29 @@ class RechargeMoneyView(View):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         c_id = request.GET.get("c_id")
-        card = ChargingCard.objects.filter(pk=c_id)
+        card = ChargingCard.objects.filter(pk=c_id).first()
         if card:
-            pass
+            form = CardRechargeForm(initial={"card": [card.id, ], "user": [card.user_id,]})
         else:
-            pass
+            form = None
 
-        
-        return render(request, template_name="cards/card_recharge.html", context={"form": form})
+        context = {
+            "form": form,
+            "action": request.get_full_path()
+        }
+
+        return render(request, template_name="cards/card_recharge.html", context=context)
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+
+        form = CardRechargeForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.op_user = request.user
+            instance.save()
+            money = instance.card.money
+            instance.card.money = money + instance.money
+            instance.card.save()
+
+        return redirect("/ydadmin/cards/chargingcard/")

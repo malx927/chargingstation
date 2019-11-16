@@ -63,13 +63,13 @@ class ChargingCard(models.Model):
 class CardRecharge(models.Model):
     """充值记录表"""
     card = models.ForeignKey(ChargingCard, verbose_name="储蓄卡", on_delete=models.CASCADE)
-    user = models.ForeignKey(CardUser, verbose_name="处置卡用户", on_delete=models.CASCADE)
-    money = models.IntegerField(verbose_name="充值金额", default=0)
+    user = models.ForeignKey(CardUser, verbose_name="储蓄卡用户", on_delete=models.CASCADE)
+    money = models.IntegerField(verbose_name="充值金额(元)", default=0)
     op_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作人', blank=True, null=True)
     add_time = models.DateTimeField(verbose_name="充值时间", auto_now_add=True)
 
     def __str__(self):
-        return self.card
+        return self.card.card_num
 
     class Meta:
         verbose_name = '充值记录表'

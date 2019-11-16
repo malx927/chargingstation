@@ -26,6 +26,7 @@ class ChargingCardAdmin(object):
     show_all_rel_details = False
     readonly_fields = ["money"]
     object_list_template = "cards/cards_model_list.html"
+    list_display_links_details = True
 
     form_layout = (
         Fieldset(
@@ -48,10 +49,20 @@ class CardRechargeAdmin(object):
     """储值卡充值"""
     list_display = ['card', 'user', 'money', 'op_user', 'add_time']
     search_fields = ['card__card_num']
+    readonly_fields = ['card', 'user', 'money', 'op_user']
     list_filter = ['user']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
+
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
 
 
 xadmin.site.register(CardRecharge, CardRechargeAdmin)

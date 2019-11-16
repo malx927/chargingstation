@@ -165,13 +165,16 @@
                 <div class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" data-dismiss="modal" id="sava-edit-btn">确定</button>
+                    <button type="submit" class="btn btn-primary" data-dismiss="modal" id="save-edit-btn">充值</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
+        $("#save-edit-btn").click(function () {
+            $("#id_form").submit();
+        })
         $('#myModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var uri = button.attr('data-uri');
