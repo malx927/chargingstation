@@ -24,7 +24,11 @@ class RechargeMoneyView(View):
     def get(self, request, *args, **kwargs):
         c_id = request.GET.get("c_id")
         card = ChargingCard.objects.filter(pk=c_id).first()
+        inital = {}
         if card:
+            inital["card"] = [card.id]
+            if card.user:
+                inital["user"] = [card.user_id]
             form = CardRechargeForm(initial={"card": [card.id, ], "user": [card.user_id,]})
         else:
             form = None
