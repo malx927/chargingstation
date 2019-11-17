@@ -51,5 +51,4 @@ class RechargeMoneyView(View):
             money = instance.card.money
             instance.card.money = money + instance.money
             instance.card.save()
-
         return redirect("/ydadmin/cards/chargingcard/")

@@ -26,7 +26,7 @@ class ChargingCardAdmin(object):
     show_all_rel_details = False
     readonly_fields = ["money"]
     object_list_template = "cards/cards_model_list.html"
-    list_display_links_details = True
+    # list_display_links_details = True
 
     form_layout = (
         Fieldset(
@@ -40,6 +40,14 @@ class ChargingCardAdmin(object):
             Row('start_date', "end_date"),
         ),
     )
+
+    def get_media(self):
+        media = super(ChargingCardAdmin, self).get_media()
+        path = self.request.get_full_path()
+        if "add" not in path and 'update' not in path:
+            media += self.vendor('xadmin.plugin.details.js', 'xadmin.form.css')
+            # media.add_js([self.static('stationmanager/js/xadmin.areacode.js')])
+        return media
 
 
 xadmin.site.register(ChargingCard, ChargingCardAdmin)
