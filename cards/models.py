@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from chargingstation import settings
@@ -13,6 +14,7 @@ class CardUser(models.Model):
     bank = models.CharField(verbose_name="开户行", max_length=64, blank=True, null=True)
     account = models.CharField(verbose_name="银行账号", max_length=64, blank=True, null=True)
     is_active = models.IntegerField(verbose_name="是否有效", choices=((1, "有效"), (0, "禁用")), default=1)
+    last_login = models.DateTimeField(verbose_name='最近登录时间', default=timezone.now)
     update_time = models.DateTimeField(verbose_name='修改时间', auto_now=True)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 
