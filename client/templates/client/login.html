@@ -1,0 +1,37 @@
+{% extends 'client/base.html' %}
+{% block title %}亚电新能源|用户登录窗口{% endblock title %}
+{% block main %}
+    <div class="login-box">
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg mt-4 mb-2">用户登录</p>
+                <form action="#" method="post">
+                    {% csrf_token %}
+                    <div class="input-group mb-4">
+                        <input type="text" name="username" class="form-control" placeholder="用户名">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-4">
+                        <input type="password" class="form-control" placeholder="密码">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-8 offset-2 mt-4 mb-4">
+                            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.login-card-body -->
+        </div>
+    </div>
+{% endblock main %}
+
