@@ -1,29 +1,33 @@
 {% load static %}<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>亚电新能源 | 充值用户面板</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{% static 'client/plugins/fontawesome-free/css/all.min.css'%}">
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <link rel="stylesheet" href="{% static 'client/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
-  <!-- iCheck -->
-  <link rel="stylesheet" href="{% static 'client/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-  <!-- JQVMap -->
-  <link rel="stylesheet" href="{% static 'client/plugins/jqvmap/jqvmap.min.css' %}">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{% static 'client/dist/css/adminlte.min.css' %}">
-  <!-- overlayScrollbars -->
-  <link rel="stylesheet" href="{% static 'client/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
-  <!-- Daterange picker -->
-  <link rel="stylesheet" href="{% static 'client/plugins/daterangepicker/daterangepicker.css' %}">
-  <!-- summernote -->
-  <link rel="stylesheet" href="{% static 'client/plugins/summernote/summernote-bs4.css' %}">
-  <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}亚电新能源 | 充值用户面板{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block css %}
+        <link rel="stylesheet" href="{% static 'client/plugins/fontawesome-free/css/all.min.css' %}">
+        <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+        <link rel="stylesheet" href="{% static 'client/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+        <!-- iCheck -->
+        <link rel="stylesheet" href="{% static 'client/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+        <!-- JQVMap -->
+        <link rel="stylesheet" href="{% static 'client/plugins/jqvmap/jqvmap.min.css' %}">
+        <!-- Theme style -->
+        <link rel="stylesheet" href="{% static 'client/dist/css/adminlte.min.css' %}">
+        <!-- overlayScrollbars -->
+        <link rel="stylesheet" href="{% static 'client/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+        <!-- Daterange picker -->
+        <link rel="stylesheet" href="{% static 'client/plugins/daterangepicker/daterangepicker.css' %}">
+        <!-- summernote -->
+        <link rel="stylesheet" href="{% static 'client/plugins/summernote/summernote-bs4.css' %}">
+        <!-- Google Font: Source Sans Pro -->
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    {% endblock %}
+    {% block js %}
+    {% endblock js %}
 </head>
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+<body class="{% block body %}hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed{% endblock %}">
 <div class="wrapper">
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -147,7 +151,7 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="#" class="brand-link">
       <img src="{% static 'client/dist/img/logo.jpg' %}" alt="亚电新能源" class="brand-image img-circle elevation-3"
            style="opacity: .8">
       <span class="brand-text font-weight-light">亚电新能源</span>
@@ -167,7 +171,6 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
-          <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
           <li class="nav-item has-treeview menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -857,6 +860,5 @@
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{% static 'client/dist/js/pages/dashboard.js' %}"></script>
 <!-- AdminLTE for demo purposes -->
-<script src="{% static 'client/dist/js/demo.js' %}"></script>
 </body>
 </html>
