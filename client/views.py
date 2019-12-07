@@ -3,6 +3,8 @@ import datetime
 from django.shortcuts import render, redirect
 
 from cards.models import CardUser
+from django.urls import reverse
+from django.views.generic import ListView
 
 
 def login(request):
@@ -37,9 +39,15 @@ def logout(request):
     request.session.delete()
 
     return redirect('/login/')
-def login(request):
-    return render(request, template_name="client/login.html")
 
 
 def index(request):
-    return render(request, template_name="client/index.html")
+    user_id = request.session.get("user_id", None)
+    if user_id:
+        return render(request, template_name="client/index.html")
+    else:
+        return redirect(reverse("index"))
+
+
+class CardListView(ListView):
+    pass

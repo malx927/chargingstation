@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-body login-card-body">
                 <p class="login-box-msg mt-4 mb-2">用户登录</p>
-                <form action="#" method="post">
+                <form  method="post">
                     {% csrf_token %}
                     <div class="input-group mb-4">
                         <input type="text" name="username" class="form-control" placeholder="用户名">
@@ -16,7 +16,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-4">
-                        <input type="password" class="form-control" placeholder="密码">
+                        <input type="password"  name="password" class="form-control" placeholder="密码">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -29,6 +29,7 @@
                         </div>
                     </div>
                 </form>
+                  <p class="mb-1 text-danger">{{ msg }}</p>
             </div>
             <!-- /.login-card-body -->
         </div>
