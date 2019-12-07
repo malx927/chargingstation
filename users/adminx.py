@@ -14,9 +14,10 @@ from django.utils.translation import ugettext as _
 class MyUserAdmin(object):
     change_user_password_template = None
     list_display = ('username', 'telephone', 'email', 'seller', 'station', 'is_staff')
-    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    list_filter = ('is_staff', 'is_active')
     search_fields = ('username', 'first_name', 'last_name', 'telephone', 'email')
     ordering = ('username',)
+    exclude = ('is_superuser', )
     style_fields = {'user_permissions': 'm2m_transfer'}
     model_icon = 'fa fa-user'
     # relfield_style = 'fk-ajax'
@@ -57,11 +58,12 @@ class MyUserAdmin(object):
                 ),
                 Side(
                     Fieldset(_('Status'),
-                             'is_active', 'is_staff', 'is_superuser',
+                             'is_active', 'is_staff'
                              ),
                 )
             )
         return super(MyUserAdmin, self).get_form_layout()
+
 
 xadmin.site.unregister(UserProfile)
 xadmin.site.register(UserProfile, MyUserAdmin)
