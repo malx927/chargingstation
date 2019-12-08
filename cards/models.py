@@ -74,6 +74,6 @@ class CardRecharge(models.Model):
         return self.card.card_num
 
     class Meta:
-        verbose_name = '充值记录表'
+        verbose_name = '储值卡充值记录'
         verbose_name_plural = verbose_name
 

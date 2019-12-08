@@ -25,7 +25,7 @@ def login(request):
             request.session["user_id"] = user.id
             request.session["username"] = user.name
             # init_permission(user, request)
-            return redirect(index)
+            return redirect(reverse("client:index"))
     else:
         return render(request, 'client/login.html')
 
@@ -38,15 +38,16 @@ def logout(request):
     """
     request.session.delete()
 
-    return redirect('/login/')
+    return redirect(reverse("client:login"))
 
 
 def index(request):
     user_id = request.session.get("user_id", None)
+    print(user_id, "000000000000000")
     if user_id:
         return render(request, template_name="client/index.html")
     else:
-        return redirect(reverse("index"))
+        return redirect(reverse("client:login"))
 
 
 class CardListView(ListView):
