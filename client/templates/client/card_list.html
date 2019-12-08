@@ -1,0 +1,58 @@
+{% extends 'client/main_base.html' %}
+{% block title %}
+充值卡列表
+{% endblock title %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">用户储值卡</h3>
+                        <div class="card-tools">
+                            <form method="get">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="search" class="form-control float-right" placeholder="搜索">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>用户</th>
+                                <th>卡号</th>
+                                <th>余额(元)</th>
+                                <th>有效开始时间</th>
+                                <th>有效截至时间</th>
+                                <th>状态</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for card in cards %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ card.user }}</td>
+                                <td>{{ card.card_num }}</td>
+                                <td><span class="badge bg-success">{{ card.money }}</span></td>
+                                <td>{{ card.start_date }}</td>
+                                <td>{{ card.end_date }}</td>
+                                <td><span class="badge bg-primary">{{ card.get_status_display }}</span></td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+{% endblock content %}

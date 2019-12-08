@@ -2,7 +2,7 @@ import datetime
 
 from django.shortcuts import render, redirect
 
-from cards.models import CardUser
+from cards.models import CardUser, ChargingCard
 from django.urls import reverse
 from django.views.generic import ListView
 
@@ -51,4 +51,14 @@ def index(request):
 
 
 class CardListView(ListView):
-    pass
+    """充值卡列表"""
+    def get(self, request, *args, **kwargs):
+        user_id = request.session.get("user_id", None)
+        if not user_id:
+            return redirect(reverse("client:login"))
+        else:
+            cards = ChargingCard.objects.filter(user_id=user_id)
+            context = {
+                "cards": cards
+            }
+            return render(request, template_name="client/card_list.html", context=context)
