@@ -11,13 +11,21 @@
                     <div class="card-header">
                         <h3 class="card-title">储值卡充值记录</h3>
                         <div class="card-tools">
-                            <form method="get">
-                            <div class="input-group input-group-sm" style="width: 150px;">
-                                <input type="text" name="search" class="form-control float-right" placeholder="搜索">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                            <form method="get" class="form-inline">
+                                <div class="form-group">
+                                    <label for="id_start_date"></label>
+                                    <input type="text" name="start_date" id="id_start_date" class="form-control form-control-sm" placeholder="开始时间">
                                 </div>
-                            </div>
+                                <div class="form-group">
+                                    <label class="text-gray" for="id_end_date">至</label>
+                                    <input type="text" name="end_date" id="id_end_date" class="form-control form-control-sm" placeholder="结束时间">
+                                </div>
+                                <div class="input-group input-group-sm ml-2" style="width: 150px;">
+                                    <input type="text" name="search" class="form-control" placeholder="卡号">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

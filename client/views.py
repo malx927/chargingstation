@@ -82,4 +82,7 @@ class CardRechargeListView(ListView):
 
     def get_queryset(self):
         recharges = CardRecharge.objects.all()
+        search = self.request.GET.get("search", None)
+        if search:
+            recharges = recharges.filter()
         return recharges
