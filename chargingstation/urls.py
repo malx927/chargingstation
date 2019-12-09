@@ -31,5 +31,5 @@ urlpatterns = [
     url('^favicon\.ico$', RedirectView.as_view(url='static/favicon.ico')),
     url('^stats/', include("statistic.urls")),
     url('^cards/', include("cards.urls")),
-    url('^client/', include("client.urls")),
+    url('^client/', include("client.urls", namespace="client")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -194,18 +194,18 @@ class OrderRecordAdmin(object):
         if self.request.user.is_superuser:
             return queryset
         elif self.request.user.station:
-            return queryset.filter(charg_pile__station=self.request.user.station)
+            return queryset.filter(order__charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            return queryset.filter(charg_pile__station__seller=self.request.user.seller)
+            return queryset.filter(order__charg_pile__station__seller=self.request.user.seller)
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
-        if db_field.name == 'charg_pile':
+        if db_field.name == 'order':
             if self.request.user.is_superuser:
                 pass
             elif self.request.user.station:
-                kwargs['queryset'] = ChargingPile.objects.filter(station=self.request.user.station)
+                kwargs['queryset'] = Order.objects.filter(charg_pile__station=self.request.user.station)
             elif self.request.user.seller:
-                kwargs['queryset'] = ChargingPile.objects.filter(station__seller=self.request.user.seller)
+                kwargs['queryset'] = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
         return super(OrderRecordAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
 
 

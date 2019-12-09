@@ -32,7 +32,7 @@ class ChargingCard(models.Model):
         (1, "启用"),
         (0, "禁用"),
     )
-    card_num = models.CharField(verbose_name="卡号", max_length=128,unique=True)
+    card_num = models.CharField(verbose_name="卡号", max_length=128, unique=True)
     cipher = models.CharField(verbose_name="卡密钥", max_length=128)
     sec_num = models.CharField(verbose_name="备用卡号", max_length=128, blank=True, null=True)
     user = models.ForeignKey(CardUser, verbose_name="用户", blank=True, null=True, on_delete=models.SET_NULL)
@@ -74,6 +74,6 @@ class CardRecharge(models.Model):
         return self.card.card_num
 
     class Meta:
-        verbose_name = '充值记录表'
+        verbose_name = '储值卡充值记录'
         verbose_name_plural = verbose_name
 
