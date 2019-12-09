@@ -55,8 +55,51 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="card-footer clearfix">
+                        <ul class="pagination pagination-sm m-0 float-right">
+                            <li class="page-item"><a class="page-link" href="#">«</a></li>
+                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">»</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 {% endblock content %}
+{% block bottom_js %}
+<script>
+$(function() {
+  $('#id_start_date').daterangepicker({
+    singleDatePicker: true,
+    startDate: moment().subtract(3, 'month'),
+    minYear: 1970,
+    maxYear: parseInt(moment().format('YYYY'),10),
+    locale: {
+        format: "YYYY-MM-DD",
+        separator: " - ",
+        daysOfWeek: ["日","一","二","三","四","五","六"],
+        monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+    }
+  }, function(start, end, label) {
+        console.log(start, end, label)
+  });
+  $('#id_end_date').daterangepicker({
+    singleDatePicker: true,
+    startDate: moment(),
+    minYear: 1970,
+    maxYear: parseInt(moment().format('YYYY'),10),
+    locale: {
+        format: "YYYY-MM-DD",
+        separator: " - ",
+        daysOfWeek: ["日","一","二","三","四","五","六"],
+        monthNames: ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"]
+    }
+  }, function(start, end, label) {
+        console.log(start, end, label)
+  });
+});
+</script>
+{% endblock %}
