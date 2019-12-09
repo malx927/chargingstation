@@ -101,19 +101,19 @@
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
-                                            <a href="{% url 'client:card-list' %}" class="nav-link active">
+                                            <a href="{% url 'client:card-list' %}" class="nav-link">
                                                 <i class="far fa-circle nav-icon"></i>
                                                 <p>储值卡</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="./index2.html" class="nav-link">
+                                            <a href="{% url 'client:card-recharge-list' %}" class="nav-link">
                                                 <i class="far fa-circle nav-icon"></i>
                                                 <p>充值记录</p>
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="./index3.html" class="nav-link">
+                                            <a href="/index3.html" class="nav-link">
                                                 <i class="far fa-circle nav-icon"></i>
                                                 <p>消费记录</p>
                                             </a>
@@ -180,8 +180,8 @@
 <script src="{% static 'client/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'client/plugins/chart.js/Chart.min.js' %}"></script>
 <script src="{% static 'client/plugins/sparklines/sparkline.js' %}"></script>
-<script src="{% static 'client/plugins/jqvmap/jquery.vmap.min.js' %}"></script>
-<script src="{% static 'client/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>
+{#<script src="{% static 'client/plugins/jqvmap/jquery.vmap.min.js' %}"></script>#}
+{#<script src="{% static 'client/plugins/jqvmap/maps/jquery.vmap.usa.js' %}"></script>#}
 <script src="{% static 'client/plugins/jquery-knob/jquery.knob.min.js' %}"></script>
 <script src="{% static 'client/plugins/moment/moment.min.js' %}"></script>
 <script src="{% static 'client/plugins/daterangepicker/daterangepicker.js' %}"></script>
@@ -190,6 +190,7 @@
 <script src="{% static 'client/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
 <script src="{% static 'client/dist/js/adminlte.js' %}"></script>
 <script src="{% static 'client/dist/js/pages/dashboard.js' %}"></script>
+<script src="{% static 'client/dist/js/client.js' %}"></script>
 {% block bottom_js %}
 {% endblock bottom_js %}
 </body>

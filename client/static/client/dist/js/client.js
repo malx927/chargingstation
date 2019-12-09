@@ -1,6 +1,7 @@
 $(function () {
-    $('ul.main-menu li a').each(function () {
-        if ($($(this))[0].href == String(window.location))
-            $(this).parent().addClass('active');
+    $('ul.nav .nav-item a').each(function () {
+        if($(this).attr("href") === window.location.pathname){
+            $(this).addClass('active');
+        }
     });
 })

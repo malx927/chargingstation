@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 
 class MyUserAdmin(object):
     change_user_password_template = None
-    list_display = ('username', 'telephone', 'email', 'seller', 'station', 'is_staff')
+    list_display = ('username', 'first_name', 'telephone', 'email', 'seller', 'station', 'is_staff')
     list_filter = ('is_staff', 'is_active')
     search_fields = ('username', 'first_name', 'last_name', 'telephone', 'email')
     ordering = ('username',)

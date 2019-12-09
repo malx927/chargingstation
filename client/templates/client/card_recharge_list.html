@@ -1,0 +1,54 @@
+{% extends 'client/main_base.html' %}
+{% block title %}
+充值卡充值列表
+{% endblock title %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">储值卡充值记录</h3>
+                        <div class="card-tools">
+                            <form method="get">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="search" class="form-control float-right" placeholder="搜索">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>用户</th>
+                                <th>卡号</th>
+                                <th>金额(元)</th>
+                                <th>操作人</th>
+                                <th>时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for r in recharges %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ r.user }}</td>
+                                <td>{{ r.card.card_num }}</td>
+                                <td><span class="badge bg-success">{{ r.money|floatformat:2 }}</span></td>
+                                <td>{{ r.op_user }}</td>
+                                <td>{{ r.add_time }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
