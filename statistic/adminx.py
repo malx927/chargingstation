@@ -8,6 +8,15 @@ class DayStatsAdmin(object):
     list_display = []
     object_list_template = "statistic/day_stats.html"
 
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
+
     def get_media(self):
         media = super(DayStatsAdmin, self).get_media()
         media.add_css({"screen": ["xadmin/vendor/bootstrap-datepicker/css/datepicker.css"]})
@@ -23,6 +32,15 @@ class MonthStatsAdmin(object):
     """月统计分析"""
     list_display = []
     object_list_template = "statistic/month_stats.html"
+
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
 
     def get_media(self):
         media = super(MonthStatsAdmin, self).get_media()
@@ -40,6 +58,15 @@ class YearStatsAdmin(object):
     list_display = []
     object_list_template = "statistic/year_stats.html"
 
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
+
     def get_media(self):
         media = super(YearStatsAdmin, self).get_media()
         media.add_css({"screen": ["xadmin/vendor/bootstrap-datepicker/css/datepicker.css"]})
@@ -55,6 +82,15 @@ class BigScreenAdmin(object):
     """数据大屏分析"""
     list_display = []
     object_list_template = "statistic/bigscreen.html"
+
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
 
 
 xadmin.site.register(DayStats, DayStatsAdmin)
