@@ -82,7 +82,6 @@ class CardRechargeListView(ListView):
 
     def get_queryset(self):
         recharges = CardRecharge.objects.all()
-        print("000000000000000000")
         search = self.request.GET.get("search", None)
         start_date = self.request.GET.get("start_date", None)
         end_date = self.request.GET.get("end_date", None)
