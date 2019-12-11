@@ -7,7 +7,7 @@ from chargingstation import settings
 
 class CardUser(models.Model):
     """储值卡用户"""
-    name = models.CharField(verbose_name="用户名称", max_length=64)
+    name = models.CharField(verbose_name="用户名称", max_length=64, unique=True)
     password = models.CharField(verbose_name="登录密码", max_length=128)
     telephone = models.CharField(verbose_name="联系电话", max_length=64)
     address = models.CharField(verbose_name="详细地址", max_length=240, blank=True, null=True)

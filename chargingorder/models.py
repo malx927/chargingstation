@@ -242,3 +242,5 @@ class ChargingStatusRecord(models.Model):
     class Meta:
         verbose_name = "充电状态记录表"
         verbose_name_plural = verbose_name
+
+

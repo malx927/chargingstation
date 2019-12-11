@@ -1,6 +1,6 @@
 {% extends 'client/main_base.html' %}
 {% block title %}
-储值卡充值列表
+储值卡充电消费记录
 {% endblock title %}
 
 {% block content %}
@@ -9,7 +9,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">储值卡充值记录</h3>
+                        <h3 class="card-title">储值卡充电消费记录</h3>
                         <div class="card-tools">
                             <form method="get" class="form-inline">
                                 <div class="form-group">
@@ -34,22 +34,27 @@
                             <thead>
                             <tr>
                                 <th>序号</th>
-                                <th>用户</th>
+                                <th>订单号</th>
                                 <th>卡号</th>
-                                <th>金额(元)</th>
-                                <th>操作人</th>
-                                <th>时间</th>
+                                <th>充电桩</th>
+                                <th>开始时间</th>
+                                <th>充电时长(小时)</th>
+                                <th>充电量(KWH)</th>
+                                <th>消费金额(元)</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {% for r in recharges %}
+                            {% for order in orders %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ r.user }}</td>
-                                <td>{{ r.card.card_num }}</td>
-                                <td><span class="badge bg-success">{{ r.money|floatformat:2 }}</span></td>
-                                <td>{{ r.op_user }}</td>
-                                <td>{{ r.add_time }}</td>
+                                <td>{{ order.out_trade_no }}</td>
+                                <td>{{ order.openid }}</td>
+                                <td>{{ order.charg_pile }}</td>
+                                <td>{{ order.gun_num }}</td>
+                                <td>{{ order.begin_time }}</td>
+                                <td>{{ order.total_hours }}</td>
+                                <td>{{ order.get_total_reading }}</td>
+                                <td><span class="badge bg-success">{{ order.cash_fee|floatformat:2 }}</span></td>
                             </tr>
                             {% endfor %}
                             </tbody>
