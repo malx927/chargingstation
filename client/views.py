@@ -1,5 +1,6 @@
 import datetime
 
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 
 from cards.models import CardUser, ChargingCard, CardRecharge
@@ -74,7 +75,7 @@ class CardRechargeListView(ListView):
     template_name = "client/card_recharge_list.html"
     model = CardRecharge
     context_object_name = "recharges"
-    paginate_by = 50
+    paginate_by = 20
 
     def get(self, request, *args, **kwargs):
         user_id = request.session.get("user_id", None)
@@ -98,13 +99,12 @@ class CardRechargeListView(ListView):
 
         return recharges
 
-# Goods.objects.all().extra(
-#     select={'reputation': 'shop.reputation'},
-#     tables=['shop'],
-#     where=['goods.shop_id=shop.id']
-# )
-# .order_by(['-num', '-reputation'])
-# .values('id', 'num', 'reputation')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        recharges = context.get("recharges")
+        total = recharges.aggregate(money=Sum("money"))
+        context["total"] = total
+        return context
 
 
 class CardOrderListView(ListView):
@@ -112,13 +112,25 @@ class CardOrderListView(ListView):
     template_name = "client/card_order_list.html"
     model = Order
     context_object_name = "orders"
-    paginate_by = 50
+    paginate_by = 2
 
     def get(self, request, *args, **kwargs):
         user_id = request.session.get("user_id", None)
         if not user_id:
             return redirect(reverse("client:login"))
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        orders = context.get("orders")
+        total = orders.aggregate(readings=Sum("total_readings"), total_fees=Sum("cash_fee"))
+        context["total"] = total
+        paginator = context.get("paginator")
+        page_obj = context.get("page_obj")
+
+        ret = self.get_pagination_data(paginator, page_obj)
+        context.update(ret)
+        return context
 
     def get_queryset(self):
         username = self.request.session.get("username", None)
@@ -128,7 +140,7 @@ class CardOrderListView(ListView):
         search = self.request.GET.get("search", None)   # 卡号
         start_date = self.request.GET.get("start_date", None)
         end_date = self.request.GET.get("end_date", None)
-        print(search, start_date, end_date)
+
         if search:
             orders = orders.filter(openid__contains=search)     # 储值卡充电 openid 存放储值卡卡号
 
@@ -138,3 +150,36 @@ class CardOrderListView(ListView):
             orders = orders.filter(begin_time__date__range=(d_start_date, d_end_date))
 
         return orders
+
+    def get_pagination_data(self, paginator, page_obj, diff_count=5):
+        page_number = page_obj.number
+        num_pages = paginator.num_pages
+
+        left_page_count = 4
+        right_page_count = 2
+        old_page_range = paginator.page_range
+        left_page_range = None
+        right_page_range = None
+        if len(old_page_range) > diff_count * 2 + left_page_count + right_page_count + 1:
+            if page_number - diff_count - left_page_count > 0:
+                left_page_range = [p for p in range(1, left_page_count + 1)]
+                begin_page = page_number - diff_count
+            else:
+                begin_page = 1
+
+            if page_number + diff_count + right_page_count < num_pages:
+                right_page_range = [p for p in range(num_pages - 1, num_pages + 1)]
+                end_page = page_number + diff_count + 1
+            else:
+                end_page = num_pages + 1
+
+            page_range = [p for p in range(begin_page, end_page)]
+        else:
+            page_range = old_page_range
+
+        return {
+            'page_range': page_range,
+            'left_page_range': left_page_range,
+            'right_page_range': right_page_range,
+
+        }

@@ -50,10 +50,9 @@
                                 <td>{{ order.out_trade_no }}</td>
                                 <td>{{ order.openid }}</td>
                                 <td>{{ order.charg_pile }}</td>
-                                <td>{{ order.gun_num }}</td>
                                 <td>{{ order.begin_time }}</td>
                                 <td>{{ order.total_hours }}</td>
-                                <td>{{ order.get_total_reading }}</td>
+                                <td>{{ order.total_readings }}</td>
                                 <td><span class="badge bg-success">{{ order.cash_fee|floatformat:2 }}</span></td>
                             </tr>
                             {% endfor %}
@@ -61,13 +60,40 @@
                         </table>
                     </div>
                     <div class="card-footer clearfix">
-                        <ul class="pagination pagination-sm m-0 float-right">
-                            <li class="page-item"><a class="page-link" href="#">«</a></li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">»</a></li>
+                        <ul class="pagination pagination-sm m-0 float-left">
+                            <li class="page-item"><a class="page-link bg-primary">充电量合计: {{ total.readings }} KWH</a> </li>
+                            <li class="page-item"><a class="page-link bg-primary">消费合计: {{ total.total_fees|floatformat:2 }} 元</a> </li>
                         </ul>
+                        {% if is_paginated %}
+                        <ul class="pagination pagination-sm m-0 float-right">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">«</a></li>
+                        {% endif %}
+                        {% for page in left_page_range %}
+                             <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                            {% if forloop.last %}
+                                <li class="page-item"><span class="page-link">...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for page in page_range %}
+                            {% if page_obj.number == page %}
+                            <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                         {% for page in right_page_range %}
+                            {% if forloop.first %}
+                                <li class="page-item"><span class="page-link">...</span></li>
+                            {% endif %}
+                             <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">»</a></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link" href="#">共{{ paginator.count }}条/{{ paginator.num_pages }}页</a></li>
+                        </ul>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -79,7 +105,7 @@
 $(function() {
   $('#id_start_date').daterangepicker({
     singleDatePicker: true,
-    startDate: moment().subtract(3, 'month'),
+    startDate: moment().subtract(6, 'month'),
     minYear: 1970,
     maxYear: parseInt(moment().format('YYYY'),10),
     locale: {
