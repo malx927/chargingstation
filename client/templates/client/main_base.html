@@ -5,24 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{% block title %}亚电新能源 | 充值用户面板{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'client/plugins/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet"
+          href="{% static 'client/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{% static 'client/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="{% static 'client/plugins/jqvmap/jqvmap.min.css' %}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'client/dist/css/adminlte.min.css' %}">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="{% static 'client/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="{% static 'client/plugins/daterangepicker/daterangepicker.css' %}">
+    <!-- summernote -->
+    <link rel="stylesheet" href="{% static 'client/plugins/summernote/summernote-bs4.css' %}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     {% block css %}
-        <link rel="stylesheet" href="{% static 'client/plugins/fontawesome-free/css/all.min.css' %}">
-        <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-        <link rel="stylesheet" href="{% static 'client/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
-        <!-- iCheck -->
-        <link rel="stylesheet" href="{% static 'client/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
-        <!-- JQVMap -->
-        <link rel="stylesheet" href="{% static 'client/plugins/jqvmap/jqvmap.min.css' %}">
-        <!-- Theme style -->
-        <link rel="stylesheet" href="{% static 'client/dist/css/adminlte.min.css' %}">
-        <!-- overlayScrollbars -->
-        <link rel="stylesheet" href="{% static 'client/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
-        <!-- Daterange picker -->
-        <link rel="stylesheet" href="{% static 'client/plugins/daterangepicker/daterangepicker.css' %}">
-        <!-- summernote -->
-        <link rel="stylesheet" href="{% static 'client/plugins/summernote/summernote-bs4.css' %}">
-        <!-- Google Font: Source Sans Pro -->
-        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     {% endblock %}
     {% block js %}
     {% endblock js %}
@@ -55,8 +56,7 @@
         {% block navbar-right %}
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        修改密码 <i class="fas fa-key"></i>
+                    <a class="nav-link" href="{% url 'client:password-change' %}">修改密码 <i class="fas fa-key"></i>
                     </a>
                 </li>
                 <li class="nav-item">

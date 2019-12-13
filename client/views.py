@@ -48,7 +48,7 @@ def logout(request):
 def index(request):
     user_id = request.session.get("user_id", None)
     if user_id:
-        return render(request, template_name="client/index.html")
+        return redirect(reverse("client:card-list"))
     else:
         return redirect(reverse("client:login"))
 
@@ -183,3 +183,27 @@ class CardOrderListView(ListView):
             'right_page_range': right_page_range,
 
         }
+
+
+class PasswordChangeView(View):
+    """修改密码"""
+    def get(self, request, *args, **kwargs):
+        user_id = request.session.get("user_id", None)
+        if not user_id:
+            return redirect(reverse("client:login"))
+        return render(request, template_name="client/change_password.html")
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.POST.get("user_id")
+        password = request.POST.get("password")
+        password1 = request.POST.get("password1")
+        if password != password1:
+            msg = "两次密码不一致,请重新输入"
+        else:
+            CardUser.objects.filter(id=user_id).update(password=password)
+            return redirect(reverse("client:login"))
+
+        context = {
+            "msg": msg,
+        }
+        return render(request, template_name="client/change_password.html", context=context)
