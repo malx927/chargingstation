@@ -157,7 +157,7 @@ def message_dispatch(topic, byte_msg):
         pile_status_handler_v12(topic, byte_msg)
 
     elif byte_command == CMD_CARD_CHARGING_REQUEST:   # 储值卡充电请求'0x83'
-       pile_card_charging_request_hander(topic, byte_msg)
+        pile_card_charging_request_hander(topic, byte_msg)
 
     elif byte_command == CMD_PILE_CHARG_REPLY:   # 充电桩回复充电指令 '\x04'
         pile_reply_charging_cmd_handler(topic, byte_msg)
@@ -201,7 +201,8 @@ def pile_card_charging_request_hander(topic, byte_msg):
 
     cur_time = datetime.datetime.now().date()
 
-    password = byte2integer(byte_msg, 77, 93).decode('utf-8').strip('\000')
+    password = byte_msg[77:93].decode('utf-8').strip('\000')
+    logging.info("password:{}".format(password))
     if card_type == 1:  # IC卡
         card = ChargingCard.objects.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1, card_num=card_num, password=password).first()
     else:               # 手机
