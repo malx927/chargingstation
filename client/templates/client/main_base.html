@@ -39,10 +39,10 @@
             </ul>
         {% endblock navbar-left %}
         {% block nav-search %}
-            <form class="form-inline ml-3">
-                <label for="id_q" class="navbar-text mr-2">消费查询 </label>
+            <form class="form-inline ml-3" action="{% url 'client:card-order-list' %}">
+                <label for="id_search" class="navbar-text mr-2">消费查询 </label>
                 <div class="input-group input-group-sm">
-                    <input class="form-control form-control-navbar" type="search" name="q" id="id_q"
+                    <input class="form-control form-control-navbar" type="search" name="search" id="id_search"
                            placeholder="请输入卡号"
                            aria-label="Search">
                     <div class="input-group-append">

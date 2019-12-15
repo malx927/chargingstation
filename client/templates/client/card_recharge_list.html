@@ -45,7 +45,7 @@
                             {% for r in recharges %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
-                                <td>{{ r.user }}</td>
+                                <td>{{ r.user|default:"" }}</td>
                                 <td>{{ r.card.card_num }}</td>
                                 <td><span class="badge bg-success">{{ r.money|floatformat:2 }}</span></td>
                                 <td>{{ r.op_user }}</td>
