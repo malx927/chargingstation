@@ -888,14 +888,13 @@ def pile_charging_status_handler(topic, byte_msg):
     logging.info(data)
     save_pile_charg_status_to_db(**data)
 
-    # 更新redis 数据
     charg_pile = ChargingPile.objects.filter(pile_sn=pile_sn).first()
     if charg_pile:
         current_time = datetime.datetime.now()
         defaults = {
             "recv_time": current_time,
         }
-        if charg_pile.pile_type not in [5, 6]:
+        if charg_pile.pile_type_id not in [5, 6]:
             defaults["over_time"] = current_time + datetime.timedelta(seconds=settings.CHARG_STATUS_OVER_TIME)
         else:
             defaults["over_time"] = current_time + datetime.timedelta(seconds=settings.CHARG_AC_STATUS_OVER_TIME)
