@@ -204,7 +204,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
     password = byte_msg[77:93].decode('utf-8').strip('\000')
     logging.info("password:{}".format(password))
     if card_type == 1:  # IC卡
-        card = ChargingCard.objects.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1, card_num=card_num, password=password).first()
+        card = ChargingCard.objects.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1, card_num=card_num, cipher=password).first()
     else:               # 手机
         try:
             user = CardUser.objects.get(telephone=card_num, password=password, is_active=1)
