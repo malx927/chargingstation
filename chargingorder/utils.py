@@ -196,7 +196,12 @@ def user_account_deduct_money(order):
         consum_money = order.consum_money
         openid = order.openid
         if order.start_model == 1:      # 储值卡启动
-            ChargingCard.objects.filter(card_num=order.openid).update(money=F("money")-order.consum_money)
+            ChargingCard.objects.filter(card_num=order.openid).update(money=F("money")-consum_money)
+            order.pay_time = datetime.datetime.now()
+            order.cash_fee = consum_money
+            card = ChargingCard.objects.filter(card_num=order.openid).first()
+            order.balance = card.money
+            order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
         else:
             try:
                 user = UserInfo.objects.get(openid=openid)

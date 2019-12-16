@@ -809,6 +809,7 @@ def pile_charging_status_handler(topic, byte_msg):
     数据区：命令号0x06（1字节）+ 枪口号（1字节）+ 用户识别号（32字节）+订单号（32字节）+时间（7字节）+所需电压值（2字节）+所需电流值（2字节）+输出电压值（2字节）
         +输出电流值（2字节）+当前电表读数（4字节）+保留（11字节）
     """
+    logging.info("Enter pile_charging_status_handler")
     data_nums = get_data_nums(byte_msg)
     # 读取电桩编码(sn)
     pile_sn = get_pile_sn(byte_msg)
@@ -902,9 +903,12 @@ def pile_charging_status_handler(topic, byte_msg):
         defaults["pile_type"] = charg_pile.pile_type_id
         ret = ChargingStatusRecord.objects.update_or_create(pile_sn=pile_sn, gun_num=gun_num, out_trade_no=out_trade_no,
                                                             defaults=defaults)
-        logging.info(ret)
+        logging.info(defaults)
+
     else:
         logging.info("{}电桩不存在".format(pile_sn))
+
+    logging.info("Leave pile_charging_status_handler")
 
 
 # 11
