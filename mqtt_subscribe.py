@@ -204,7 +204,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
     password = byte_msg[77:93].decode('utf-8').strip('\000')
     logging.info("password:{}".format(password))
     if card_type == 1:  # IC卡
-        card = ChargingCard.objects.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1, card_num=card_num, cipher=password).first()
+        card = ChargingCard.objects.filter(start_date__lte=cur_time, end_date__gte=cur_time, status=1, card_num=card_num, cipher=password).first()
     else:               # 手机
         try:
             user = CardUser.objects.get(telephone=card_num, password=password, is_active=1)
@@ -254,6 +254,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
             "start_model": 1,   # 储值卡启动
         }
         order = Order.objects.create(**params)
+        logging.info(order)
         out_trade_no = order.out_trade_no
         data = {
             'pile_sn': pile_sn,
@@ -276,7 +277,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
 
         charging_policy_value = 0
         data["charging_policy_value"] = charging_policy_value
-
+        logging.info(data)
         server_send_charging_cmd(**data)
 
     logging.info("0x83 Leave pile_card_charging_request_hander")
