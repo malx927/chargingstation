@@ -32,7 +32,7 @@ def index(request):
 
 
 def get_account_balance(openid, value=None):
-    """账号余额"""
+    """判断账号余额是否充足"""
     try:
         user = UserInfo.objects.get(openid=openid)
         sub_account = user.is_sub_user()
@@ -49,6 +49,20 @@ def get_account_balance(openid, value=None):
     except UserInfo.DoesNotExist as ex:
         pass
     return False
+
+
+def get_account_balance_amount(openid):
+    """账号余额数量"""
+    try:
+        user = UserInfo.objects.get(openid=openid)
+        sub_account = user.is_sub_user()
+        if sub_account:     # 附属账号
+            return sub_account.main_user.account_balance()
+        else:
+            return user.account_balance()
+    except UserInfo.DoesNotExist as ex:
+        print(ex)
+        return 0
 
 
 class RechargeView(View):
@@ -180,6 +194,9 @@ class RechargeView(View):
             data["subscribe_status"] = charg_pile.subscribe_status  # 收取预约费
             data["low_fee_status"] = charg_pile.low_offset  # 收取小电流补偿费
             data["low_restrict_status"] = charg_pile.low_restrict  # 限制小电流输出
+        # 启动类型charging_category
+        data["start_model"] = 0   # 微信启动
+        data["charging_way"] = charg_mode   # 000充满为止，001按金额，010按分钟数，011按SOC，100按电量
 
         charging_policy_value = 0
         if charg_mode == 1:
@@ -190,10 +207,10 @@ class RechargeView(View):
             charging_policy_value = int(request.POST.get("charg_soc_val", "0"))
 
         data["charging_policy_value"] = charging_policy_value
+        data["balance"] = get_account_balance_amount(openid)
 
         server_send_charging_cmd(**data)
-        # send_charging_start_message_to_user(order)
-        # send_charging_end_message_to_user(order)
+
         data = {
             "return_code": "success",
             "redirect_url": "{0}?out_trade_no={1}".format(reverse("order-recharge-status"), out_trade_no)
@@ -216,8 +233,8 @@ class RechargeView(View):
             "gun_num": int(gun_num),
             "openid": openid,
             "name": name,
+            "start_model": 0,
             "charg_mode": charg_mode,
-            "charg_type": 0,            # 0后台 01本地离线
             "out_trade_no": out_trade_no,
             "charg_pile": gun.charg_pile,
             "gun": gun,

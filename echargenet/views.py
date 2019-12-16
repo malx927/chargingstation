@@ -349,15 +349,15 @@ class StartChargeAPIView(APIView):
         else:
             out_trade_no = StartChargeSeq
         charg_pile = pile_gun.charg_pile
+        start_model = 2
         params = {
             "gun_num": pile_gun.gun_num,
             "openid": openid,
             "name": name,
             "charg_mode": charg_mode,
-            "charg_type": 0,  # 0后台 01本地离线
             "out_trade_no": out_trade_no,
             "charg_pile": charg_pile,
-            "start_model": 2,
+            "start_model": start_model,
         }
         # order = Order.objects.create(**params)
         ret = Order.objects.update_or_create(start_charge_seq=StartChargeSeq, defaults=params)
@@ -382,6 +382,7 @@ class StartChargeAPIView(APIView):
             data["low_fee_status"] = charg_pile.low_offset  # 收取小电流补偿费
             data["low_restrict_status"] = charg_pile.low_restrict  # 限制小电流输出
 
+        data["start_model"] = start_model
         charging_policy_value = 0
         data["charging_policy_value"] = charging_policy_value
 

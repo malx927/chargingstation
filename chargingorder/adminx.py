@@ -16,6 +16,7 @@ class OrderAdmin(object):
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_mode', 'charg_type', 'charg_status', 'begin_time', 'status']
+    exclude = ['charg_type']
     date_hierarchy = 'begin_time'
     list_per_page = 50
     model_icon = 'fa fa-file-text'
@@ -95,7 +96,6 @@ class OrderAdmin(object):
             ),
             Fieldset(
                 '其他信息',
-                'charg_type',
                 'output_voltage',
                 'output_current',
                 'prev_reading',

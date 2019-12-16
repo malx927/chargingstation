@@ -243,15 +243,15 @@ def pile_card_charging_request_hander(topic, byte_msg):
 
         pile_gun = ChargingGun.objects.select_related("charg_pile").filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         charg_pile = pile_gun.charg_pile
+        start_model = 1
         params = {
             "gun_num": gun_num,
             "openid": openid,
             "name": name,
-            "charg_mode": 0,
-            "charg_type": 0,  # 0后台 01本地离线
+            "charg_mode": 0,    # 充满为止
             "out_trade_no": out_trade_no,
             "charg_pile": charg_pile,
-            "start_model": 1,   # 储值卡启动
+            "start_model": start_model,   # 储值卡启动
         }
         order = Order.objects.create(**params)
         logging.info(order)
@@ -275,8 +275,10 @@ def pile_card_charging_request_hander(topic, byte_msg):
             data["low_fee_status"] = charg_pile.low_offset  # 收取小电流补偿费
             data["low_restrict_status"] = charg_pile.low_restrict  # 限制小电流输出
 
+        data["start_model"] = start_model
         charging_policy_value = 0
         data["charging_policy_value"] = charging_policy_value
+        data["balance"] = card.money
         logging.info(data)
         server_send_charging_cmd(**data)
 
@@ -439,7 +441,7 @@ def server_send_charging_cmd(*args, **kwargs):
     b_charging_type = bytes([charg_type << 7 | subscribe_min & 0x7f])
 
     # 充电策略 1、充电模式(后台or本地离线)
-    charging_category = kwargs.get("charging_category", 0)  # D15-D14
+    start_model = kwargs.get("start_model", 0)  # D15-D14
     charging_way = kwargs.get("charging_way", 0)    # D13－D11
     # 充电策略是否使用(D0：1使用充电策略，0系统默认策略)
     continue_charg_status = kwargs.get("continue_charg_status", 0)  # 断网可继续充电
@@ -449,7 +451,7 @@ def server_send_charging_cmd(*args, **kwargs):
     low_restrict_status = kwargs.get("low_restrict_status", 0)  # 限制小电流输出
     use_policy_flag = kwargs.get("use_policy_flag", 0)
 
-    charging_policy1 = charging_category << 6 & 0xFF | charging_way << 3 & 0xFF | continue_charg_status << 2 & 0xFF \
+    charging_policy1 = start_model << 6 & 0xFF | charging_way << 3 & 0xFF | continue_charg_status << 2 & 0xFF \
                        | occupy_fee_status << 1 & 0xFf | subscribe_fee_status & 0xFF
     charging_policy2 = low_fee_status << 7 & 0xFF | low_restrict_status << 6 & 0xFF | use_policy_flag & 0xFf
     b_charging_policy1 = bytes([charging_policy1])
@@ -464,10 +466,13 @@ def server_send_charging_cmd(*args, **kwargs):
 
     b_send_time = get_byte_daytime(datetime.datetime.now())  # 同步时间
 
-    b_blank = bytes(8)   # 保留8字节
+    balance = kwargs.get("balance", 0)      # 账号余额
+    b_balance = int(balance).to_bytes(4, byteorder="big")
+
+    b_blank = bytes(4)   # 保留4字节
 
     b_data = b''.join([b_command, b_gun_num, b_charging_type, b_charging_policy,
-                     b_charging_policy_value, b_out_trade_no, b_send_time, b_blank])
+                     b_charging_policy_value, b_out_trade_no, b_send_time, b_balance, b_blank])
 
     data_len = (len(b_data)).to_bytes(2, byteorder='big')
     # rand = bytes([random.randint(0, 2)])
