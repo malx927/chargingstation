@@ -86,6 +86,17 @@ class RechargeView(View):
 
         pile_sn = kwargs.get('pile_sn', None)
         gun_num = kwargs.get('gun_num', None)
+
+        charging_order = Order.objects.filter(openid=openid, status__lt=2).first()
+        if charging_order:
+            charging_pile_sn = charging_order.charg_pile.pile_sn
+            charging_gun_num = charging_order.gun_num
+            if charging_pile_sn != pile_sn or charging_gun_num != gun_num:
+                context = {
+                    "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(charging_pile_sn)
+                }
+                return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+
         try:
             pile_gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
             if pile_gun.work_status == 0 or pile_gun.work_status is None:       # 空闲状态
