@@ -112,7 +112,7 @@ class CardOrderListView(ListView):
     template_name = "client/card_order_list.html"
     model = Order
     context_object_name = "orders"
-    paginate_by = 20
+    paginate_by = 15
 
     def get(self, request, *args, **kwargs):
         user_id = request.session.get("user_id", None)
