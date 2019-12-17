@@ -319,7 +319,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
         data["start_model"] = start_model
         charging_policy_value = 0
         data["charging_policy_value"] = charging_policy_value
-        data["balance"] = int(card.money / settings.FACTOR_READINGS)
+        data["balance"] = int(card.money / decimal.Decimal(settings.FACTOR_READINGS))
         logging.info(data)
         server_send_charging_cmd(**data)
 

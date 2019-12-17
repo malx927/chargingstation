@@ -207,7 +207,7 @@ class RechargeView(View):
             charging_policy_value = int(request.POST.get("charg_soc_val", "0"))
 
         data["charging_policy_value"] = charging_policy_value
-        balance = int(get_account_balance_amount(openid) / settings.FACTOR_READINGS)
+        balance = int(get_account_balance_amount(openid) / decimal.Decimal(settings.FACTOR_READINGS))
         print("余额：".format(balance))
         data["balance"] = balance
 
