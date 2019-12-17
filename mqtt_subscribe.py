@@ -12,9 +12,6 @@ import signal
 import datetime
 import logging
 import binascii
-import asyncio
-import websockets
-from concurrent.futures import ThreadPoolExecutor
 import paho.mqtt.client as mqtt
 from asgiref.sync import async_to_sync
 from django.db.models import F, Sum, DecimalField
@@ -171,13 +168,57 @@ def message_dispatch(topic, byte_msg):
     elif byte_command == CMD_PILE_STOP_CHARGING:   # 充电桩停止充电上报
         pile_charging_stop_handler(topic, byte_msg)
 
-    elif byte_command == PILE_UPGRADE_FILEDATA:   # 充电桩获取升级文件数据
-        pass
+    elif byte_command == CMD_PILE_REQUEST_PRICE:   # 充电桩请求电价信息
+        pile_request_stage_tariff(topic, byte_msg)
 
-    elif byte_command == CMD_PILE_LOG_DATA:   # 充电桩上报LOG数据
+    elif byte_command == CMD_REPLY_PRICE:   # 服务器下发阶段电价信息
         pass
 
     logging.info("*****************leave message_dispach****************")
+
+
+# 0x08
+def pile_request_stage_tariff(topic, byte_msg):
+    """充电桩请求电价信息"""
+    """说明：充电桩->服务器，充电桩主动请求（48字节）"""
+    logging.info("0x08 Enter pile_request_stage_tariff")
+    pile_sn = get_pile_sn(byte_msg)
+    logging.info("充电桩Sn编码:{}".format(pile_sn))
+    data = {
+        "pile_sn": pile_sn
+    }
+    server_reply_stage_tafiff(**data)
+    logging.info("0x08 Leave pile_request_stage_tariff")
+
+
+# 0x88
+def server_reply_stage_tafiff(*arg, **kwargs):
+    """
+    服务器下发阶段电价信息 说明：服务器->充电桩，回复充电桩0x08命令（64字节）。
+    """
+    logging.info("0x08 Enter server_reply_stage_tafiff")
+    pile_sn = kwargs.get("pile_sn", None)
+    if pile_sn is None:
+        logging.info("No Charging Pile SN")
+        return
+
+    charg_pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
+
+    if charg_pile:
+        charg_price = charg_pile.station.chargingprice_set.filter(default_flag=1).first()
+        charg_price_details = charg_price.prices.all()
+        for detail in charg_price_details:
+            b_begin_hour = bytes([detail.begin_time.hour])
+            b_begin_min = bytes([detail.begin_time.minute])
+            b_end_hour = bytes([detail.end_time.hour])
+            b_end_min = bytes([detail.end_time.minute])
+            b_price = bytes([detail.price/settings.FACTOR_READINGS])
+            service_price = detail.service_price
+            interval_data = b''.join([b_begin_hour, b_begin_min, b_end_hour, b_end_min, b_price])
+
+    else:
+        logging.info("Charging pile not exists")
+    logging.info("0x08 Leave server_reply_stage_tafiff")
 
 
 # 83(0x83)
@@ -278,7 +319,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
         data["start_model"] = start_model
         charging_policy_value = 0
         data["charging_policy_value"] = charging_policy_value
-        data["balance"] = card.money
+        data["balance"] = int(card.money / settings.FACTOR_READINGS)
         logging.info(data)
         server_send_charging_cmd(**data)
 

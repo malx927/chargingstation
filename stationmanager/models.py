@@ -348,7 +348,7 @@ class ChargingPriceDetail(models.Model):
     class Meta:
         verbose_name = '价格明细表'
         verbose_name_plural = verbose_name
-
+        ordering = ["begin_time"]
 
 # mqtt订阅消息记录
 class MqttSubData(models.Model):
