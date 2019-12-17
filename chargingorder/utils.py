@@ -195,13 +195,19 @@ def user_account_deduct_money(order):
     if order.status == 2 and order.pay_time is None and order.cash_fee == 0:
         consum_money = order.consum_money
         openid = order.openid
+        logging.info("启动方式：{},{}".format(order.start_model, consum_money))
         if order.start_model == 1:      # 储值卡启动
-            ChargingCard.objects.filter(card_num=order.openid).update(money=F("money")-consum_money)
-            order.pay_time = datetime.datetime.now()
-            order.cash_fee = consum_money
-            card = ChargingCard.objects.filter(card_num=order.openid).first()
-            order.balance = card.money
-            order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
+            try:
+                card = ChargingCard.objects.get(card_num=openid)
+                card.money = card.money - consum_money
+                card.save(update_fields=['money'])
+                logging.info("card.money：{}".format(card.money))
+                order.pay_time = datetime.datetime.now()
+                order.cash_fee = consum_money
+                order.balance = card.money
+                order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
+            except ChargingCard.DoesNotExist as ex:
+                logging.info(ex)
         else:
             try:
                 user = UserInfo.objects.get(openid=openid)

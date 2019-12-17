@@ -264,7 +264,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
     if order and oper_type == 2:
         cur_dtime = datetime.datetime.now()
         diff_seconds = (cur_dtime - order.begin_time).seconds
-        if diff_seconds > 30:
+        if diff_seconds > 3:
             stop_data = {
                 "pile_sn": pile_sn,
                 "gun_num": gun_num,
@@ -509,7 +509,6 @@ def server_send_charging_cmd(*args, **kwargs):
 
     balance = kwargs.get("balance", 0)      # 账号余额
     b_balance = balance.to_bytes(4, byteorder="big")
-
     b_blank = bytes(4)   # 保留4字节
 
     b_data = b''.join([b_command, b_gun_num, b_charging_type, b_charging_policy,
