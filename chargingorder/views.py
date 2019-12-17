@@ -196,7 +196,7 @@ class RechargeView(View):
             data["low_restrict_status"] = charg_pile.low_restrict  # 限制小电流输出
         # 启动类型charging_category
         data["start_model"] = 0   # 微信启动
-        data["charging_way"] = charg_mode   # 000充满为止，001按金额，010按分钟数，011按SOC，100按电量
+        data["charging_way"] = int(charg_mode)   # 000充满为止，001按金额，010按分钟数，011按SOC，100按电量
 
         charging_policy_value = 0
         if charg_mode == 1:
