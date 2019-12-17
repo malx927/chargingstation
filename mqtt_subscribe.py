@@ -508,7 +508,7 @@ def server_send_charging_cmd(*args, **kwargs):
     b_send_time = get_byte_daytime(datetime.datetime.now())  # 同步时间
 
     balance = kwargs.get("balance", 0)      # 账号余额
-    b_balance = int(balance).to_bytes(4, byteorder="big")
+    b_balance = balance.to_bytes(4, byteorder="big")
 
     b_blank = bytes(4)   # 保留4字节
 
