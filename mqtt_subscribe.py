@@ -260,7 +260,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
         return
 
     # 判断是否正在充电如果正在充电判断充电时间操作30s后，进行停充
-    order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num, openid=card_num, status__lt=0).first()
+    order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=str(gun_num), openid=card_num, status__lt=2).first()
     if order and oper_type == 2:
         cur_dtime = datetime.datetime.now()
         diff_seconds = (cur_dtime - order.begin_time).seconds
