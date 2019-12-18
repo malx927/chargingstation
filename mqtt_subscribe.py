@@ -624,7 +624,7 @@ def update_gun_order_status(**data):
         order.begin_time = begin_time
         order.status = status
         order.save()
-        if order.name != settings.ECHARGEUSER:
+        if order.start_model == 0:
             send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
 
         send_data = {
