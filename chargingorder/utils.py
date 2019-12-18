@@ -190,8 +190,10 @@ def send_data_to_client(pile_sn, gun_num, **data):
 
 def user_account_deduct_money(order):
     """扣款"""
+    logging.info("---------------Enter user_account_deduct_money--------------------")
     if order.begin_time is None:        # 充电命令未得到回复
         return
+    logging.info("状态：{}，支付时间：{}, 实付金额：{}".format(order.status, order.pay_time, order.cash_fee))
     if order.status == 2 and order.pay_time is None and order.cash_fee == 0:
         consum_money = order.consum_money
         openid = order.openid
@@ -247,3 +249,4 @@ def user_account_deduct_money(order):
                     send_charging_end_message_to_user(order)
             except UserInfo.DoesNotExist as ex:
                 logging.warning(ex)
+    logging.info("---------------Leave user_account_deduct_money--------------------")

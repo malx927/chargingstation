@@ -1316,6 +1316,7 @@ def pile_charging_stop_handler(topic, byte_msg):
             order.charg_status = faultCode
             order.status = 2  # 结账
             order.save(update_fields=['charg_status', 'status'])
+            logging.info("更新订单状态")
         except Order.DoesNotExist as ex:
             logging.warning("{}:{}订单不存在".format("pile_charging_stop_handler", out_trade_no))
             return
