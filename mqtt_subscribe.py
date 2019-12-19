@@ -297,6 +297,11 @@ def pile_card_charging_request_hander(topic, byte_msg):
         order = Order.objects.create(**params)
         logging.info(order)
         out_trade_no = order.out_trade_no
+        # 保存 订单
+        pile_gun.out_trade_no = out_trade_no
+        pile_gun.order_time = datetime.datetime.now()
+        pile_gun.save(update_fields=["out_trade_no", "order_time"])
+
         data = {
             'pile_sn': pile_sn,
             'gun_num': int(order.gun_num),
@@ -570,7 +575,6 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
     update_gun_order_status(**data)
     # 清除发送充电命令超时判断
     ChargingCmdRecord.objects.filter(out_trade_no=out_trade_no, pile_sn=pile_sn, cmd_flag="start").delete()
-    # notification_start_charge_result.delay()
 
     logging.info("Leave pile_reply_charging_cmd_handler")
 
@@ -600,6 +604,7 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
 # 8---> 通知用户
 def update_gun_order_status(**data):
     """
+    pile_reply_charging_cmd_handler
     更新充电桩枪口的充电状态, 状态返回到用户界面，
     更新订单充电状态, 状态返回到用户界面，
     :param data: out_trade_no, gun_num , pile_sn, status
@@ -624,7 +629,7 @@ def update_gun_order_status(**data):
         order.begin_time = begin_time
         order.status = status
         order.save()
-        if order.start_model == 0:
+        if order.start_model == 0:      # 启动方式：微信启动
             send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
 
         send_data = {
@@ -804,6 +809,7 @@ def stop_charging(order):
 # 10 (0x85)
 def server_reply_charging_info_handler(*args, **kwargs):
     """
+    pile_charging_status_handler
     服务器->充电桩，服务器主动向充电桩发送帐单信息，收到06命令的回复（48字节）。
     """
     logging.info(kwargs)
@@ -911,6 +917,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "output_voltage": int(output_voltage * settings.FACTOR_VOLTAGE),
         "output_current": int(output_current * settings.FACTOR_CURRENT),
     }
+    logging.info(data)
 
     org_data = {
         "pile_sn": pile_sn,
@@ -930,7 +937,6 @@ def pile_charging_status_handler(topic, byte_msg):
     }
     logging.info(org_data)
     OrderChargDetail.objects.create(**org_data)
-    logging.info(data)
     save_pile_charg_status_to_db(**data)
 
     charg_pile = ChargingPile.objects.filter(pile_sn=pile_sn).first()
@@ -947,7 +953,7 @@ def pile_charging_status_handler(topic, byte_msg):
         defaults["pile_type"] = charg_pile.pile_type_id
         ret = ChargingStatusRecord.objects.update_or_create(pile_sn=pile_sn, gun_num=gun_num, out_trade_no=out_trade_no,
                                                             defaults=defaults)
-        logging.info(defaults)
+        logging.info(ret)
 
     else:
         logging.info("{}电桩不存在".format(pile_sn))

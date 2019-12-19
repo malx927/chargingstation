@@ -77,6 +77,8 @@ class UserInfo(models.Model):
     is_freeze = models.IntegerField(verbose_name='是否冻结', default=0, choices=((0, '正常'), (1, '冻结')))  # 1、退款申请 2、反复充停电操作
     freeze_time = models.DateTimeField(verbose_name='冻结时间', blank=True, null=True)  # 1、退款后确认解冻，2、10分钟，3主动停充后，3-5分内停充
     freeze_reason = models.CharField(verbose_name='冻结原因', max_length=128, blank=True, null=True)
+    pile_sn = models.CharField(verbose_name='电桩SN', max_length=64, blank=True, null=True)
+    gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True)
     out_trade_no = models.CharField(verbose_name='最近一次订单编号', max_length=32, blank=True, null=True)
     visit_city = models.CharField(verbose_name="最后访问地点", max_length=120, blank=True, null=True)
     visit_time = models.DateTimeField(verbose_name="最后访问时间", blank=True, null=True)

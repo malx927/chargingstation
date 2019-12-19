@@ -174,9 +174,9 @@ def save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, send_cmd, flag):
             "over_time": datetime.datetime.now() + datetime.timedelta(seconds=settings.CHARGING_SEND_CMD_INTERVAL),
             "cmd_flag": flag,
         }
-        print(charging_cmd_data)
+        logging.info(charging_cmd_data)
         ret = ChargingCmdRecord.objects.update_or_create(out_trade_no=out_trade_no, pile_sn=pile_sn, gun_num=gun_num, defaults=charging_cmd_data)
-        print(ret)
+        logging.info(ret)
 
 
 def send_data_to_client(pile_sn, gun_num, **data):

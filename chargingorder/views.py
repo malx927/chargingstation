@@ -253,7 +253,7 @@ class RechargeView(View):
         order = Order.objects.create(**kwargs)
         gun.out_trade_no = order.out_trade_no
         gun.order_time = datetime.now()
-        gun.save(update_fields={"out_trade_no", "order_time"})
+        gun.save(update_fields=["out_trade_no", "order_time"])
 
         openid = kwargs.get("openid", None)
         # 添加到用户信息里
