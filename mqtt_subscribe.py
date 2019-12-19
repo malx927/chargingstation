@@ -1260,6 +1260,11 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     # 保存停止充电指令
     if stop_code == 0:
         save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "stop")
+
+    openid = kwargs.get("openid", None)
+    start_model = kwargs.get("start_model", None)
+    user_update_pile_gun(openid, start_model, None, None)
+
     logging.info("Leave server_send_stop_charging_cmd function")
 
 

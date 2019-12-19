@@ -141,9 +141,10 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     if consum_money is None:
         try:
             order = Order.objects.get(out_trade_no=out_trade_no)
+            consum_money = order.consum_money * 100 if order is not None else 0
         except Order.DoesNotExist as ex:
             pass
-        consum_money = order.consum_money * 100 if order is not None else 0
+
     if consum_money > 0:
         b_consum_money = int(consum_money).to_bytes(4, byteorder="big")
     else:
@@ -181,4 +182,9 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     server_publish(pile_sn, b_reply_proto)   # 发送主题
     # 保存充电命令
     save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "stop")
+
+    openid = kwargs.get("openid", None)
+    start_model = kwargs.get("start_model", None)
+    user_update_pile_gun(openid, start_model, None, None)
+
     print("Leave server_send_stop_charging_cmd function")
