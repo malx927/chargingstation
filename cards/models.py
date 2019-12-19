@@ -40,6 +40,8 @@ class ChargingCard(models.Model):
     status = models.IntegerField(verbose_name="状态", choices=STATUS, default=0)
     start_date = models.DateField(verbose_name="生效开始时间")
     end_date = models.DateField(verbose_name="生效结束时间")
+    pile_sn = models.CharField(verbose_name='电桩SN', max_length=64, blank=True, null=True)
+    gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True)
     update_time = models.DateTimeField(verbose_name='修改时间', auto_now=True)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 

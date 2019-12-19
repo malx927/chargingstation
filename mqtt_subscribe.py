@@ -34,7 +34,7 @@ from stationmanager.models import ChargingPile, MqttSubData, ChargingGun,  Charg
 from codingmanager.constants import *
 from chargingorder.utils import uchar_checksum, byte2integer, get_pile_sn, get_32_byte, get_byte_daytime, \
     get_data_nums, get_byte_version, get_datetime_from_byte, message_escape, save_charging_cmd_to_db, \
-    send_data_to_client, user_account_deduct_money
+    send_data_to_client, user_account_deduct_money, user_update_pile_gun
 from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
@@ -531,7 +531,9 @@ def server_send_charging_cmd(*args, **kwargs):
     server_publish(pile_sn, b_reply_proto)
 
     save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "start")
-
+    # 更新用户使用电桩情况，用于杜绝一卡多充的情况
+    openid = kwargs.get("openid", None)
+    user_update_pile_gun(openid, start_model, pile_sn, gun_num)
     logging.info("Leave server_send_charging_cmd function")
 
 

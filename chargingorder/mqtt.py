@@ -5,11 +5,13 @@ import json
 import logging
 import random
 
+from cards.models import ChargingCard
 from chargingorder.models import Order, ChargingCmdRecord
 from paho import mqtt
 import paho.mqtt.publish as publish
 from datetime import datetime
 from chargingstation import settings
+from wxchat.models import UserInfo
 
 __author__ = 'Administrator'
 
@@ -17,7 +19,7 @@ __author__ = 'Administrator'
 logging.basicConfig(level=logging.INFO, filename='./logs/charging_django.log',
                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
 from .utils import get_32_byte, get_byte_daytime, get_pile_sn, byte2integer, uchar_checksum, get_data_nums, \
-    message_escape, save_charging_cmd_to_db
+    message_escape, save_charging_cmd_to_db, user_update_pile_gun
 from codingmanager.constants import *
 
 SUB_TOPIC = 'sub'
@@ -106,7 +108,9 @@ def server_send_charging_cmd(*args, **kwargs):
 
     # 保存充电命令用于超时判断
     save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "start")
-
+    # 更新用户使用电桩情况，用于杜绝一卡多充的情况
+    openid = kwargs.get("openid", None)
+    user_update_pile_gun(openid, start_model, pile_sn, gun_num)
     logging.info("Leave server_send_charging_cmd function")
 
 

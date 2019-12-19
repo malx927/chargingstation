@@ -245,8 +245,17 @@ def user_account_deduct_money(order):
                 order.cash_fee = consum_money
                 order.balance = user.account_balance()
                 order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
-                if order.name != settings.ECHARGEUSER:
+                if order.start_model == 0:
                     send_charging_end_message_to_user(order)
             except UserInfo.DoesNotExist as ex:
                 logging.warning(ex)
     logging.info("---------------Leave user_account_deduct_money--------------------")
+
+
+def user_update_pile_gun(openid, start_model, pile_sn, gun_num):
+    """更新用户当前使用的电桩sn和枪口号"""
+    logging.info("openid:{}, start_model:{}, pile_sn:{}, gun_num:{}".format(openid, start_model, pile_sn, gun_num))
+    if start_model == 0:
+        UserInfo.objects.filter(openid=openid).update(pile_sn=pile_sn, gun_num=gun_num)
+    elif start_model == 1:
+        ChargingCard.objects.filter(card_num=openid).update(pile_sn=pile_sn, gun_num=gun_num)
