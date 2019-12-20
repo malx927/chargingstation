@@ -381,11 +381,13 @@ class OrderChargeStopView(View):
             stop_data = {
                 "pile_sn": pile_sn,
                 "gun_num": int(gun_num),
+                "openid": order.openid,
                 "out_trade_no": out_trade_no,
                 "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
                 "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
                 "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
-                "fault_code": 91    # 用户停止
+                "fault_code": 91,    # 用户停止
+                "start_model": order.start_model,
             }
             # print(stop_data)
             server_send_stop_charging_cmd(**stop_data)

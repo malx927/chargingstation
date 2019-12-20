@@ -131,11 +131,13 @@ def charging_status_overtime():
                 stop_cmd = {
                     "pile_sn": order.charg_pile.pile_sn,
                     "gun_num": int(order.gun_num),
+                    "openid": order.openid,
                     "out_trade_no": order.out_trade_no,
                     "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
                     "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
                     "stop_code": 0,  # 0 为后台主动停止
-                    "fault_code": 71  # 后台主动停止－通讯超时
+                    "fault_code": 71,  # 后台主动停止－通讯超时
+                    "start_model": order.start_model,
                 }
                 server_send_stop_charging_cmd(**stop_cmd)  # 发送停止命令
 

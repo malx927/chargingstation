@@ -268,11 +268,13 @@ def pile_card_charging_request_hander(topic, byte_msg):
             stop_data = {
                 "pile_sn": pile_sn,
                 "gun_num": gun_num,
+                "openid": order.openid,
                 "out_trade_no": order.out_trade_no,
                 "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
                 "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
                 "stop_code": 0,  # 0 主动停止，1被动响应
                 "fault_code": 0,
+                "start_model": order.start_model,
             }
             server_send_stop_charging_cmd(**stop_data)
 
@@ -792,11 +794,13 @@ def stop_charging(order):
         stop_data = {
             "pile_sn": order.charg_pile.pile_sn,
             "gun_num": int(order.gun_num),
+            "openid": order.openid,
             "out_trade_no": order.out_trade_no,
             "consum_money": 0,
             "total_reading": 0,
             "stop_code": 0,  # 0 主动停止，1被动响应，
             "fault_code": 92,  # 后台主动停止－通讯超时
+            "start_model": order.start_model,
         }
         order.status = 2
         order.charg_status_id = 92
@@ -985,11 +989,13 @@ def save_pile_charg_status_to_db(**data):
         stop_error_data = {
             "pile_sn": data.get("pile_sn", None),
             "gun_num": data.get("gun_num", None),
+            "openid": order.openid,
             "out_trade_no": out_trade_no,
             "consum_money": 0,
             "total_reading": 0,
             "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
-            "fault_code": 95
+            "fault_code": 95,
+            "start_model": order.start_model,
         }
         logging.warning("订单数据异常....订单：{},{},{},{}".format(out_trade_no, order.end_reading - order.begin_reading, order.power_fee, order.service_fee))
         server_send_stop_charging_cmd(**stop_error_data)
@@ -1027,10 +1033,12 @@ def save_pile_charg_status_to_db(**data):
     stop_data = {
         "pile_sn": data.get("pile_sn", None),
         "gun_num": data.get("gun_num", None),
+        "openid": order.openid,
         "out_trade_no": out_trade_no,
         "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
         "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
         "stop_code": 0,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
+        "start_model": order.start_model,
     }
 
     if order.openid == settings.ECHARGEUSER:    # E充网用户直接返回
@@ -1342,12 +1350,14 @@ def pile_charging_stop_handler(topic, byte_msg):
         stop_data = {
             "pile_sn": pile_sn,
             "gun_num": gun_num,
+            "openid": order.openid,
             "out_trade_no": out_trade_no,
             "consum_money": order.consum_money * 100,
             "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
             "stop_code": 1,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
             "state_code": state_code,
             "fault_code": 0,
+            "start_model": order.start_model,
         }
         logging.info(stop_data)
         server_send_stop_charging_cmd(**stop_data)
