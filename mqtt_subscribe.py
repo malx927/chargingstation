@@ -244,24 +244,20 @@ def pile_card_charging_request_hander(topic, byte_msg):
 
     password = byte_msg[77:93].decode('utf-8').strip('\000')
     logging.info("password:{}".format(password))
-    if card_type == 1:  # IC卡
-        card = ChargingCard.objects.filter(start_date__lte=cur_time, end_date__gte=cur_time, status=1, card_num=card_num, cipher=password).first()
-    else:               # 手机
-        try:
-            user = CardUser.objects.get(telephone=card_num, password=password, is_active=1)
-            card = user.chargingcard_set.filter(start_date__gte=cur_time, end_date__lte=cur_time, status=1) \
-                .order_by("-money").first()
-        except CardUser.DoesNotExist as ex:
-            logging.info(ex)
-            return
+    if card_type != 1:  # IC卡
+        logging.info("不是IC卡，类型错误。")
+        return
+
+    card = ChargingCard.objects.filter(start_date__lte=cur_time, end_date__gte=cur_time, status=1, card_num=card_num, cipher=password).first()
 
     if not card:
         logging.info("card number or user does not exits")
         return
 
-    if card.pile_sn and card.gun_num and card.pile_sn != pile_sn and card.gun_num != str(gun_num):
-        logging.info("卡正在电桩SN{}枪口{}上充电".format(card.pile_sn, card.gun_num))
-        return
+    if card.pile_sn and card.gun_num:
+        if card.pile_sn != pile_sn or card.gun_num != str(gun_num):
+            logging.info("卡正在电桩SN{}枪口{}上充电".format(card.pile_sn, card.gun_num))
+            return
 
     # 判断是否正在充电如果正在充电判断充电时间操作3s后，进行停充
     order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=str(gun_num), openid=card_num, status__lt=2).first()

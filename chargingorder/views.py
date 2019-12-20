@@ -99,12 +99,13 @@ class RechargeView(View):
         pile_sn = kwargs.get('pile_sn', None)
         gun_num = kwargs.get('gun_num', None)
         logging.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
-        if user_info.pile_sn and user_info.gun_num and user_info.pile_sn != pile_sn and user_info.gun_num != gun_num:
-            logging.info("000000000000000000000000000000000000000")
-            context = {
-                "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
-            }
-            return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+        if user_info.pile_sn and user_info.gun_num:
+            if user_info.pile_sn != pile_sn or user_info.gun_num != gun_num:
+                logging.info("000000000000000000000000000000000000000")
+                context = {
+                    "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
+                }
+                return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
         try:
             pile_gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
