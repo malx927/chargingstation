@@ -82,7 +82,6 @@ class UserInfoAdmin(object):
             )
         ),
         Side(
-            'ic_card', 'ic_pwd',
             AppendedText('total_money', '元'),
             AppendedText('consume_money', '元'),
             AppendedText('binding_amount', '元'),

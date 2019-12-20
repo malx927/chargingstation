@@ -1,11 +1,11 @@
 # coding=utf-8
+import logging
 import time
 from datetime import datetime
 import json
 import random
 import decimal
 
-from codingmanager.constants import USER_CHARGING_MODE
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
@@ -17,12 +17,10 @@ from django.views.generic import DetailView
 
 from stationmanager.models import ChargingPile, ChargingGun
 from chargingorder.models import Order, OrderRecord
-import paho.mqtt.publish as publish
 from chargingstation import settings
 from chargingorder.mqtt import server_send_charging_cmd, server_send_stop_charging_cmd
 from wxchat.decorators import weixin_decorator
 from wxchat.models import UserInfo, SubAccount
-from wxchat.utils import send_charging_start_message_to_user, send_charging_end_message_to_user
 
 
 @weixin_decorator
@@ -100,12 +98,13 @@ class RechargeView(View):
 
         pile_sn = kwargs.get('pile_sn', None)
         gun_num = kwargs.get('gun_num', None)
-
+        logging.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
         if user_info.pile_sn and user_info.gun_num and user_info.pile_sn != pile_sn and user_info.gun_num != gun_num:
-                context = {
-                    "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
-                }
-                return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+            logging.info("000000000000000000000000000000000000000")
+            context = {
+                "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
+            }
+            return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
         try:
             pile_gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
