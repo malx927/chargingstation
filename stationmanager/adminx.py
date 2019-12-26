@@ -46,14 +46,6 @@ class CommXadminSetting(object):
     site_title = settings.SITE_TITLE
     site_footer = settings.SITE_FOOTER
 
-    # def get_site_menu(self):
-    #     return (
-    #         {'title': '内容管理', 'perm': self.get_model_perm(UserProfile, 'change'), 'menus':(
-    #             {'title': '游戏资料', 'icon': 'info-sign', 'url': self.get_model_url(UserProfile, 'changelist') + '?_rel_categories__id__exact=2'},
-    #             {'title': '网站文章', 'icon': 'file', 'url': self.get_model_url(UserProfile, 'changelist') + '?_rel_categories__id__exact=1'},
-    #         )},
-    #     )
-
 
 xadmin.site.register(views.CommAdminView, CommXadminSetting)
 
@@ -500,6 +492,7 @@ class ChargingPriceDetailInline(object):
     model = ChargingPriceDetail
     extra = 3
     style = 'table'
+    max_num = 12
 
 
 class ChargingPriceAdmin(object):

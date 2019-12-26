@@ -1,3 +1,4 @@
+from chargingorder.models import Order
 from django.db import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -79,3 +80,10 @@ class CardRecharge(models.Model):
         verbose_name = '储值卡充值记录'
         verbose_name_plural = verbose_name
 
+
+class CardOrder(Order):
+    """储值卡消费记录"""
+    class Meta:
+        proxy = True
+        verbose_name = '储值卡消费记录'
+        verbose_name_plural = verbose_name

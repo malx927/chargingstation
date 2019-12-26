@@ -202,22 +202,55 @@ def server_reply_stage_tafiff(*arg, **kwargs):
         logging.info("No Charging Pile SN")
         return
 
+    b_pile_sn = get_32_byte(pile_sn)
+    b_command = CMD_REPLY_PRICE
+
     charg_pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
 
+    interval_price_list = []
     if charg_pile:
         charg_price = charg_pile.station.chargingprice_set.filter(default_flag=1).first()
         charg_price_details = charg_price.prices.all()
+        service_price = 0
         for detail in charg_price_details:
             b_begin_hour = bytes([detail.begin_time.hour])
             b_begin_min = bytes([detail.begin_time.minute])
             b_end_hour = bytes([detail.end_time.hour])
             b_end_min = bytes([detail.end_time.minute])
-            b_price = bytes([detail.price/settings.FACTOR_READINGS])
-            service_price = detail.service_price
-            interval_data = b''.join([b_begin_hour, b_begin_min, b_end_hour, b_end_min, b_price])
+            b_price = bytes([int(detail.price * 100)])
+            if service_price == 0:
+                service_price = detail.service_price
 
+            interval_data = b''.join([b_begin_hour, b_begin_min, b_end_hour, b_end_min, b_price])
+            interval_price_list.append(interval_data)
+
+        b_service_price = service_price.to_bytes(2, byteorder="big")
+        logging.info("servcie price:{}".format(service_price))
     else:
         logging.info("Charging pile not exists")
+        b_service_price = bytes([0])
+
+    data_counts = len(interval_price_list)
+    b_data_counts = bytes([data_counts])
+
+    interval_price_data = b''.join(interval_price_list)
+    logging.info(interval_price_data)
+
+    blank = 60 - data_counts * 5
+
+    b_blank = bytes(blank)
+    b_data = b''.join([b_command, interval_price_data, b_blank, b_service_price, b_data_counts])
+
+    data_len = (len(b_data)).to_bytes(2, byteorder='big')
+    # rand = bytes([random.randint(0, 2)])
+    rand = bytes([0])
+    byte_proto_data = b"".join([PROTOCAL_HEAD, b_pile_sn, rand, data_len, b_data])
+    checksum = bytes([uchar_checksum(byte_proto_data)])
+    byte_data = b"".join([b_pile_sn, rand, data_len, b_data, checksum])
+    byte_data = message_escape(byte_data)
+    b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
+    server_publish(pile_sn, b_reply_proto)
+
     logging.info("0x08 Leave server_reply_stage_tafiff")
 
 
