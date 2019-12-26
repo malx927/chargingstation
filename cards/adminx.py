@@ -83,7 +83,7 @@ class CardOrderAdmin(object):
         'consum_money', 'cash_fee', 'status'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
-    list_filter = ['charg_mode', 'charg_type', 'charg_status', 'begin_time', 'status']
+    list_filter = ['charg_status', 'begin_time', 'status']
     exclude = ['charg_type']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
