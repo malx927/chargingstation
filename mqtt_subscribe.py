@@ -149,7 +149,7 @@ def message_dispatch(topic, byte_msg):
     """
     logging.info('************************enter message_dispach*******************************')
 
-    byte_command = byte_msg[37:38]
+    byte_command = byte_msg[37]
     if byte_command == CMD_PILE_STATUS:     # 充电桩状态上报
         pile_status_handler_v12(topic, byte_msg)
 
@@ -171,10 +171,92 @@ def message_dispatch(topic, byte_msg):
     elif byte_command == CMD_PILE_REQUEST_PRICE:   # 充电桩请求电价信息
         pile_request_stage_tariff(topic, byte_msg)
 
-    elif byte_command == CMD_REPLY_PRICE:   # 服务器下发阶段电价信息
-        pass
+    elif byte_command == CMD_PILE_UPLOAD_BILL:   # 上报离线充电帐单
+        pile_upload_offline_bill(topic, byte_msg)
 
     logging.info("*****************leave message_dispach****************")
+
+
+# 0x09
+def pile_upload_offline_bill(topic, byte_msg):
+    """
+    充电桩上报离线结束充电产生的帐单
+    说明：充电桩->服务器，充电桩主动请求（88字节）
+    """
+    logging.info("0x09 Enter pile_upload_offline_bill function")
+
+    data_nums = get_data_nums(byte_msg)
+    # 读取电桩编码(sn)
+    pile_sn = get_pile_sn(byte_msg)
+    # 枪口号
+    gun_num = byte_msg[38]
+    # 订单
+    out_trade_no = byte_msg[39:71].decode('utf-8').strip('\000')
+    logging.info("充电桩Sn编码:{}, 枪口：{}， 订单：{}".format(pile_sn, gun_num, out_trade_no))
+    # 起始充电时间
+    b_begin_time = byte_msg[71:78]
+    begin_time = get_datetime_from_byte(b_begin_time)
+    begin_readings = byte2integer(byte_msg, 78, 82)
+    logging.info('起始充电时间: {}, 超始电量:{}'.format(begin_time, begin_readings))
+    # 结束充电时间
+    b_end_time = byte_msg[82:89]
+    end_time = get_datetime_from_byte(b_end_time)
+    end_readings = byte2integer(byte_msg, 89, 93)
+    logging.info('结束充电时间: {}, 结束电量:{}'.format(end_time, end_readings))
+    # 充电帐单金额
+    money = byte2integer(byte_msg, 93, 97) * 0.01
+    logging.info('充电帐单金额: {}.'.format(money))
+
+    # 回复电桩
+    data = {
+        "pile_sn": pile_sn,
+        "gun_num": gun_num,
+        "out_trade_no": out_trade_no,
+    }
+    server_reply_offline_bill(**data)
+    logging.info("0x09 Leave pile_upload_offline_bill function")
+
+
+# 0x89
+def server_reply_offline_bill(*args, **kwargs):
+    """
+    服务器回复收到充电桩上报的帐单
+    说明：服务器->充电桩，回复充电桩0x09命令（48字节）。
+    """
+    logging.info("0x08 Enter server_reply_offline_bill")
+    pile_sn = kwargs.get("pile_sn", None)
+    if pile_sn is None:
+        logging.info("No Charging Pile SN")
+        return
+
+    gun_num = kwargs.get("gun_num", None)
+    if gun_num is None:
+        logging.info("gun num does not exist")
+        return
+
+    out_trade_no = kwargs.get("out_trade_no", None)
+    if out_trade_no is None:
+        logging.info("out_trade_no does not exist")
+        return
+
+    b_pile_sn = get_32_byte(pile_sn)
+    b_command = CMD_REPLY_BILL
+    b_gun_num = bytes([gun_num])
+    b_out_trade_no = get_32_byte(out_trade_no)
+    b_blank = bytes(14)
+
+    b_data = b''.join([b_command, b_gun_num, b_out_trade_no, b_blank])
+
+    data_len = (len(b_data)).to_bytes(2, byteorder='big')
+    rand = bytes([0])
+    byte_proto_data = b"".join([PROTOCAL_HEAD, b_pile_sn, rand, data_len, b_data])
+    checksum = bytes([uchar_checksum(byte_proto_data)])
+    byte_data = b"".join([b_pile_sn, rand, data_len, b_data, checksum])
+    byte_data = message_escape(byte_data)
+    b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
+    server_publish(pile_sn, b_reply_proto)
+
+    logging.info("0x89 Leave server_reply_offline_bill")
 
 
 # 0x08
