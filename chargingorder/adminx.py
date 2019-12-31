@@ -137,8 +137,11 @@ class OrderRecordAdmin(object):
         if obj.begin_time is None or obj.end_time is None:
             return 0
         else:
-            return (obj.end_time - obj.begin_time).seconds
-    charg_time.short_description = '充电时间(秒)'
+            # return int((obj.end_time - obj.begin_time).seconds / 60)
+            mins = decimal.Decimal((obj.end_time - obj.begin_time).total_seconds() / 60)
+            return mins.quantize(decimal.Decimal('0.01'))
+
+    charg_time.short_description = '充电时间(分)'
     charg_time.allow_tags = True
     charg_time.is_column = True
 
