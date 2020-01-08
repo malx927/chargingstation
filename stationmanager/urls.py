@@ -17,7 +17,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.conf import settings
 # from django.contrib import admin
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from .views import StationListView, StationDetailView, StationPricesDetailView, FaultChargingGunListView
 
 urlpatterns = [
@@ -25,4 +25,5 @@ urlpatterns = [
    url(r'^detail/(?P<stationid>\d+)/$', StationDetailView.as_view(), name='station-detail'),
    url(r'^pricedetail/(?P<stationid>\d+)/$', StationPricesDetailView.as_view(), name='station-price-detail'),
    url(r'^faultgun/$', FaultChargingGunListView.as_view(), name='fault-gun-list'),
+   # url('^logo/$', RedirectView.as_view(url='/static/stationmanager/images/logo-1.png')),
 ]

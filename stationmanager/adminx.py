@@ -7,6 +7,7 @@ from django.forms import CharField
 import qrcode
 from django.conf import settings
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from codingmanager.models import AreaCode
 from users.models import UserProfile
@@ -44,6 +45,8 @@ xadmin.site.register(views.BaseAdminView, BaseXadminSetting)
 
 class CommXadminSetting(object):
     site_title = settings.SITE_TITLE
+    # img_url = "/static/stationmanager/images/logo-1.png"
+    # site_title = mark_safe("<img src='{}' width='120' height='50'/>{}".format(img_url, settings.SITE_TITLE))
     site_footer = settings.SITE_FOOTER
 
 
