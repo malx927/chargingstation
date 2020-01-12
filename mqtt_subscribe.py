@@ -206,6 +206,10 @@ def pile_upload_offline_bill(topic, byte_msg):
     # 充电帐单金额
     money = byte2integer(byte_msg, 93, 97) * 0.01
     logging.info('充电帐单金额: {}.'.format(money))
+    # 各个时间段电量
+    b_interval_readings = byte_msg[97, 121]
+
+    _readings = [b_interval_readings[i:i+2] for i in range(0, len(b_interval_readings), 2)]
 
     # 回复电桩
     data = {
