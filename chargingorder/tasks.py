@@ -12,7 +12,7 @@ from celery.utils.log import get_task_logger
 from channels.layers import get_channel_layer
 from chargingorder.models import Order, ChargingStatusRecord, ChargingCmdRecord
 from chargingorder.mqtt import server_publish, server_send_stop_charging_cmd
-from chargingorder.utils import send_data_to_client, user_account_deduct_money
+from chargingorder.utils import send_data_to_client, user_account_deduct_money, user_update_pile_gun
 from chargingstation import settings
 from codingmanager.models import FaultCode
 
@@ -68,6 +68,8 @@ def send_start_stop_cmd_overtime():
             try:
                 order = Order.objects.get(out_trade_no=rec.out_trade_no)
                 print("send_charging_cmd_overtime:订单{}".format(order.out_trade_no))
+                # 情况用户使用的电桩sn和枪口号
+                user_update_pile_gun(order.openid, order.start_model, None, None)
                 if order.status == 2:
                     rec.delete()
                     continue
