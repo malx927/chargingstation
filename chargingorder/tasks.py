@@ -127,6 +127,7 @@ def charging_status_overtime():
                     .update(work_status=2, charg_status=fault_code)  # 2故障状态 71充电阶段超时
                 order = Order.objects.get(out_trade_no=record.out_trade_no)
                 if order.status == 2:
+                    user_update_pile_gun(order.openid, order.start_model, None, None)
                     record.delete()
                     continue
 
