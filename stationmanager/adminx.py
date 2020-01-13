@@ -504,6 +504,7 @@ class ChargingPriceAdmin(object):
     """
     list_display = ['station', 'type', 'parking_fee', 'default_flag']
     model_icon = 'fa fa-sitemap'
+    save_as = True
 
     form_layout = (
         Fieldset(
