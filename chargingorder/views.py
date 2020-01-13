@@ -99,16 +99,17 @@ class RechargeView(View):
         pile_sn = kwargs.get('pile_sn', None)
         gun_num = kwargs.get('gun_num', None)
         logging.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
-        if user_info.pile_sn and user_info.gun_num:
-            if user_info.pile_sn != pile_sn or user_info.gun_num != gun_num:
-                logging.info("000000000000000000000000000000000000000")
-                context = {
-                    "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
-                }
-                return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+        pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
+        if pile_gun:
+            if user_info.pile_sn and user_info.gun_num:
+                if pile_gun.work_status == 1:
+                    if user_info.pile_sn != pile_sn or user_info.gun_num != gun_num:
+                        context = {
+                            "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
+                        }
+                        logging.info(context)
+                        return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
-        try:
-            pile_gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
             if pile_gun.work_status == 0 or pile_gun.work_status is None:       # 空闲状态
                 context = {
                     "pile_sn": pile_gun.charg_pile.pile_sn,
@@ -120,10 +121,6 @@ class RechargeView(View):
                 print(openid, order)
                 if order:
                     return render(request, template_name='weixin/recharge_order_status.html', context={"order": order})
-
-        except ChargingGun.DoesNotExist as ex:
-            print(ex)
-            pile_gun = None
 
         return render(request, template_name="chargingorder/charging_pile_status.html", context={"pile_gun": pile_gun})
 

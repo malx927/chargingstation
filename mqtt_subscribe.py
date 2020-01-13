@@ -373,10 +373,16 @@ def pile_card_charging_request_hander(topic, byte_msg):
         logging.info("card number or user does not exits")
         return
 
+    pile_gun = ChargingGun.objects.select_related("charg_pile").filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
+    if not pile_gun:
+        logging.info("{}-{} 不存在".format(pile_sn, gun_num))
+        return
+
     if card.pile_sn and card.gun_num:
-        if card.pile_sn != pile_sn or card.gun_num != str(gun_num):
-            logging.info("卡正在电桩SN{}枪口{}上充电".format(card.pile_sn, card.gun_num))
-            return
+        if pile_gun.work_status == 1:
+            if card.pile_sn != pile_sn or card.gun_num != str(gun_num):
+                logging.info("卡正在电桩SN{}枪口{}上充电".format(card.pile_sn, card.gun_num))
+                return
 
     # 判断是否正在充电如果正在充电判断充电时间操作3s后，进行停充
     order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=str(gun_num), openid=card_num, status__lt=2).first()
@@ -403,7 +409,6 @@ def pile_card_charging_request_hander(topic, byte_msg):
         name = card.user.name if card.user else openid
         out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
 
-        pile_gun = ChargingGun.objects.select_related("charg_pile").filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         charg_pile = pile_gun.charg_pile
         start_model = 1
         params = {

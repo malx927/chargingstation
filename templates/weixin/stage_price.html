@@ -10,7 +10,7 @@
         <div class="coupon-code__code">时段电费</div>
         <div class="coupon-code__bar">
             {% for price in price_details %}
-            <div class="bar1">{{ price.begin_time }}-{{ price.end_time }}<br />（{{ price.price|floatformat:1 }}元/度）</div>
+            <div class="bar1">{{ price.begin_time }}-{{ price.end_time }}<br />（{{ price.price|floatformat:2 }}元/度）</div>
             {% endfor %}
         </div>
         <div class="coupon-code__code" id="id_close">关闭</div>
