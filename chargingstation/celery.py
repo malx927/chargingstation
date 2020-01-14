@@ -55,6 +55,10 @@ app.conf.update(
             'task': 'chargingorder.tasks.charging_status_overtime',
             'schedule': timedelta(seconds=5),
         },
+        'order_charging_detail_remove_task': {
+            'task': 'chargingorder.tasks.order_charging_detail_remove',
+            'schedule': crontab(minute=30, hour='3'),
+        },
     }
 )
 

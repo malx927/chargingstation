@@ -10,7 +10,7 @@ from time import sleep
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from channels.layers import get_channel_layer
-from chargingorder.models import Order, ChargingStatusRecord, ChargingCmdRecord
+from chargingorder.models import Order, ChargingStatusRecord, ChargingCmdRecord, OrderChargDetail
 from chargingorder.mqtt import server_publish, server_send_stop_charging_cmd
 from chargingorder.utils import send_data_to_client, user_account_deduct_money, user_update_pile_gun
 from chargingstation import settings
@@ -153,3 +153,7 @@ def charging_status_overtime():
     log.info('Leave update_pile_status_overtime task')
 
 
+@shared_task
+def order_charging_detail_remove():
+    # 清理15天前的数据
+    OrderChargDetail.objects.filter(update_time__lte=datetime.datetime.now() - datetime.timedelta(days=15)).delete()
