@@ -700,9 +700,10 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
     }
     logging.info(data)
 
+    ChargingCmdRecord.objects.filter(out_trade_no=out_trade_no, pile_sn=pile_sn, cmd_flag="start").delete()
+
     update_gun_order_status(**data)
     # 清除发送充电命令超时判断
-    ChargingCmdRecord.objects.filter(out_trade_no=out_trade_no, pile_sn=pile_sn, cmd_flag="start").delete()
 
     logging.info("Leave pile_reply_charging_cmd_handler")
 
@@ -757,8 +758,11 @@ def update_gun_order_status(**data):
         order.begin_time = begin_time
         order.status = status
         order.save()
-        if order.start_model == 0:      # 启动方式：微信启动
-            send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
+
+        user = UserInfo.objects.filter(openid=order.openid).first()
+        if user:
+            if order.start_model == 0 and user.subscribe == 1:      # 启动方式：微信启动并且订阅的用户
+                send_charging_start_message_to_user(order)  # 发送模板消息，通知客户充电开始
 
         send_data = {
             "return_code": "success",

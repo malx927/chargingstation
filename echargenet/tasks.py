@@ -173,7 +173,7 @@ def notification_charge_order_info_for_bonus():
             result["StopReason"] = 1    # 客户归属地运营商平台停止充
         else:
             result["StopReason"] = 3  # 充电机设备故障
-        print("task.py:183:", result)
+
         echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
         ret_data = echarge.notification_charge_order_info_for_bonus(**result)
 

@@ -48,7 +48,7 @@ class UserInfoAdmin(object):
     """
     list_display = ['name', 'nickname', 'openid', 'user_type', 'seller', 'binding_amount', 'telephone', 'total_money',
                     'consume_money', 'account_balance']
-    search_fields = ['name', 'openid', 'telephone']
+    search_fields = ['name', 'openid', 'telephone', 'nickname']
     list_filter = ['user_type', 'seller']
     list_per_page = 50
     style_fields = {"is_freeze": "radio-inline"}

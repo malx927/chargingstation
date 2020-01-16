@@ -213,6 +213,7 @@ def user_account_deduct_money(order):
         else:
             try:
                 user = UserInfo.objects.get(openid=openid)
+                subscribe = user.subscribe
                 sub_account = user.is_sub_user()
                 if sub_account:  # 附属账户
                     order_data = {
@@ -239,13 +240,12 @@ def user_account_deduct_money(order):
 
                 if order.main_openid:
                     user = UserInfo.objects.get(openid=order.main_openid)
-                else:
-                    user = UserInfo.objects.get(openid=order.openid)
+
                 order.pay_time = datetime.datetime.now()
                 order.cash_fee = consum_money
                 order.balance = user.account_balance()
                 order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
-                if order.start_model == 0:
+                if order.start_model == 0 and subscribe == 1:
                     send_charging_end_message_to_user(order)
             except UserInfo.DoesNotExist as ex:
                 logging.warning(ex)
