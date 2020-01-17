@@ -171,16 +171,16 @@ def createMenu(request):
                 "name": "附近电站",
                 "url": settings.ROOT_URL + "/station/"
             },
-            {
-                "type": "view",
-                "name": "充电桩",
-                "url": settings.ROOT_URL + "/order/"
-            },
             # {
             #     "type": "view",
-            #     "name": "扫码充电",
-            #     "url": settings.ROOT_URL + "/wechat/scanqrcode/"
+            #     "name": "充电桩",
+            #     "url": settings.ROOT_URL + "/order/"
             # },
+            {
+                "type": "view",
+                "name": "扫码充电",
+                "url": settings.ROOT_URL + "/wechat/scanqrcode/"
+            },
             {
                 "type": "view",
                 "name": "个人中心",
