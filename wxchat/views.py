@@ -434,12 +434,15 @@ class PersonInfoView(View):
         try:
             openid = request.session.get("openid", None)
             user = UserInfo.objects.get(openid=openid)
+            order = Order.objects.filter(out_trade_no=user.out_trade_no, charg_status_id__gt=0, charg_status_id__lt=7).first()
         except UserInfo.DoesNotExist as ex:
             user = None
+
         signPackage = getJsApiSign(self.request)
         context = {
             "user": user,
-            "sign": signPackage
+            "sign": signPackage,
+            "order": order,
         }
         return render(request, template_name="weixin/wxchat_personinfo.html", context=context)
 
