@@ -107,7 +107,25 @@
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
               </a>
             </div>
+              <div class="classic-group__item">
+                  <a class="van-cell van-cell--clickable" href="{% url 'wxchat-sub-account' %}">
+                      <i class="van-icon van-icon--image van-cell__left-icon"><img
+                              src="{% static 'weixin/images/f9c1b3cb9e4f7ec7909e180ae2efbb6c.png' %}"></i>
+                      <div class="van-cell__title"><span>充电监控</span></div>
+                      <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                  </a>
+              </div>
             {% if user %}
+                {% if order %}
+                  <div class="classic-group__item">
+                      <a class="van-cell van-cell--clickable" href="{% url 'order-recharge-status' %}?out_trade_no={{ order.out_trade_no }}">
+                          <i class="van-icon van-icon--image van-cell__left-icon"><img
+                                  src="{% static 'weixin/images/f9c1b3cb9e4f7ec7909e180ae2efbb6c.png' %}"></i>
+                          <div class="van-cell__title"><span>充电监控</span></div>
+                          <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
+                      </a>
+                  </div>
+                {% endif %}
             <div class="classic-group__item">
               <a class="van-cell van-cell--clickable"  href="{% url 'wxchat-user-detail' user.id %}">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/77b91dd266a2b452dc18a192ee709f0d.png' %}"></i>
