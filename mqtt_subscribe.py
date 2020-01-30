@@ -1174,7 +1174,7 @@ def save_pile_charg_status_to_db(**data):
 
     if order.start_model == 1:  # 储蓄卡
         card = ChargingCard.objects.filter(card_num=order.openid).first()
-        if card.money - - order.consum_money <= 0.2:
+        if card.money - order.consum_money <= 0.2:
             stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
             logging.info(stop_data)
             server_send_stop_charging_cmd(**stop_data)
