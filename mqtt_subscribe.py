@@ -1232,6 +1232,8 @@ def calculate_order(**kwargs):
     output_current = kwargs.get("output_current", 0)
     charg_status = kwargs.pop("charg_status", None)
     order_status = kwargs.pop("status", 0)
+    end_reading = kwargs.get("end_reading", 0)
+
     logging.info(kwargs)
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
@@ -1258,7 +1260,8 @@ def calculate_order(**kwargs):
     try:
         currRec = OrderRecord.objects.get(out_trade_no=out_trade_no, price_begin_time=price.begin_time, price_end_time=price.end_time)
         currRec.end_time = kwargs["end_time"]
-        currRec.end_reading = kwargs["end_reading"]
+        if end_reading > currRec.end_reading:
+            currRec.end_reading = end_reading
         currRec.current_soc = kwargs["current_soc"]
         currRec.accumulated_readings = currRec.end_reading - currRec.begin_reading
         if currRec.accumulated_readings <= 0:
@@ -1282,7 +1285,7 @@ def calculate_order(**kwargs):
             order.begin_time = kwargs["end_time"]
             order.begin_reading = kwargs["end_reading"]
             first_data["begin_time"] = kwargs["end_time"]
-            first_data["begin_reading"] = kwargs["end_reading"]
+            first_data["begin_reading"] = end_reading
         else:
             first_data["begin_time"] = order.begin_time
             if order.end_reading >= order.begin_reading:
@@ -1294,7 +1297,7 @@ def calculate_order(**kwargs):
         first_data["price_begin_time"] = price.begin_time
         first_data["price_end_time"] = price.end_time
         first_data["current_soc"] = kwargs["current_soc"]
-        first_data["end_reading"] = kwargs["end_reading"]
+        first_data["end_reading"] = end_reading
         first_data["accumulated_readings"] = first_data["end_reading"] - first_data["begin_reading"]
         if first_data["accumulated_readings"] <= 0:
             first_data["accumulated_readings"] = 0
@@ -1316,6 +1319,8 @@ def calculate_order(**kwargs):
     order.prev_reading = order.end_reading
     order.end_reading = currRec.end_reading
     order.total_readings = order.end_reading - order.begin_reading
+    if order.total_readings < 0:
+        order.total_readings = 0
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
     order.park_fee = (order.total_hours() * price.charg_price.parking_fee).quantize(decimal.Decimal("0.01"))
