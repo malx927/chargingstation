@@ -282,7 +282,7 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     """
     服务器下发阶段电价信息 说明：服务器->充电桩，回复充电桩0x08命令（64字节）。
     """
-    logging.info("0x08 Enter server_reply_stage_tafiff")
+    logging.info("0x88 Enter server_reply_stage_tafiff")
     pile_sn = kwargs.get("pile_sn", None)
     if pile_sn is None:
         logging.info("No Charging Pile SN")
@@ -294,18 +294,25 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     charg_pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
 
     interval_price_list = []
+    service_price = 0       # 服务费
+    is_seat_fee = 0         # 是否收占位费
+    free_min = 0            # 免费时间
+    occupy_fee = 0          # 每十分钟占位费
     if charg_pile:
         charg_price = charg_pile.station.chargingprice_set.filter(default_flag=1).first()
         charg_price_details = charg_price.prices.all()
-        service_price = 0
+        is_seat_fee = charg_pile.station.is_seat_fee
+        free_min = charg_pile.station.free_min
+        occupy_fee = int(charg_pile.station.occupy_fee * 100)
+
         for detail in charg_price_details:
             b_begin_hour = bytes([detail.begin_time.hour])
             b_begin_min = bytes([detail.begin_time.minute])
             b_end_hour = bytes([detail.end_time.hour])
             b_end_min = bytes([detail.end_time.minute])
-            b_price = bytes([int(detail.price * 100)])
+            b_price = int(detail.price * 100).to_bytes(2, byteorder="big")
             if service_price == 0:
-                service_price = detail.service_price
+                service_price = int(detail.service_price * 100)
 
             interval_data = b''.join([b_begin_hour, b_begin_min, b_end_hour, b_end_min, b_price])
             interval_price_list.append(interval_data)
@@ -314,18 +321,23 @@ def server_reply_stage_tafiff(*arg, **kwargs):
         logging.info("servcie price:{}".format(service_price))
     else:
         logging.info("Charging pile not exists")
-        b_service_price = bytes([0])
+        b_service_price = service_price.to_bytes(2, byteorder="big")
 
     data_counts = len(interval_price_list)
     b_data_counts = bytes([data_counts])
 
-    interval_price_data = b''.join(interval_price_list)
-    logging.info(interval_price_data)
+    b_interval_price_data = b''.join(interval_price_list)
+    logging.info(b_interval_price_data)
 
-    blank = 60 - data_counts * 5
+    interval_blank = 72 - data_counts * 6
+    b_interval_blank = bytes(interval_blank)
 
-    b_blank = bytes(blank)
-    b_data = b''.join([b_command, interval_price_data, b_blank, b_service_price, b_data_counts])
+    b_is_seat_fee = bytes([is_seat_fee])
+    b_free_min = bytes([free_min])
+    b_occupy_fee = occupy_fee.to_bytes(2, byteorder="big")
+    b_end_blank = bytes(8)
+    b_data = b''.join([b_command, b_interval_price_data, b_interval_blank, b_service_price, b_data_counts,
+                       b_is_seat_fee, b_free_min, b_occupy_fee, b_end_blank])
 
     data_len = (len(b_data)).to_bytes(2, byteorder='big')
     # rand = bytes([random.randint(0, 2)])
@@ -337,7 +349,7 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
     server_publish(pile_sn, b_reply_proto)
 
-    logging.info("0x08 Leave server_reply_stage_tafiff")
+    logging.info("0x88 Leave server_reply_stage_tafiff")
 
 
 # 83(0x83)
