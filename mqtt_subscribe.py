@@ -304,7 +304,6 @@ def server_reply_stage_tafiff(*arg, **kwargs):
         is_seat_fee = charg_pile.station.is_seat_fee
         free_min = charg_pile.station.free_min
         occupy_fee = int(charg_pile.station.occupy_fee * 100)
-        data_counts = 0
         for detail in charg_price_details:
 
             b_begin_hour = bytes([detail.begin_time.hour])
@@ -317,8 +316,7 @@ def server_reply_stage_tafiff(*arg, **kwargs):
 
             interval_data = b''.join([b_begin_hour, b_begin_min, b_end_hour, b_end_min, b_price])
             interval_price_list.append(interval_data)
-            data_counts += 1
-            if data_counts == 8:
+            if len(interval_price_list) == 8:
                 break
 
         b_service_price = service_price.to_bytes(2, byteorder="big")
@@ -1685,17 +1683,5 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, Quit)
     signal.signal(signal.SIGTERM, Quit)
-
-    # client.loop_start()
-    # # 连接redis
-    #
-    #
-    # while True:
-    #     time.sleep(10)
-    #     group_name = 'group_{}_{}'.format('AC1-P01-987654321', "0")
-    #     print(group_name)
-    #     async_to_sync(channel_layer.group_send)(group_name, {"type": "chat.message", "message": "hello888888"})
-    #     # print("----------------------------------------------", datetime.now())
-    # client.loop_stop()
 
     client.loop_forever()
