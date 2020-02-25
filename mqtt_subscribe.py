@@ -304,8 +304,9 @@ def server_reply_stage_tafiff(*arg, **kwargs):
         is_seat_fee = charg_pile.station.is_seat_fee
         free_min = charg_pile.station.free_min
         occupy_fee = int(charg_pile.station.occupy_fee * 100)
-
+        data_counts = 0
         for detail in charg_price_details:
+
             b_begin_hour = bytes([detail.begin_time.hour])
             b_begin_min = bytes([detail.begin_time.minute])
             b_end_hour = bytes([detail.end_time.hour])
@@ -316,6 +317,9 @@ def server_reply_stage_tafiff(*arg, **kwargs):
 
             interval_data = b''.join([b_begin_hour, b_begin_min, b_end_hour, b_end_min, b_price])
             interval_price_list.append(interval_data)
+            data_counts += 1
+            if data_counts == 8:
+                break
 
         b_service_price = service_price.to_bytes(2, byteorder="big")
         logging.info("servcie price:{}".format(service_price))
@@ -329,7 +333,7 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     b_interval_price_data = b''.join(interval_price_list)
     logging.info(b_interval_price_data)
 
-    interval_blank = 72 - data_counts * 6
+    interval_blank = 48 - data_counts * 6
     b_interval_blank = bytes(interval_blank)
 
     b_is_seat_fee = bytes([is_seat_fee])
