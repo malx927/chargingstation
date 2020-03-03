@@ -57,7 +57,7 @@ def update_pile_status_overtime():
 
 @shared_task
 def send_start_stop_cmd_overtime():
-    print('Enter send_charging_cmd_overtime')
+    print('Enter send_start_stop_cmd_overtime')
     for rec in ChargingCmdRecord.objects.all():
         over_time = rec.over_time
         current_time = datetime.datetime.now()
@@ -108,7 +108,7 @@ def send_start_stop_cmd_overtime():
             rec.send_time = datetime.datetime.now()
             rec.over_time = datetime.datetime.now() + datetime.timedelta(seconds=settings.CHARGING_SEND_CMD_INTERVAL)
             rec.save()
-    print('Leave send_charging_cmd_overtime')
+    print('Leave send_start_stop_cmd_overtime')
 
 
 @shared_task
