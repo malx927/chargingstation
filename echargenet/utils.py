@@ -4,6 +4,7 @@ from datetime import datetime
 import hashlib
 import hmac
 import time
+import logging
 
 import redis
 import requests
@@ -11,6 +12,7 @@ from Crypto.Cipher import AES
 import base64
 from chargingstation import settings
 
+logger = logging.getLogger("django")
 
 BLOCK_SIZE = 16  # Bytes
 pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * chr(BLOCK_SIZE - len(s) % BLOCK_SIZE)
@@ -150,7 +152,7 @@ class EchargeNet(object):
         else:
             if "Authorization" in self.HEADERS:
                 del self.HEADERS["Authorization"]
-        print("_post", send_data)
+        logger.info(send_data)
         r = requests.post(url, data=json.dumps(send_data), headers=self.HEADERS)
         result = r.json()
         return result
@@ -160,11 +162,11 @@ class EchargeNet(object):
         r = self.connect_redis()
         access_token = r.get(self.ACCESS_TOKEN_KEY)
         b_expires_at = r.get(self.ACCESS_TOKEN_EXPIRES_AT)
-        print("161", access_token, b_expires_at)
+        logger.info("{}--{}".format(access_token, b_expires_at))
         if access_token and b_expires_at:
             timestamp = time.time()
             expires_at = int(b_expires_at)
-            print(timestamp, expires_at)
+            logger.info("{}--{}".format(timestamp, timestamp))
             if expires_at - timestamp > 60:
                 res = {
                     "success": True,
@@ -178,18 +180,20 @@ class EchargeNet(object):
         }
         url = '{0}{1}'.format(self.E_CHARGE_URL, 'query_token')
         result = self._post(url, **data)
-        print("178", result)
+        logger.info(result)
         if "Ret" in result and result["Ret"] == 0:
             # 解密
             ret_crypt_data = result["Data"]
             dict_decrpt_data = data_decode(ret_crypt_data)
-            print("get_query_token", dict_decrpt_data)
+            logger.info(dict_decrpt_data)
             # # 获取到code值
             if dict_decrpt_data["SuccStat"] == 0:
                 # 设置token
                 access_token = dict_decrpt_data["AccessToken"]
                 token_available_time = dict_decrpt_data["TokenAvailableTime"]
-                print(190, access_token, token_available_time)
+
+                logger.info("{}--{}".format(access_token, token_available_time))
+
                 r.set(self.ACCESS_TOKEN_KEY, access_token, token_available_time)
                 expires_at = int(time.time()) + token_available_time
                 r.set(self.ACCESS_TOKEN_EXPIRES_AT, expires_at)
@@ -222,7 +226,7 @@ class EchargeNet(object):
         if dict_token["success"]:
             token = dict_token["access_token"]
         else:
-            print("access token error!")
+            logger.info("access token error!")
             return 4002
 
         notification_stationStatusData = {
@@ -232,9 +236,9 @@ class EchargeNet(object):
                     }
         }
 
-        print(230, notification_stationStatusData)
+        logger.info(notification_stationStatusData)
         result = self._post(url, token, **notification_stationStatusData)
-        print("notification_station_status:", result)
+        logger.info(result)
 
         if "Ret" in result and result["Ret"] == 0:
             # 解密
@@ -244,7 +248,7 @@ class EchargeNet(object):
             status = dict_decrpt_data["Status"]
             return status
         else:
-            print(result["Msg"])
+            logger.info(result["Msg"])
             return result["Ret"]
 
     # 接口名称：query_equip_auth
@@ -257,22 +261,22 @@ class EchargeNet(object):
         if dict_token["success"]:
             token = dict_token["access_token"]
         else:
-            print("access token error!")
+            logger.info("access token error!")
             return 4002
 
         result = self._post(url, token, **kwargs)
-        print("notification_start_charge_result:", result)
+        logger.info(result)
 
         if "Ret" in result and result["Ret"] == 0:
             # 解密
             ret_crypt_data = result["Data"]
             dict_decrpt_data = data_decode(ret_crypt_data)
             # 获取到code值
-            print(dict_decrpt_data["StartChargeSeq"])
+            logger.info(dict_decrpt_data["StartChargeSeq"])
             status = dict_decrpt_data["SuccStat"]
             return status
         else:
-            print(result["Msg"])
+            logger.info(result["Msg"])
             return result["Ret"]
 
     def notification_equip_charge_status(self, *args, **kwargs):
@@ -282,22 +286,22 @@ class EchargeNet(object):
         if dict_token["success"]:
             token = dict_token["access_token"]
         else:
-            print("access token error!")
+            logger.info("access token error!")
             return 4002
 
         result = self._post(url, token, **kwargs)
-        print("notification_equip_charge_status:", result)
+        logger.info(result)
 
         if "Ret" in result and result["Ret"] == 0:
             # 解密
             ret_crypt_data = result["Data"]
             dict_decrpt_data = data_decode(ret_crypt_data)
             # 获取到code值
-            print(dict_decrpt_data["StartChargeSeq"])
+            logger.info(dict_decrpt_data["StartChargeSeq"])
             status = dict_decrpt_data["SuccStat"]
             return status
         else:
-            print(result["Msg"])
+            logger.info(result["Msg"])
             return result["Ret"]
 
     def notification_stop_charge_result(self, *args, **kwargs):
@@ -307,22 +311,23 @@ class EchargeNet(object):
         if dict_token["success"]:
             token = dict_token["access_token"]
         else:
-            print("access token error!")
+            logger.info("access token error!")
             return 4002  # Token 错误
 
         result = self._post(url, token, **kwargs)
-        print("notification_stop_charge_result:", result)
+        logger.info(result)
 
         if "Ret" in result and result["Ret"] == 0:
             # 解密
             ret_crypt_data = result["Data"]
             dict_decrpt_data = data_decode(ret_crypt_data)
             # 获取到code值
-            print(dict_decrpt_data["StartChargeSeq"])
+            logger.info(dict_decrpt_data["StartChargeSeq"])
+
             status = dict_decrpt_data["SuccStat"]
             return status
         else:
-            print(result["Msg"])
+            logger.info(result["Msg"])
             return result["Ret"]
 
     def notification_charge_order_info_for_bonus(self, *args, **kwargs):
@@ -332,7 +337,7 @@ class EchargeNet(object):
         if dict_token["success"]:
             token = dict_token["access_token"]
         else:
-            print("access token error!")
+            logger.info("access token error!")
             result = {
                 "Ret": 4002,
                 "Msg": "access token error!",
@@ -340,7 +345,7 @@ class EchargeNet(object):
             return result  # Token 错误
 
         result = self._post(url, token, **kwargs)
-        print("notification_charge_order_info_for_bonus:", result)
+        logger.info(result)
         return result
 
     def check_charge_orders(self, *args, **kwargs):
@@ -350,7 +355,7 @@ class EchargeNet(object):
         if dict_token["success"]:
             token = dict_token["access_token"]
         else:
-            print("access token error!")
+            logger.info("access token error!")
             result = {
                 "Ret": 4002,
                 "Msg": "access token error!",
@@ -358,5 +363,5 @@ class EchargeNet(object):
             return result  # Token 错误
 
         result = self._post(url, token, **kwargs)
-        print("check_charge_orders:", result)
+        logger.info("check_charge_orders:", result)
         return result

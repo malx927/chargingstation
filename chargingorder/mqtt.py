@@ -15,9 +15,8 @@ from wxchat.models import UserInfo
 
 __author__ = 'Administrator'
 
-# logging.basicConfig(level=logging.INFO, )
-logging.basicConfig(level=logging.INFO, filename='./logs/charging_django.log',
-                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
+logger = logging.getLogger("django")
+
 from .utils import get_32_byte, get_byte_daytime, get_pile_sn, byte2integer, uchar_checksum, get_data_nums, \
     message_escape, save_charging_cmd_to_db, user_update_pile_gun
 from codingmanager.constants import *
@@ -33,8 +32,8 @@ def server_publish(pile_sn, data):
         'username': settings.USERNAME,
         'password': settings.PASSWORD,
     }
-    print(topic, auth)
-    print("server_publish:", data.hex())
+    logger.info("{}:{}".format(topic, auth))
+    logger.info("server_publish:{}".format(data.hex()))
     publish.single(topic, payload=data, qos=0, retain=False, hostname=settings.MQTT_HOST, port=1883,
                    client_id=settings.DEVICENAME_SEND, keepalive=60, will=None, auth=auth)
 
@@ -48,7 +47,7 @@ def server_send_charging_cmd(*args, **kwargs):
     此函数由用户扫描缴费调用，通过二维码的pile_sn 和 gun_nums确定后台的数据内容
     :return:
     """
-    logging.info("Enter server_send_charging_cmd function")
+    logger.info("Enter server_send_charging_cmd function")
     pile_sn = kwargs.get("pile_sn", None)
     b_pile_sn = get_32_byte(pile_sn)
     b_command = CMD_SEND_CHARGING
@@ -101,7 +100,7 @@ def server_send_charging_cmd(*args, **kwargs):
     checksum = bytes([uchar_checksum(byte_proto_data)])
     byte_data = b"".join([b_pile_sn, rand, data_len, b_data, checksum])
     byte_data = message_escape(byte_data)
-    print("2:", byte_data.hex())
+    logger.info(byte_data.hex())
     b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
 
     server_publish(pile_sn, b_reply_proto)
@@ -111,23 +110,23 @@ def server_send_charging_cmd(*args, **kwargs):
     # 更新用户使用电桩情况，用于杜绝一卡多充的情况
     openid = kwargs.get("openid", None)
     user_update_pile_gun(openid, start_model, pile_sn, gun_num)
-    logging.info("Leave server_send_charging_cmd function")
+    logger.info("Leave server_send_charging_cmd function")
 
 
 # 12 (0x86)
 def server_send_stop_charging_cmd(*args, **kwargs):
     """12、服务器主动下发停止充电或停止充电确认"""
-    print("Enter server_send_stop_charging_cmd function")
+    logger.info("Enter server_send_stop_charging_cmd function")
 
     pile_sn = kwargs.get("pile_sn")
     if pile_sn is None:
-        print("pile_sn can not be empty")
+        logger.info("pile_sn can not be empty")
         return
     b_pile_sn = get_32_byte(pile_sn)
 
     out_trade_no = kwargs.get("out_trade_no", None)
     if out_trade_no is None:
-        print("Order Can not Be Empty")
+        logger.info("Order Can not Be Empty")
         return
     # 订单号
     b_out_trade_no = get_32_byte(out_trade_no)
@@ -149,24 +148,24 @@ def server_send_stop_charging_cmd(*args, **kwargs):
         b_consum_money = int(consum_money).to_bytes(4, byteorder="big")
     else:
         b_consum_money = bytes([0])
-    print("金额：", consum_money, b_consum_money.hex())
+    logger.info("金额：{}".format(consum_money))
     # 总的电表数
     total_reading = kwargs.get("total_reading", 0)
     if total_reading < 0:
         total_reading = 0
     b_total_reading = total_reading.to_bytes(4, byteorder="big")
-    print("电表数：", total_reading, b_total_reading.hex())
+    logger.info("电表数：{}".format(total_reading))
     # 停止标记
     stop_code = kwargs.get("stop_code", 0)
     b_stop_code = bytes([stop_code])
-    print("停止标记：", stop_code, b_stop_code.hex())
+    logger.info("停止标记：{}".format(stop_code))
     # 运行状态标记
     state_code = kwargs.get("state_code", 3)
     b_state_code = bytes([state_code])
     # 故障代码
     fault_code = kwargs.get("fault_code", 0)
     b_fault_code = bytes([fault_code])
-    print("故障代码：", fault_code, b_fault_code.hex())
+    logger.info("故障代码：{}".format(fault_code))
     # 保留
     b_blank = bytes(3)
 
@@ -187,4 +186,4 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     start_model = kwargs.get("start_model", None)
     user_update_pile_gun(openid, start_model, None, None)
 
-    print("Leave server_send_stop_charging_cmd function")
+    logger.info("Leave server_send_stop_charging_cmd function")

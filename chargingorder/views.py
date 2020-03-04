@@ -22,6 +22,8 @@ from chargingorder.mqtt import server_send_charging_cmd, server_send_stop_chargi
 from wxchat.decorators import weixin_decorator
 from wxchat.models import UserInfo, SubAccount
 
+logger = logging.getLogger("django")
+
 
 @weixin_decorator
 def index(request):
@@ -59,7 +61,7 @@ def get_account_balance_amount(openid):
         else:
             return user.account_balance()
     except UserInfo.DoesNotExist as ex:
-        print(ex)
+        logger.error(ex)
         return 0
 
 
@@ -93,12 +95,12 @@ class RechargeView(View):
             return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
         if not get_account_balance(openid):
             redirect_url = "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
-            print(redirect_url)
+            logger.info(redirect_url)
             return HttpResponseRedirect(redirect_url)
 
         pile_sn = kwargs.get('pile_sn', None)
         gun_num = kwargs.get('gun_num', None)
-        logging.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
+        logger.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
         pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         if pile_gun:
             if user_info.pile_sn and user_info.gun_num:
@@ -107,7 +109,7 @@ class RechargeView(View):
                         context = {
                             "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
                         }
-                        logging.info(context)
+                        logger.info(context)
                         return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
             if pile_gun.work_status == 0 or pile_gun.work_status is None:       # 空闲状态
@@ -118,7 +120,6 @@ class RechargeView(View):
                 return render(request, template_name='chargingorder/recharge.html', context=context)  # 进入充电界面
             elif pile_gun.work_status in [1, 3]:         # 1-充电中 3-充电结束(未拔枪)
                 order = Order.objects.filter(openid=openid, out_trade_no=pile_gun.out_trade_no, status__lte=2).first()
-                print(openid, order)
                 if order:
                     return render(request, template_name='weixin/recharge_order_status.html', context={"order": order})
 
@@ -201,7 +202,7 @@ class RechargeView(View):
 
         data["charging_policy_value"] = charging_policy_value
         balance = int(get_account_balance_amount(openid) / decimal.Decimal(settings.FACTOR_READINGS))
-        print("余额：".format(balance))
+        logger.info("余额：".format(balance))
         data["balance"] = balance
 
         server_send_charging_cmd(**data)
@@ -266,7 +267,7 @@ class RechargeView(View):
 
     def full_recharge(self, request, *args, **kwargs):
         params = self.get_request_params(request, *args, **kwargs)
-        print("full_recharge:", params)
+        logger.info("full_recharge:{}".format(params))
         order = self.create_order(**params)
         return order
 
@@ -368,7 +369,6 @@ class OrderChargeStopView(View):
         out_trade_no = request.POST.get("out_trade_no", None)
         pile_sn = request.POST.get("pile_sn", None)
         gun_num = request.POST.get("gun_num", None)
-        print(out_trade_no)
         try:
             order = Order.objects.get(out_trade_no=out_trade_no)
             stop_data = {
@@ -382,10 +382,10 @@ class OrderChargeStopView(View):
                 "fault_code": 91,    # 用户停止
                 "start_model": order.start_model,
             }
-            # print(stop_data)
+            logger.info(stop_data)
             server_send_stop_charging_cmd(**stop_data)
         except Order.DoesNotExist as ex:
-            print(ex)
+            logger.info(ex)
             return JsonResponse({"return_code": "FAIL", "errmsg": "停止操作失败!"})
 
         return JsonResponse({"return_code": "SUCCESS"})
