@@ -212,6 +212,6 @@ class CurrentMonthYearAccumAPIView(APIView):
         for res in year_results:
             station_id = res["station_id"]
             result_dict[station_id]["year_money"] = res["year_money"]
-        print(sorted(result_dict.values()))
+
         return Response(result_dict.values())
 
