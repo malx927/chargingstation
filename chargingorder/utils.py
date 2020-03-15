@@ -181,11 +181,12 @@ def save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, send_cmd, flag):
 
 def send_data_to_client(pile_sn, gun_num, **data):
     group_name = 'group_{}_{}'.format(pile_sn, gun_num)
-    try:
-        group = GroupName.objects.get(name=group_name)
-        async_to_sync(channel_layer.group_send)(group.name, {"type": "chat.message", "message": json.dumps(data)})
-    except GroupName.DoesNotExist as ex:
-        print(ex)
+    async_to_sync(channel_layer.group_send)(group_name, {"type": "chat.message", "message": json.dumps(data)})
+    # try:
+    #     group = GroupName.objects.get(name=group_name)
+    #     async_to_sync(channel_layer.group_send)(group.name, {"type": "chat.message", "message": json.dumps(data)})
+    # except GroupName.DoesNotExist as ex:
+    #     print(ex)
 
 
 def user_account_deduct_money(order):

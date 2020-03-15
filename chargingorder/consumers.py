@@ -1,4 +1,6 @@
 # coding=utf-8
+from django.db.models import F
+
 from chargingorder.models import GroupName
 
 __author__ = 'Administrator'
@@ -19,7 +21,7 @@ class ChargingConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        await database_sync_to_async(self.create_group)(self.room_group_name, self.channel_name)
+        # await database_sync_to_async(self.create_group)(self.room_group_name, self.channel_name)
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -28,7 +30,7 @@ class ChargingConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
-        await database_sync_to_async(self.delete_group)(self.room_group_name, self.channel_name)
+        # await database_sync_to_async(self.delete_group)(self.room_group_name, self.channel_name)
 
     # Receive message from WebSocket
     async def receive(self, text_data):
@@ -51,25 +53,37 @@ class ChargingConsumer(AsyncWebsocketConsumer):
         }))
 
     def create_group(self, group_name, channel_name):
-        try:
-            group = GroupName.objects.get(name=group_name)
-            group.nums = group.nums + 1
-            group.save()
-        except GroupName.DoesNotExist as ex:
-            group = GroupName()
-            group.name = group_name
-            group.channel_name = channel_name
-            group.nums = 1
-            group.save()
+        counts = GroupName.objects.filter(name=group_name).count()
+        if counts == 0:
+            data = {
+                "name": group_name,
+                "nums": 1,
+                "channel_name": channel_name,
+            }
+            GroupName.objects.create(**data)
+        elif counts == 1:
+            GroupName.objects.filter(name=group_name).update(nums=F('nums') + 1)
+        else:
+            GroupName.objects.filter(name=group_name).delete()
+            data = {
+                "name": group_name,
+                "nums": 1,
+                "channel_name": channel_name,
+            }
+            GroupName.objects.create(**data)
 
     def delete_group(self, group_name, channel_name):
-        try:
-            group = GroupName.objects.get(name=group_name)
-            if group.nums > 1:
+        counts = GroupName.objects.filter(name=group_name).count()
+        if counts == 0:
+            return
+        if counts > 1:
+            GroupName.objects.filter(name=group_name).delete()
+        else:
+            group = GroupName.objects.filter(name=group_name).first()
+            if group and group.nums > 1:
                 group.nums = group.nums - 1
                 group.save()
             else:
-                group.delete()
-        except GroupName.DoesNotExist as ex:
-            pass
+                GroupName.objects.filter(name=group_name).delete()
+
 
