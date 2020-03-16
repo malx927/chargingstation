@@ -160,19 +160,16 @@ class EchargeNet(object):
     def get_query_token(self):
         """获取token"""
         r = self.connect_redis()
+
         access_token = r.get(self.ACCESS_TOKEN_KEY)
-        b_expires_at = r.get(self.ACCESS_TOKEN_EXPIRES_AT)
-        logger.info("{}--{}".format(access_token, b_expires_at))
-        if access_token and b_expires_at:
-            timestamp = time.time()
-            expires_at = int(b_expires_at)
-            logger.info("{}--{}".format(timestamp, timestamp))
-            if expires_at - timestamp > 60:
-                res = {
-                    "success": True,
-                    "access_token": access_token.decode(),
-                }
-                return res
+        # b_expires_at = r.get(self.ACCESS_TOKEN_EXPIRES_AT)
+        logger.info("{}".format(access_token))
+        if access_token:
+            res = {
+                "success": True,
+                "access_token": access_token.decode(),
+            }
+            return res
 
         data = {
             'OperatorID': settings.OPERATORID,
@@ -194,9 +191,9 @@ class EchargeNet(object):
 
                 logger.info("{}--{}".format(access_token, token_available_time))
 
-                r.set(self.ACCESS_TOKEN_KEY, access_token, token_available_time)
-                expires_at = int(time.time()) + token_available_time
-                r.set(self.ACCESS_TOKEN_EXPIRES_AT, expires_at)
+                r.set(self.ACCESS_TOKEN_KEY, access_token, token_available_time - 60)
+                # expires_at = int(time.time()) + token_available_time
+                # r.set(self.ACCESS_TOKEN_EXPIRES_AT, expires_at)
                 res = {
                     "success": True,
                     "access_token": access_token,
