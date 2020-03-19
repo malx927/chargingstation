@@ -45,11 +45,11 @@ app.conf.update(
         # },
         'update_pile_status_overtime_task': {
             'task': 'chargingorder.tasks.update_pile_status_overtime',
-            'schedule': timedelta(seconds=5),
+            'schedule': timedelta(seconds=10),
         },
         'send_start_stop_cmd_overtime_task': {
             'task': 'chargingorder.tasks.send_start_stop_cmd_overtime',
-            'schedule': timedelta(seconds=2),
+            'schedule': timedelta(seconds=5),
         },
         'charging_status_overtime_task': {
             'task': 'chargingorder.tasks.charging_status_overtime',
