@@ -93,6 +93,7 @@ class RechargeView(View):
                 "errmsg": "请先关注亚电新能源公众号"
             }
             return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+
         if not get_account_balance(openid):
             redirect_url = "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
             logger.info(redirect_url)
@@ -104,13 +105,12 @@ class RechargeView(View):
         pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         if pile_gun:
             if user_info.pile_sn and user_info.gun_num:
-                if pile_gun.work_status == 1:
-                    if user_info.pile_sn != pile_sn or user_info.gun_num != gun_num:
-                        context = {
-                            "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
-                        }
-                        logger.info(context)
-                        return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+                if user_info.pile_sn != pile_sn or user_info.gun_num != gun_num:
+                    context = {
+                        "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
+                    }
+                    logger.info(context)
+                    return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
             if pile_gun.work_status == 0 or pile_gun.work_status is None:       # 空闲状态
                 context = {
@@ -132,13 +132,6 @@ class RechargeView(View):
         openid = request.session.get("openid", None)
         total_fee = request.POST.get("total_fee", "0")
 
-        if not get_account_balance(openid, float(total_fee)):
-            data = {
-                "return_code": "success",
-                "redirect_url": "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
-            }
-            return JsonResponse(data)
-
         gun = self.get_charging_gun(request)
         if gun is None:
             data = {
@@ -146,6 +139,14 @@ class RechargeView(View):
                 "errmsg": "充电设备不存在",
             }
             return JsonResponse(data)
+
+        if not get_account_balance(openid, float(total_fee)):
+            data = {
+                "return_code": "success",
+                "redirect_url": "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
+            }
+            return JsonResponse(data)
+
         cur_time = datetime.now()
         if gun.order_time and (cur_time - gun.order_time).seconds < 10:
             return render(request, template_name="chargingorder/charging_pile_status.html", context={"pile_gun": gun})
@@ -291,6 +292,9 @@ class RechargeView(View):
         params["charg_soc_val"] = charg_soc_val
         order = self.create_order(**params)
         return order
+
+    def is_charging(self, request, *args, **kwargs):
+        pass
 
 
 class StopChargeView(View):
