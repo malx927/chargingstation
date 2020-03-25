@@ -144,7 +144,7 @@ xadmin.site.register(WxUnifiedOrderResult, WxUnifiedOrderResultAdmin)
 class WxPayResultAdmin(object):
     list_display = ('return_code', 'appid', 'mch_id', 'device_info', 'result_code', 'err_code', 'openid',
                     'is_subscribe', 'trade_type', 'total_fee', 'cash_fee', 'transaction_id', 'out_trade_no')
-    search_fields = ['transaction_id', 'out_trade_no']
+    search_fields = ['transaction_id', 'out_trade_no', 'openid']
     list_per_page = 50
     model_icon = 'fa fa-weixin'
 

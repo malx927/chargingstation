@@ -132,7 +132,7 @@ class RechargeView(View):
         openid = request.session.get("openid", None)
         total_fee = request.POST.get("total_fee", "0")
 
-        if not get_account_balance(openid, int(total_fee)):
+        if not get_account_balance(openid, float(total_fee)):
             data = {
                 "return_code": "success",
                 "redirect_url": "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
@@ -201,8 +201,8 @@ class RechargeView(View):
             charging_policy_value = int(request.POST.get("charg_soc_val", "0"))
 
         data["charging_policy_value"] = charging_policy_value
-        balance = int(get_account_balance_amount(openid) / decimal.Decimal(settings.FACTOR_READINGS))
-        logger.info("余额：".format(balance))
+        balance = int(get_account_balance_amount(openid) * 100)
+        logger.info("余额：{}".format(balance))
         data["balance"] = balance
 
         server_send_charging_cmd(**data)
@@ -377,7 +377,7 @@ class OrderChargeStopView(View):
                 "openid": order.openid,
                 "out_trade_no": out_trade_no,
                 "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-                "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+                "total_reading": int(order.get_total_reading() * 100),
                 "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
                 "fault_code": 91,    # 用户停止
                 "start_model": order.start_model,

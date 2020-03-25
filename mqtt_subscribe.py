@@ -409,7 +409,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
                 "openid": order.openid,
                 "out_trade_no": order.out_trade_no,
                 "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-                "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+                "total_reading": int(order.get_total_reading() * 100),
                 "stop_code": 0,  # 0 主动停止，1被动响应
                 "fault_code": 0,
                 "start_model": order.start_model,
@@ -463,7 +463,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
         data["start_model"] = start_model
         charging_policy_value = 0
         data["charging_policy_value"] = charging_policy_value
-        data["balance"] = int(card.money / decimal.Decimal(settings.FACTOR_READINGS))
+        data["balance"] = int(card.money * 100)
         logging.info(data)
         server_send_charging_cmd(**data)
 
@@ -1148,7 +1148,7 @@ def save_pile_charg_status_to_db(**data):
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-        "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+        "total_reading": int(order.get_total_reading() * 100),
     }
     logging.info(reply_charging_data)
     server_reply_charging_info_handler(**reply_charging_data)
@@ -1177,7 +1177,7 @@ def save_pile_charg_status_to_db(**data):
         "openid": order.openid,
         "out_trade_no": out_trade_no,
         "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-        "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+        "total_reading": int(order.get_total_reading() * 100),
         "stop_code": 0,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
         "start_model": order.start_model,
     }
@@ -1499,7 +1499,7 @@ def pile_charging_stop_handler(topic, byte_msg):
             "openid": order.openid,
             "out_trade_no": out_trade_no,
             "consum_money": order.consum_money * 100,
-            "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+            "total_reading": int(order.get_total_reading() * 100),
             "stop_code": 1,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
             "state_code": state_code,
             "fault_code": 0,

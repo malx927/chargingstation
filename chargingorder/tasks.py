@@ -142,7 +142,7 @@ def charging_status_overtime():
                     "openid": order.openid,
                     "out_trade_no": order.out_trade_no,
                     "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-                    "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+                    "total_reading": int(order.get_total_reading() * 100),
                     "stop_code": 0,  # 0 为后台主动停止
                     "fault_code": 71,  # 后台主动停止－通讯超时
                     "start_model": order.start_model,
