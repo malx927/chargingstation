@@ -1609,37 +1609,6 @@ def connect_redis():
     return redis_client
 
 
-# def charg_reply_to_work_overtime():
-#     """
-#     判断充电回复到充电作业超时
-#     :param k:
-#     :param v:
-#     :return:
-#     """
-#     while loop_flag:
-#         reply_to_work_dict = r.hgetall(settings.CHARG_REPLY_TO_WORK_OVERTIME)
-#         print('charg_reply_to_work_overtime', reply_to_work_dict)
-#         for k, v in reply_to_work_dict.items():
-#             key = k.decode("utf-8")
-#             value = v.decode("utf-8")
-#             dict_val = json.loads(value)
-#             send_time = datetime.strptime(dict_val["send_time"], '%Y-%m-%d %H:%M:%S')
-#             overtime = dict_val["overtime"]
-#             delta_time = (datetime.now() - send_time).seconds
-#             if delta_time >= overtime:   # 超时
-#                 key_list = key.split('.')
-#                 pile_sn = key_list[0]
-#                 gun_num = key_list[1]
-#                 out_trade_no = key_list[2]
-#                 ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).update(work_status=4)
-#                 Order.objects.filter(out_trade_no).update(charg_status=4, status=2)  # 设置为后端停止，订单为结账标志
-#         time.sleep(1)
-
-
-# async def send_to_server(uri, **data):
-#     async with websockets.connect(uri) as websocket:
-#         await websocket.send(json.dumps(data))
-
 if __name__ == "__main__":
     port = 1883
     # 初始化客户端
