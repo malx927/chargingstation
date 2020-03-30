@@ -91,7 +91,7 @@ class EquipmentInfo(models.Model):
     EquipmentType = models.IntegerField(verbose_name='设备类型', choices=EQUIP_TYPE)
     EquipmentLng = models.FloatField(verbose_name='经度', default=0)
     EquipmentLat = models.FloatField(verbose_name='纬度', default=0)
-    Power = models.DecimalField(verbose_name='设备总功率', max_digits=7, decimal_places=1)
+    Power = models.DecimalField(verbose_name='设备总功率', max_digits=8, decimal_places=1)
     EquipmentName = models.CharField(verbose_name='充电设备名称', max_length=30, blank=True, default="")
     is_subsidy = models.IntegerField(verbose_name='运营补贴', default=0, choices=((0, '否'), (1, '运营补贴')))
     add_time = models.DateTimeField(verbose_name="添加时间", auto_now=True)

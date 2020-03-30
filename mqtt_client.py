@@ -1148,4 +1148,3 @@ if __name__ == "__main__":
 
     client.loop_stop()
 
-    # client.loop_forever()

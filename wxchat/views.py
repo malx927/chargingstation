@@ -627,7 +627,6 @@ class SubAccountUpdateAmount(View):
     def get(self, request, *args, **kwargs):
         try:
             openid = request.session.get("openid")
-            openid = "oX5Zn04Imn5RlCGlhEVg-aEUCHNs"
             owner = UserInfo.objects.get(openid=openid)
             sub_users = SubAccount.objects.filter(main_user__openid=openid).values("id", "sub_user", "recharge_amount", "balance")
             SubAccountFormSet = forms.formset_factory(SubAccountForm, extra=0)

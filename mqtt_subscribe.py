@@ -282,7 +282,7 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     """
     服务器下发阶段电价信息 说明：服务器->充电桩，回复充电桩0x08命令（64字节）。
     """
-    logging.info("0x08 Enter server_reply_stage_tafiff")
+    logging.info("0x88 Enter server_reply_stage_tafiff")
     pile_sn = kwargs.get("pile_sn", None)
     if pile_sn is None:
         logging.info("No Charging Pile SN")
@@ -294,38 +294,52 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     charg_pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
 
     interval_price_list = []
+    service_price = 0       # 服务费
+    is_seat_fee = 0         # 是否收占位费
+    free_min = 0            # 免费时间
+    occupy_fee = 0          # 每十分钟占位费
     if charg_pile:
         charg_price = charg_pile.station.chargingprice_set.filter(default_flag=1).first()
         charg_price_details = charg_price.prices.all()
-        service_price = 0
+        is_seat_fee = charg_pile.station.is_seat_fee
+        free_min = charg_pile.station.free_min
+        occupy_fee = int(charg_pile.station.occupy_fee * 100)
         for detail in charg_price_details:
+
             b_begin_hour = bytes([detail.begin_time.hour])
             b_begin_min = bytes([detail.begin_time.minute])
             b_end_hour = bytes([detail.end_time.hour])
             b_end_min = bytes([detail.end_time.minute])
-            b_price = bytes([int(detail.price * 100)])
+            b_price = int(detail.price * 100).to_bytes(2, byteorder="big")
             if service_price == 0:
-                service_price = detail.service_price
+                service_price = int(detail.service_price * 100)
 
             interval_data = b''.join([b_begin_hour, b_begin_min, b_end_hour, b_end_min, b_price])
             interval_price_list.append(interval_data)
+            if len(interval_price_list) == 8:
+                break
 
         b_service_price = service_price.to_bytes(2, byteorder="big")
         logging.info("servcie price:{}".format(service_price))
     else:
         logging.info("Charging pile not exists")
-        b_service_price = bytes([0])
+        b_service_price = service_price.to_bytes(2, byteorder="big")
 
     data_counts = len(interval_price_list)
     b_data_counts = bytes([data_counts])
 
-    interval_price_data = b''.join(interval_price_list)
-    logging.info(interval_price_data)
+    b_interval_price_data = b''.join(interval_price_list)
+    logging.info(b_interval_price_data)
 
-    blank = 60 - data_counts * 5
+    interval_blank = 48 - data_counts * 6
+    b_interval_blank = bytes(interval_blank)
 
-    b_blank = bytes(blank)
-    b_data = b''.join([b_command, interval_price_data, b_blank, b_service_price, b_data_counts])
+    b_is_seat_fee = bytes([is_seat_fee])
+    b_free_min = bytes([free_min])
+    b_occupy_fee = occupy_fee.to_bytes(2, byteorder="big")
+    b_end_blank = bytes(8)
+    b_data = b''.join([b_command, b_interval_price_data, b_interval_blank, b_service_price, b_data_counts,
+                       b_is_seat_fee, b_free_min, b_occupy_fee, b_end_blank])
 
     data_len = (len(b_data)).to_bytes(2, byteorder='big')
     # rand = bytes([random.randint(0, 2)])
@@ -337,7 +351,7 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
     server_publish(pile_sn, b_reply_proto)
 
-    logging.info("0x08 Leave server_reply_stage_tafiff")
+    logging.info("0x88 Leave server_reply_stage_tafiff")
 
 
 # 83(0x83)
@@ -379,10 +393,9 @@ def pile_card_charging_request_hander(topic, byte_msg):
         return
 
     if card.pile_sn and card.gun_num:
-        if pile_gun.work_status == 1:
-            if card.pile_sn != pile_sn or card.gun_num != str(gun_num):
-                logging.info("卡正在电桩SN{}枪口{}上充电".format(card.pile_sn, card.gun_num))
-                return
+        if card.pile_sn != pile_sn or card.gun_num != str(gun_num):
+            logging.info("卡正在电桩SN{}枪口{}上充电".format(card.pile_sn, card.gun_num))
+            return
 
     # 判断是否正在充电如果正在充电判断充电时间操作3s后，进行停充
     order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=str(gun_num), openid=card_num, status__lt=2).first()
@@ -396,7 +409,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
                 "openid": order.openid,
                 "out_trade_no": order.out_trade_no,
                 "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-                "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+                "total_reading": int(order.get_total_reading() * 100),
                 "stop_code": 0,  # 0 主动停止，1被动响应
                 "fault_code": 0,
                 "start_model": order.start_model,
@@ -450,7 +463,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
         data["start_model"] = start_model
         charging_policy_value = 0
         data["charging_policy_value"] = charging_policy_value
-        data["balance"] = int(card.money / decimal.Decimal(settings.FACTOR_READINGS))
+        data["balance"] = int(card.money * 100)
         logging.info(data)
         server_send_charging_cmd(**data)
 
@@ -1135,7 +1148,7 @@ def save_pile_charg_status_to_db(**data):
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-        "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+        "total_reading": int(order.get_total_reading() * 100),
     }
     logging.info(reply_charging_data)
     server_reply_charging_info_handler(**reply_charging_data)
@@ -1164,7 +1177,7 @@ def save_pile_charg_status_to_db(**data):
         "openid": order.openid,
         "out_trade_no": out_trade_no,
         "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-        "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+        "total_reading": int(order.get_total_reading() * 100),
         "stop_code": 0,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
         "start_model": order.start_model,
     }
@@ -1174,7 +1187,7 @@ def save_pile_charg_status_to_db(**data):
 
     if order.start_model == 1:  # 储蓄卡
         card = ChargingCard.objects.filter(card_num=order.openid).first()
-        if card.money - - order.consum_money <= 0.2:
+        if card.money - order.consum_money <= 0.2:
             stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
             logging.info(stop_data)
             server_send_stop_charging_cmd(**stop_data)
@@ -1232,6 +1245,8 @@ def calculate_order(**kwargs):
     output_current = kwargs.get("output_current", 0)
     charg_status = kwargs.pop("charg_status", None)
     order_status = kwargs.pop("status", 0)
+    end_reading = kwargs.get("end_reading", 0)
+
     logging.info(kwargs)
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
@@ -1258,7 +1273,8 @@ def calculate_order(**kwargs):
     try:
         currRec = OrderRecord.objects.get(out_trade_no=out_trade_no, price_begin_time=price.begin_time, price_end_time=price.end_time)
         currRec.end_time = kwargs["end_time"]
-        currRec.end_reading = kwargs["end_reading"]
+        if end_reading > currRec.end_reading:
+            currRec.end_reading = end_reading
         currRec.current_soc = kwargs["current_soc"]
         currRec.accumulated_readings = currRec.end_reading - currRec.begin_reading
         if currRec.accumulated_readings <= 0:
@@ -1282,7 +1298,7 @@ def calculate_order(**kwargs):
             order.begin_time = kwargs["end_time"]
             order.begin_reading = kwargs["end_reading"]
             first_data["begin_time"] = kwargs["end_time"]
-            first_data["begin_reading"] = kwargs["end_reading"]
+            first_data["begin_reading"] = end_reading
         else:
             first_data["begin_time"] = order.begin_time
             if order.end_reading >= order.begin_reading:
@@ -1294,7 +1310,7 @@ def calculate_order(**kwargs):
         first_data["price_begin_time"] = price.begin_time
         first_data["price_end_time"] = price.end_time
         first_data["current_soc"] = kwargs["current_soc"]
-        first_data["end_reading"] = kwargs["end_reading"]
+        first_data["end_reading"] = end_reading
         first_data["accumulated_readings"] = first_data["end_reading"] - first_data["begin_reading"]
         if first_data["accumulated_readings"] <= 0:
             first_data["accumulated_readings"] = 0
@@ -1316,6 +1332,8 @@ def calculate_order(**kwargs):
     order.prev_reading = order.end_reading
     order.end_reading = currRec.end_reading
     order.total_readings = order.end_reading - order.begin_reading
+    if order.total_readings < 0:
+        order.total_readings = 0
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
     order.park_fee = (order.total_hours() * price.charg_price.parking_fee).quantize(decimal.Decimal("0.01"))
@@ -1481,7 +1499,7 @@ def pile_charging_stop_handler(topic, byte_msg):
             "openid": order.openid,
             "out_trade_no": out_trade_no,
             "consum_money": order.consum_money * 100,
-            "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+            "total_reading": int(order.get_total_reading() * 100),
             "stop_code": 1,         # 0 主动停止，1被动响应，2消费清单已结束或不存在
             "state_code": state_code,
             "fault_code": 0,
@@ -1591,37 +1609,6 @@ def connect_redis():
     return redis_client
 
 
-# def charg_reply_to_work_overtime():
-#     """
-#     判断充电回复到充电作业超时
-#     :param k:
-#     :param v:
-#     :return:
-#     """
-#     while loop_flag:
-#         reply_to_work_dict = r.hgetall(settings.CHARG_REPLY_TO_WORK_OVERTIME)
-#         print('charg_reply_to_work_overtime', reply_to_work_dict)
-#         for k, v in reply_to_work_dict.items():
-#             key = k.decode("utf-8")
-#             value = v.decode("utf-8")
-#             dict_val = json.loads(value)
-#             send_time = datetime.strptime(dict_val["send_time"], '%Y-%m-%d %H:%M:%S')
-#             overtime = dict_val["overtime"]
-#             delta_time = (datetime.now() - send_time).seconds
-#             if delta_time >= overtime:   # 超时
-#                 key_list = key.split('.')
-#                 pile_sn = key_list[0]
-#                 gun_num = key_list[1]
-#                 out_trade_no = key_list[2]
-#                 ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).update(work_status=4)
-#                 Order.objects.filter(out_trade_no).update(charg_status=4, status=2)  # 设置为后端停止，订单为结账标志
-#         time.sleep(1)
-
-
-# async def send_to_server(uri, **data):
-#     async with websockets.connect(uri) as websocket:
-#         await websocket.send(json.dumps(data))
-
 if __name__ == "__main__":
     port = 1883
     # 初始化客户端
@@ -1664,17 +1651,5 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, Quit)
     signal.signal(signal.SIGTERM, Quit)
-
-    # client.loop_start()
-    # # 连接redis
-    #
-    #
-    # while True:
-    #     time.sleep(10)
-    #     group_name = 'group_{}_{}'.format('AC1-P01-987654321', "0")
-    #     print(group_name)
-    #     async_to_sync(channel_layer.group_send)(group_name, {"type": "chat.message", "message": "hello888888"})
-    #     # print("----------------------------------------------", datetime.now())
-    # client.loop_stop()
 
     client.loop_forever()

@@ -134,10 +134,13 @@ class StationAdmin(object):
             ),
             Fieldset(
                 '费用收取设置',
-                'charg_policy',
                 Row(
-                    AppendedText('subscribe_fee', '元'),
+                    'is_seat_fee',
                     AppendedText('occupy_fee', '元'),
+                ),
+                Row(
+                    AppendedText('free_min', '分钟'),
+                    AppendedText('subscribe_fee', '元'),
                 ),
                 Row(
                     AppendedText('low_restrict_val', '毫安'),

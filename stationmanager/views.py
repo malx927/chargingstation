@@ -3,10 +3,13 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
+import logging
 
 from wxchat.decorators import weixin_decorator
 from wxchat.views import getJsApiSign
 from .models import ChargingPile, Station, ChargingPrice, FaultChargingGun
+
+logger = logging.getLogger("django")
 
 
 class StationListView(View):
@@ -17,7 +20,7 @@ class StationListView(View):
         context = {
             "sign": sign,
         }
-        print(request.session.get("openid"))
+        logger.info(request.session.get("openid"))
         return render(request, template_name='weixin/station_index.html', context=context)
 
 
@@ -50,7 +53,7 @@ class StationPricesDetailView(View):
                 charg_price = ChargingPrice.objects.get(station_id=station_id, default_flag=1)
                 price_details = charg_price.prices.all()
             except ChargingPrice.DoesNotExist as ex:
-                print("StationPricesDetailView:", ex)
+                logger.info(ex)
 
         context = {
             "price_details": price_details,

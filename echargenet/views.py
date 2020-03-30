@@ -466,7 +466,7 @@ class StopChargeAPIView(APIView):
                 "openid": order.openid,
                 "out_trade_no": order.out_trade_no,
                 "consum_money": int(order.consum_money.quantize(Decimal("0.01")) * 100),
-                "total_reading": int(order.get_total_reading() / Decimal(settings.FACTOR_READINGS)),
+                "total_reading": int(order.get_total_reading() * 100),
                 "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
                 "start_model": order.start_model,
             }

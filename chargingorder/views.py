@@ -22,6 +22,8 @@ from chargingorder.mqtt import server_send_charging_cmd, server_send_stop_chargi
 from wxchat.decorators import weixin_decorator
 from wxchat.models import UserInfo, SubAccount
 
+logger = logging.getLogger("django")
+
 
 @weixin_decorator
 def index(request):
@@ -59,7 +61,7 @@ def get_account_balance_amount(openid):
         else:
             return user.account_balance()
     except UserInfo.DoesNotExist as ex:
-        print(ex)
+        logger.error(ex)
         return 0
 
 
@@ -91,24 +93,24 @@ class RechargeView(View):
                 "errmsg": "请先关注亚电新能源公众号"
             }
             return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+
         if not get_account_balance(openid):
             redirect_url = "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
-            print(redirect_url)
+            logger.info(redirect_url)
             return HttpResponseRedirect(redirect_url)
 
         pile_sn = kwargs.get('pile_sn', None)
         gun_num = kwargs.get('gun_num', None)
-        logging.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
+        logger.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
         pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         if pile_gun:
             if user_info.pile_sn and user_info.gun_num:
-                if pile_gun.work_status == 1:
-                    if user_info.pile_sn != pile_sn or user_info.gun_num != gun_num:
-                        context = {
-                            "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
-                        }
-                        logging.info(context)
-                        return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+                if user_info.pile_sn != pile_sn or user_info.gun_num != gun_num:
+                    context = {
+                        "errmsg": "您目前在编号为{}电桩上充电,同一账号不能再充电".format(pile_sn)
+                    }
+                    logger.info(context)
+                    return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
             if pile_gun.work_status == 0 or pile_gun.work_status is None:       # 空闲状态
                 context = {
@@ -118,7 +120,6 @@ class RechargeView(View):
                 return render(request, template_name='chargingorder/recharge.html', context=context)  # 进入充电界面
             elif pile_gun.work_status in [1, 3]:         # 1-充电中 3-充电结束(未拔枪)
                 order = Order.objects.filter(openid=openid, out_trade_no=pile_gun.out_trade_no, status__lte=2).first()
-                print(openid, order)
                 if order:
                     return render(request, template_name='weixin/recharge_order_status.html', context={"order": order})
 
@@ -131,13 +132,6 @@ class RechargeView(View):
         openid = request.session.get("openid", None)
         total_fee = request.POST.get("total_fee", "0")
 
-        if not get_account_balance(openid, int(total_fee)):
-            data = {
-                "return_code": "success",
-                "redirect_url": "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
-            }
-            return JsonResponse(data)
-
         gun = self.get_charging_gun(request)
         if gun is None:
             data = {
@@ -145,6 +139,14 @@ class RechargeView(View):
                 "errmsg": "充电设备不存在",
             }
             return JsonResponse(data)
+
+        if not get_account_balance(openid, float(total_fee)):
+            data = {
+                "return_code": "success",
+                "redirect_url": "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())
+            }
+            return JsonResponse(data)
+
         cur_time = datetime.now()
         if gun.order_time and (cur_time - gun.order_time).seconds < 10:
             return render(request, template_name="chargingorder/charging_pile_status.html", context={"pile_gun": gun})
@@ -200,8 +202,8 @@ class RechargeView(View):
             charging_policy_value = int(request.POST.get("charg_soc_val", "0"))
 
         data["charging_policy_value"] = charging_policy_value
-        balance = int(get_account_balance_amount(openid) / decimal.Decimal(settings.FACTOR_READINGS))
-        print("余额：".format(balance))
+        balance = int(get_account_balance_amount(openid) * 100)
+        logger.info("余额：{}".format(balance))
         data["balance"] = balance
 
         server_send_charging_cmd(**data)
@@ -266,7 +268,7 @@ class RechargeView(View):
 
     def full_recharge(self, request, *args, **kwargs):
         params = self.get_request_params(request, *args, **kwargs)
-        print("full_recharge:", params)
+        logger.info("full_recharge:{}".format(params))
         order = self.create_order(**params)
         return order
 
@@ -290,6 +292,9 @@ class RechargeView(View):
         params["charg_soc_val"] = charg_soc_val
         order = self.create_order(**params)
         return order
+
+    def is_charging(self, request, *args, **kwargs):
+        pass
 
 
 class StopChargeView(View):
@@ -368,7 +373,6 @@ class OrderChargeStopView(View):
         out_trade_no = request.POST.get("out_trade_no", None)
         pile_sn = request.POST.get("pile_sn", None)
         gun_num = request.POST.get("gun_num", None)
-        print(out_trade_no)
         try:
             order = Order.objects.get(out_trade_no=out_trade_no)
             stop_data = {
@@ -377,15 +381,15 @@ class OrderChargeStopView(View):
                 "openid": order.openid,
                 "out_trade_no": out_trade_no,
                 "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-                "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+                "total_reading": int(order.get_total_reading() * 100),
                 "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
                 "fault_code": 91,    # 用户停止
                 "start_model": order.start_model,
             }
-            # print(stop_data)
+            logger.info(stop_data)
             server_send_stop_charging_cmd(**stop_data)
         except Order.DoesNotExist as ex:
-            print(ex)
+            logger.info(ex)
             return JsonResponse({"return_code": "FAIL", "errmsg": "停止操作失败!"})
 
         return JsonResponse({"return_code": "SUCCESS"})

@@ -6,6 +6,7 @@ import json
 import random
 import logging
 import datetime
+import time
 from time import sleep
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -36,6 +37,7 @@ def update_pile_status_overtime():
         update_time = gun.add_time
         current_time = datetime.datetime.now()
         if current_time < update_time:
+            time.sleep(0.1)
             continue
         delta_time = (current_time - update_time).seconds
         print("---------------:", delta_time)
@@ -53,15 +55,17 @@ def update_pile_status_overtime():
             gun.charg_status = None
             gun.add_time = datetime.datetime.now()
             gun.save(update_fields={"work_status", "charg_status", "add_time"})
+        time.sleep(0.1)
     log.info('Leave update_pile_status_overtime task')
 
 @shared_task
 def send_start_stop_cmd_overtime():
-    print('Enter send_charging_cmd_overtime')
+    print('Enter send_start_stop_cmd_overtime')
     for rec in ChargingCmdRecord.objects.all():
         over_time = rec.over_time
         current_time = datetime.datetime.now()
         if current_time < over_time:
+            time.sleep(0.1)
             continue
         print("send_charging_cmd_overtime:{}".format((current_time - rec.over_time).seconds))
         if (datetime.datetime.now() - rec.over_time).seconds > 20 or rec.send_count >= 3:
@@ -108,7 +112,8 @@ def send_start_stop_cmd_overtime():
             rec.send_time = datetime.datetime.now()
             rec.over_time = datetime.datetime.now() + datetime.timedelta(seconds=settings.CHARGING_SEND_CMD_INTERVAL)
             rec.save()
-    print('Leave send_charging_cmd_overtime')
+        time.sleep(0.1)
+    print('Leave send_start_stop_cmd_overtime')
 
 
 @shared_task
@@ -137,7 +142,7 @@ def charging_status_overtime():
                     "openid": order.openid,
                     "out_trade_no": order.out_trade_no,
                     "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
-                    "total_reading": int(order.get_total_reading() / decimal.Decimal(settings.FACTOR_READINGS)),
+                    "total_reading": int(order.get_total_reading() * 100),
                     "stop_code": 0,  # 0 为后台主动停止
                     "fault_code": 71,  # 后台主动停止－通讯超时
                     "start_model": order.start_model,
@@ -150,6 +155,7 @@ def charging_status_overtime():
                 log.warning(ex)
             # 删除状态命令
             record.delete()
+        time.sleep(0.1)
     log.info('Leave update_pile_status_overtime task')
 
 

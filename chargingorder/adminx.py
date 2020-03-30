@@ -1,6 +1,6 @@
 # coding=utf-8
 import decimal
-
+import logging
 from django.contrib import admin
 from stationmanager.models import Station, ChargingPile
 import xadmin
