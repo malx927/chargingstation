@@ -69,7 +69,19 @@ app.conf.update(
         },
         'current_month_year_accumlative_stats_task': {
             'task': 'statistic.tasks.current_month_year_accumlative_stats',
-            'schedule': crontab(minute='2', hour='0'),
+            'schedule': crontab(minute='0', hour='6'),
+        },
+        'charging_device_stats_task': {
+            'task': 'statistic.tasks.charging_device_stats',
+            'schedule': crontab(minute='0', hour='17'),
+        },
+        'real_time_power_stats_task': {
+            'task': 'statistic.tasks.real_time_power_stats',
+            'schedule': timedelta(seconds=60),
+        },
+        'charging_today_data_task': {
+            'task': 'statistic.tasks.charging_today_data',
+            'schedule': timedelta(seconds=60),
         },
     }
 )

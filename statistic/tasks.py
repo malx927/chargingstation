@@ -9,7 +9,7 @@ import datetime
 import time
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.db.models import Count, Sum, F, Case, When, IntegerField, FloatField
+from django.db.models import Count, Sum, F, Case, When, IntegerField, FloatField, Q
 
 from django_redis import get_redis_connection
 
@@ -22,7 +22,7 @@ log = get_task_logger(__name__)
 def get_hour_data(current_date, limit_hour=24):
     """分时统计数据"""
     # 充电次数,充电量,充电金额
-    charging_stats = Order.objects.filter(status=2, begin_time__date=current_date) \
+    charging_stats = Order.objects.filter(begin_time__date=current_date) \
         .extra(select={'hour': "HOUR(begin_time)"}) \
         .values("hour").annotate(count=Count("id"), readings=Sum("total_readings"), money=Sum("consum_money")).order_by("hour")
 
@@ -82,10 +82,11 @@ def charging_device_stats():
         dc_device=Sum(Case(When(pile_type__in=[1, 2], then=1), default=0, output_field=IntegerField())),
         ac_device=Sum(Case(When(pile_type__in=[5, 6], then=1), default=0, output_field=IntegerField())),
     )
-
+    device_counts = ChargingPile.objects.count()
     conn = get_redis_connection("default")
 
     conn.set("yd_device_category_stats", json.dumps(list(results)))
+    conn.set("yd_device_counts", device_counts)
     log.info('Leave charging_device_stats')
 
 
@@ -99,14 +100,12 @@ def charging_accumulative_total_stats():
     results = Order.objects.filter(status=2, consum_money__gt=0). \
         aggregate(accum_readings=Sum("total_readings"), accum_counts=Count("id"), accum_fees=Sum("consum_money"))
 
-    device_counts = ChargingPile.objects.count()
-
     conn = get_redis_connection("default")
 
     conn.set("yd_accum_readings", float(results.get("accum_readings", 0)))
     conn.set("yd_accum_counts", results.get("accum_counts", 0))
     conn.set("yd_accum_fees", float(results.get("accum_fees", 0)))
-    conn.set("yd_device_counts", device_counts)
+
     log.info('Leave charging_accumulative_total_stats task')
 
 
@@ -142,8 +141,8 @@ def current_month_year_accumlative_stats():
 @shared_task
 def real_time_power_stats():
     """实时电力统计"""
-    search_date = datetime.datetime.now() + datetime.timedelta(days=-2)
-    results = Order.objects.filter(charg_status_id=6, begin_time__date__gte=search_date). \
+    search_date = datetime.datetime.now() + datetime.timedelta(days=-1)
+    results = Order.objects.filter(charg_status_id=6, begin_time__date__gte=search_date.date()). \
         aggregate(realtime_power=Sum(F("output_voltage") * F("output_current"), output_field=FloatField()) / 1000)
 
     conn = get_redis_connection("default")
@@ -156,7 +155,8 @@ def real_time_power_stats():
 def charging_today_data():
     """当天充电次数、充电电量、充电金额、充电电力"""
     cur_date = datetime.datetime.now().date()
-    today_totals = Order.objects.filter(status=2, begin_time__date=cur_date)\
+    yester_date = (datetime.datetime.now() + datetime.timedelta(days=-1)).date()
+    today_totals = Order.objects.filter(begin_time__date=cur_date)\
         .aggregate(today_total_counts=Count("id"), today_total_readings=Sum("total_readings"), today_total_money=Sum("consum_money"))
     log.info(today_totals)
 
