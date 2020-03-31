@@ -224,8 +224,8 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                console.log(JSON.stringify(data));
-                {#$("#id_total_counts").text(data.total_count);#}
+                {#console.log(JSON.stringify(data));#}
+                $("#id_total_counts").text(data.total_count);
                 var option = {
                         title: {
                             text: '今日充电次数曲线(次)',

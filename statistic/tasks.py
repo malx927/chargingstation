@@ -122,7 +122,7 @@ def current_month_year_accumlative_stats():
         .values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
         .annotate(month_money=Sum("consum_money", output_field=FloatField())).order_by("station_id")
     print(month_results)
-
+    # print(connection.queries)
     # 年累计
     year_results = Order.objects.select_related("charg_pile").filter(status=2, begin_time__year=current_year) \
         .values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
