@@ -9,6 +9,7 @@ import datetime
 import time
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from django.db import connection
 from django.db.models import Count, Sum, F, Case, When, IntegerField, FloatField, Q
 
 from django_redis import get_redis_connection
@@ -27,7 +28,7 @@ def get_hour_data(current_date, limit_hour=24):
         .values("hour").annotate(count=Count("id"), readings=Sum("total_readings"), money=Sum("consum_money")).order_by("hour")
 
     power_stats = OrderChargDetail.objects.filter(current_time__date=current_date) \
-        .extra(select={'hour': "HOUR(current_time)"}) \
+        .extra(select={'hour': "HOUR(`current_time`)"}) \
         .values("hour").annotate(power=Sum(F("output_voltage") * F("output_current")) / 1000).order_by("hour")
 
     count_results = {k: 0 for k in range(limit_hour)}
@@ -166,7 +167,6 @@ def charging_today_data():
 
     today_total_power = OrderChargDetail.objects.filter(current_time__date=cur_date) \
         .aggregate(today_total_power=Sum(F("output_voltage") * F("output_current")) / 1000)
-
     log.info(today_total_power)
 
     cur_date = datetime.datetime.now().date()
