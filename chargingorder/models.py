@@ -192,6 +192,7 @@ class OrderChargDetail(models.Model):
     class Meta:
         verbose_name = '充电监控'
         verbose_name_plural = verbose_name
+        ordering = ["-current_time"]
 
 
 class GroupName(models.Model):
