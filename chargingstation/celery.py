@@ -62,10 +62,11 @@ app.conf.update(
         'charging_yesterday_data_task': {
             'task': 'statistic.tasks.charging_yesterday_data',
             'schedule': crontab(minute='0', hour='0'),
+
         },
         'charging_accumulative_total_stats_task': {
             'task': 'statistic.tasks.charging_accumulative_total_stats',
-            'schedule': crontab(minute='1', hour='0'),
+            'schedule': crontab(minute='0', hour='0'),
         },
         'current_month_year_accumlative_stats_task': {
             'task': 'statistic.tasks.current_month_year_accumlative_stats',

@@ -120,10 +120,14 @@ def current_month_year_accumlative_stats():
                                                                       begin_time__month=current_month) \
         .values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
         .annotate(month_money=Sum("consum_money", output_field=FloatField())).order_by("station_id")
+    print(month_results)
+
     # 年累计
     year_results = Order.objects.select_related("charg_pile").filter(status=2, begin_time__year=current_year) \
         .values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
         .annotate(year_money=Sum("consum_money", output_field=FloatField())).order_by("station_id")
+    print(year_results)
+
     result_dict = {}
     for result in month_results:
         result_dict[result["station_id"]] = result
@@ -155,9 +159,9 @@ def real_time_power_stats():
 def charging_today_data():
     """当天充电次数、充电电量、充电金额、充电电力"""
     cur_date = datetime.datetime.now().date()
-    yester_date = (datetime.datetime.now() + datetime.timedelta(days=-1)).date()
+    # yester_date = (datetime.datetime.now() + datetime.timedelta(days=-1)).date()
     today_totals = Order.objects.filter(begin_time__date=cur_date)\
-        .aggregate(today_total_counts=Count("id"), today_total_readings=Sum("total_readings"), today_total_money=Sum("consum_money"))
+        .aggregate(today_total_counts=Count("id"), today_total_readings=Sum("total_readings", output_field=FloatField()), today_total_money=Sum("consum_money", output_field=FloatField()))
     log.info(today_totals)
 
     today_total_power = OrderChargDetail.objects.filter(current_time__date=cur_date) \

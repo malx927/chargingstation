@@ -23,6 +23,7 @@ logger = logging.getLogger("django")
 class BigScreenChargStatsAPIView(APIView):
     """累计充电次数、累计充电电量、充电桩总数"""
     def get(self, request, *args, **kwargs):
+        logger.info("Enter BigScreenChargStatsAPIView")
         conn = get_redis_connection("default")
         accum_readings = conn.get("yd_accum_readings")
         if accum_readings is None:
@@ -30,15 +31,19 @@ class BigScreenChargStatsAPIView(APIView):
             time.sleep(0.5)
             accum_readings = conn.get("yd_accum_readings")
 
+        today_total_readings = conn.get("yd_today_total_readings")
+
         accum_counts = conn.get("yd_accum_counts")
+        today_total_counts = conn.get("yd_today_total_counts")
         # accum_fees = conn.get("yd_accum_fees")
         device_counts = conn.get("yd_device_counts")
-
+        # print(today_total_readings, accum_readings, accum_counts, today_total_counts)
         results = dict()
-        results["accum_readings"] = accum_readings
-        results["accum_counts"] = accum_counts
+        results["accum_readings"] = float(accum_readings) + float(today_total_readings)
+        results["accum_counts"] = int(accum_counts) + int(today_total_counts)
         results["device_counts"] = device_counts
         logger.info(results)
+        logger.info("Leave BigScreenChargStatsAPIView")
         return Response(results)
 
 
@@ -74,7 +79,7 @@ class BigScreenDeviceStatsAPIView(APIView):
 
         results = json.loads(results_stats.decode("utf-8"))
         logger.info(results)
-
+        logger.info("Leave BigScreenDeviceStatsAPIView")
         return Response(results)
 
 
@@ -172,6 +177,7 @@ class TodayChargingPowerAPIView(APIView):
 class CurrentMonthYearAccumAPIView(APIView):
     """当前月、年金额统计"""
     def get(self, request, *args, **kwargs):
+        logger.info("Enter CurrentMonthYearAccumAPIView")
         conn = get_redis_connection("default")
         results = conn.get("yd_current_mon_year_accum_stats")
         if results is None:
@@ -181,5 +187,6 @@ class CurrentMonthYearAccumAPIView(APIView):
 
         result_dict = json.loads(results.decode("utf-8"))
         logger.info(result_dict)
+        logger.info("Leave CurrentMonthYearAccumAPIView")
         return Response(result_dict)
 

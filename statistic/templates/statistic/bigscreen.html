@@ -193,7 +193,7 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                console.log(JSON.stringify(data));
+                {#console.log(JSON.stringify(data));#}
                 $("#id_realtime_power").text(data.realtime_power);
 
                 $('.counter').countUp();
@@ -213,7 +213,7 @@
             today_power_stats();
             station_device_stats();
             station_money_stats()
-        }, 10000);
+        }, 20000);
 
         var today_counts = echarts.init(document.getElementById('id_today_counts'));
 
@@ -225,7 +225,7 @@
               timeout: 5000,
               success: function(data){
                 console.log(JSON.stringify(data));
-                $("#id_total_counts").text(data.total_count);
+                {#$("#id_total_counts").text(data.total_count);#}
                 var option = {
                         title: {
                             text: '今日充电次数曲线(次)',
@@ -314,7 +314,7 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                console.log(JSON.stringify(data));
+                {#console.log(JSON.stringify(data));#}
                 $("#id_total_readings").text(data.total_readings);
                 var option = {
                         title: {
@@ -410,7 +410,7 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                console.log(JSON.stringify(data));
+                {#console.log(JSON.stringify(data));#}
                 $("#id_total_money").text(data.total_money);
                 var option = {
                         title: {
@@ -500,7 +500,7 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                console.log(JSON.stringify(data));
+                {#console.log(JSON.stringify(data));#}
                 $("#id_total_power").text(data.total_power);
                 var option = {
                         title: {

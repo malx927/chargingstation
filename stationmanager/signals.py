@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from chargingstation import settings
 from .models import Seller, Station, ChargingPile, ChargingGun, FaultChargingGun
 from echargenet.models import OperatorInfo, StationInfo, EquipmentInfo, ConnectorInfo
+from statistic import tasks
 
 
 # 运营商
@@ -104,11 +105,16 @@ def update_equipment_info(sender, instance, created, **kwargs):
             EquipmentInfo.objects.update_or_create(EquipmentID=str(EquipmentID), defaults=defaults)
         except StationInfo.DoesNotExist as ex:
             pass
+        print("mmmmmmmmmmmmmmmmmmmmmm:", created)
+        if created:
+            tasks.charging_device_stats.delay()
 
 
 @receiver(post_delete, sender=ChargingPile)
 def equipment_info_delete(sender, instance, **kwargs):
     EquipmentInfo.objects.filter(EquipmentID=str(instance.id)).delete()
+    print("delete000000000000000000000000::")
+    tasks.charging_device_stats.delay()
 
 
 @receiver(post_init, sender=ChargingGun)
