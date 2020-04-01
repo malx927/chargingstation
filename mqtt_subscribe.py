@@ -1043,8 +1043,10 @@ def pile_charging_status_handler(topic, byte_msg):
 
     charg_time = datetime.datetime.strptime(charg_time, '%Y-%m-%d %H:%M:%S')
 
+    prev_reading = 0
     try:
         order = Order.objects.get(out_trade_no=out_trade_no)
+        prev_reading = order.prev_reading
         stop_charging(order)
     except Order.DoesNotExist as ex:
         logging.warning("{}订单不存在".format(out_trade_no))
@@ -1081,6 +1083,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "cab_temp": int(cab_temp * settings.FACTOR_TEMPERATURE),
         "cab_temp1": int(cab_temp1 * settings.FACTOR_TEMPERATURE),
         "current_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01")),
+        "prev_reading": prev_reading,
     }
     logging.info(org_data)
     OrderChargDetail.objects.create(**org_data)

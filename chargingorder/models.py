@@ -183,6 +183,7 @@ class OrderChargDetail(models.Model):
     cab_temp = models.DecimalField(verbose_name='柜内温度1', blank=True, null=True, max_digits=6, decimal_places=2)
     cab_temp1 = models.DecimalField(verbose_name='柜内温度2', blank=True, null=True, max_digits=6, decimal_places=2)
     current_reading = models.DecimalField(verbose_name='当前电表数', blank=True, default=0, max_digits=9, decimal_places=2)
+    prev_reading = models.DecimalField(verbose_name='上次电表数', blank=True, default=0, max_digits=9, decimal_places=2)
     update_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
 
     def __str__(self):

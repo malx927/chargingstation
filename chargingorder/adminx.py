@@ -216,7 +216,7 @@ xadmin.site.register(OrderRecord, OrderRecordAdmin)
 
 
 class OrderChargDetailAdmin(object):
-    list_display = ['pile_sn', 'gun_num', 'out_trade_no', 'current_time', 'current_soc', 'current_reading',
+    list_display = ['pile_sn', 'gun_num', 'out_trade_no', 'current_time', 'current_soc', 'current_reading', 'prev_reading',
                     'voltage', 'current', 'output_voltage', 'output_current']
     search_fields = ['out_trade_no', 'pile_sn']
     list_per_page = 50
