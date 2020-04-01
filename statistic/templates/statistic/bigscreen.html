@@ -174,7 +174,7 @@
               timeout: 5000,
               success: function(data){
                 $("#id_accum_counts").text(data.accum_counts);
-                $("#id_accum_readings").text(data.accum_readings);
+                $("#id_accum_readings").text(data.accum_readings.toFixed(2));
                 $("#id_device_counts").text(data.device_counts);
                 $('.counter').countUp();
                 $("#id_accum_counts").removeClass("counter");
