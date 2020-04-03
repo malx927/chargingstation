@@ -1048,7 +1048,7 @@ def pile_charging_status_handler(topic, byte_msg):
     try:
         order = Order.objects.get(out_trade_no=out_trade_no)
         stop_charging(order)
-        prev_reading = order.prev_reading
+        prev_reading = order.prev_reading if order.prev_reading >= order.begin_reading else order.begin_reading
         order.prev_reading = curr_readings
         order.save(update_fields=['prev_reading'])
     except Order.DoesNotExist as ex:
