@@ -52,7 +52,7 @@
         <table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+              <th>序号</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(分钟)</th><th>充电收入(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -62,8 +62,8 @@
               <td>{{ result.station_name}}</td>
               <td>{{ result.total_readings}}</td>
               <td>{{ result.counts }}</td>
-              <td>{{ result.total_fees}}</td>
-              <td>{{ result.times }}</td>
+              <td>{{ result.times|floatformat:2 }}</td>
+              <td>{{ result.total_fees }}</td>
           </tr>
           {% endfor %}
           </tbody>
