@@ -52,10 +52,10 @@ class DashBoardPlugin(BaseAdminPlugin):
             station["times"] = 0
             for result in today_results:
                 if result["station_id"] == station["id"]:
-                    station["total_readings"] = result.ge("total_readings", 0)
-                    station["counts"] = result.ge("counts", 0)
-                    station["total_fees"] = result.ge("total_fees", 0)
-                    station["times"] = result.ge("times", 0)
+                    station["total_readings"] = result.get("total_readings", 0)
+                    station["counts"] = result.get("counts", 0)
+                    station["total_fees"] = result.get("total_fees", 0)
+                    station["times"] = result.get("times", 0)
 
         print(stations_list)
         context.update({'stations_list': stations_list})
