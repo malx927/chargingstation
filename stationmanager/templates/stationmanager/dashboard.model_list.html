@@ -56,14 +56,14 @@
             </tr>
           </thead>
           <tbody>
-          {% for result in today_results %}
+          {% for result in stations_list %}
           <tr>
               <td>{{ forloop.counter }}</td>
-              <td>{{ result.station_name}}</td>
-              <td>{{ result.total_readings}}</td>
+              <td>{{ result.name}}</td>
+              <td>{{ result.total_readings|floatformat:2}}</td>
               <td>{{ result.counts }}</td>
               <td>{{ result.times|floatformat:2 }}</td>
-              <td>{{ result.total_fees }}</td>
+              <td>{{ result.total_fees|floatformat:2 }}</td>
           </tr>
           {% endfor %}
           </tbody>

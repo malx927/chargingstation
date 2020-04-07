@@ -2,6 +2,7 @@
 from django.db.models import Q, Sum, Count, FloatField, F
 from django.template import loader
 from chargingorder.models import Order
+from stationmanager.models import Station
 from xadmin.plugins.utils import get_context_dict
 import datetime
 __author__ = 'Administrator'
@@ -36,13 +37,28 @@ class DashBoardPlugin(BaseAdminPlugin):
         # context.update({'fault_guns': fault_guns})
         curr_date = datetime.datetime.now().date()
 
-        today_results = Order.objects.select_related("charg_pile").filter(status=2, begin_time__date=curr_date).values(
+        today_results = Order.objects.select_related("charg_pile").filter(begin_time__date=curr_date).values(
             station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
             .annotate(total_readings=Sum("total_readings", output_field=FloatField()), counts=Count("id"),
                       total_fees=Sum("consum_money", output_field=FloatField()),
                       times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60))).order_by("station_id")
+        stations = Station.objects.values("id", "name")
 
-        context.update({'today_results': today_results})
+        stations_list = list(stations)
+        for station in stations_list:
+            station["total_readings"] = 0
+            station["counts"] = 0
+            station["total_fees"] = 0
+            station["times"] = 0
+            for result in today_results:
+                if result["station_id"] == station["id"]:
+                    station["total_readings"] = result.ge("total_readings", 0)
+                    station["counts"] = result.ge("counts", 0)
+                    station["total_fees"] = result.ge("total_fees", 0)
+                    station["times"] = result.ge("times", 0)
+
+        print(stations_list)
+        context.update({'stations_list': stations_list})
         return context
 
     def block_results_top(self, context, nodes):
