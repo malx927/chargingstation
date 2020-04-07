@@ -47,14 +47,14 @@ def update_pile_status_overtime():
             gun.work_status = 9
             gun.charg_status = None
             gun.add_time = datetime.datetime.now()
-            gun.save(update_fields={"work_status", "charg_status", "add_time"})
+            gun.save(update_fields=["work_status", "charg_status", "add_time"])
         elif gun.charg_pile.pile_type in [5, 6] and delta_time > settings.PILE_AC_STATUS_OVER_TIME:     # 60 * 30
             # 更新pile状态 为离线状态
             log.info('update_pile_status_overtime:交流电桩SN{}枪口{}{}'.format(gun.charg_pile.pile_sn, gun.gun_num, '离线'))
             gun.work_status = 9
             gun.charg_status = None
             gun.add_time = datetime.datetime.now()
-            gun.save(update_fields={"work_status", "charg_status", "add_time"})
+            gun.save(update_fields=["work_status", "charg_status", "add_time"])
         time.sleep(0.1)
     log.info('Leave update_pile_status_overtime task')
 
@@ -81,7 +81,7 @@ def send_start_stop_cmd_overtime():
                 fault_code = FaultCode.objects.get(id=92)  # 后台主动停止－通讯超时
                 order.charg_status = fault_code
                 order.status = 2
-                order.save(update_fields={"status", "charg_status"})
+                order.save(update_fields=["status", "charg_status"])
                 send_data = {
                     "return_code": "success",
                     "cmd": "07",  # 充电状态上报

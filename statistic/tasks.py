@@ -184,6 +184,10 @@ def charging_today_data():
     conn.set("yd_today_total_money", today_total_money)
     conn.set("yd_today_total_power", today_total_power)
 
+    conn.delete("yd_today_hour_count")
+    conn.delete("yd_today_hour_readings")
+    conn.delete("yd_today_hour_money")
+    conn.delete("yd_today_hour_power")
     conn.hmset("yd_today_hour_count", today_results.get("count"))
     conn.hmset("yd_today_hour_readings", today_results.get("readings"))
     conn.hmset("yd_today_hour_money", today_results.get("money"))

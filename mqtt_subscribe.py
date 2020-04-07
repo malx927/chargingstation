@@ -1043,9 +1043,14 @@ def pile_charging_status_handler(topic, byte_msg):
 
     charg_time = datetime.datetime.strptime(charg_time, '%Y-%m-%d %H:%M:%S')
 
+    prev_reading = 0
+    curr_readings = decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01"))
     try:
         order = Order.objects.get(out_trade_no=out_trade_no)
         stop_charging(order)
+        prev_reading = order.prev_reading if order.prev_reading >= order.begin_reading else order.begin_reading
+        order.prev_reading = curr_readings
+        order.save(update_fields=['prev_reading'])
     except Order.DoesNotExist as ex:
         logging.warning("{}订单不存在".format(out_trade_no))
 
@@ -1057,7 +1062,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "end_time": charg_time,
-        "end_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01")),
+        "end_reading": curr_readings,
         "current_soc": current_soc,
         "voltage": int(voltage * settings.FACTOR_VOLTAGE),
         "current": int(current * settings.FACTOR_CURRENT),
@@ -1080,7 +1085,8 @@ def pile_charging_status_handler(topic, byte_msg):
         "gun_temp1": int(gun_temp1 * settings.FACTOR_TEMPERATURE),
         "cab_temp": int(cab_temp * settings.FACTOR_TEMPERATURE),
         "cab_temp1": int(cab_temp1 * settings.FACTOR_TEMPERATURE),
-        "current_reading": decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01")),
+        "current_reading": curr_readings,
+        "prev_reading": prev_reading,
     }
     logging.info(org_data)
     OrderChargDetail.objects.create(**org_data)
@@ -1329,7 +1335,6 @@ def calculate_order(**kwargs):
     accumulated_service_amount = totals.get('accumulated_service_amount') if totals.get('accumulated_service_amount') is not None else decimal.Decimal(0)
 
     order.end_time = currRec.end_time
-    order.prev_reading = order.end_reading
     order.end_reading = currRec.end_reading
     order.total_readings = order.end_reading - order.begin_reading
     if order.total_readings < 0:
