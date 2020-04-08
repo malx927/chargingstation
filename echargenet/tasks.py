@@ -46,13 +46,13 @@ def notification_start_charge_result(**data):
     #     Data["StartChargeSeqStat"] = 5
     #     Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
 
-    log.info(data)
+    print(data)
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     status = echarge.notification_start_charge_result(**data)
     if status > 0:
-        log.info("notification_start_charge_result failure:", status)
+        print("notification_start_charge_result failure:", status)
     else:
-        log.info("notification_start_charge_result succcess:", status)
+        print("notification_start_charge_result succcess:", status)
 
 
 # 定时任务
@@ -95,12 +95,12 @@ def notification_equip_charge_status():
         result["TotalMoney"] = float(order.consum_money.quantize(decimal.Decimal("0.01")))
 
         echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
-        log.info(result)
+        print("98:", result)
         status = echarge.notification_equip_charge_status(**result)
         if status > 0:
-            log.info("推送充电状态失败!", status)
+            print("push charging status fail!", status)
         else:
-            log.info("推送充电状态成功!", status)
+            print("push charging status success!", status)
 
 
 @shared_task
@@ -114,16 +114,16 @@ def notification_stop_charge_result(**data):
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     status = echarge.notification_stop_charge_result(**data)
     if status > 0:
-        log.info("notification_stop_charge_result failure", status)
+        print("notification_stop_charge_result failure", status)
     else:
-        log.info("notification_stop_charge_result success", status)
+        print("notification_stop_charge_result success", status)
 
     connector_id = data.get("ConnectorID")
     connector_status = echarge.notification_station_status(connector_id, 0)  # 设置为空闲状态
     if status > 0:
-        log("118:notification_station_status failure", connector_status)
+        print("notification_station_status failure", connector_status)
     else:
-        log("120:notification_station_status success", connector_status)
+        print("120:notification_station_status success", connector_status)
 
 
 @shared_task
@@ -187,7 +187,7 @@ def notification_charge_order_info_for_bonus():
             ret_crypt_data = ret_data["Data"]
             ret_decrypt_data = data_decode(ret_crypt_data)
             # 获取到code值
-            log.info(ret_decrypt_data["StartChargeSeq"])
+            print(ret_decrypt_data["StartChargeSeq"])
             ConfirmResult = ret_decrypt_data["ConfirmResult"]
         else:
             ConfirmResult = 99
@@ -196,9 +196,9 @@ def notification_charge_order_info_for_bonus():
         order.report_time = datetime.now()
         order.save()
         if ConfirmResult > 0:
-            log.info("notification_charge_order_info_for_bonus failure:", ConfirmResult)
+            print("notification_charge_order_info_for_bonus failure:", ConfirmResult)
         else:
-            log.info("notification_charge_order_info_for_bonus success:", ConfirmResult)
+            print("notification_charge_order_info_for_bonus success:", ConfirmResult)
 
 
 # 定时任务
@@ -210,9 +210,9 @@ def notification_connector_status():
     for connector in connectors:
         status = echarge.notification_station_status(connector.ConnectorID, connector.Status)
         if status > 0:
-            print("设备状态变化推送失败:{},{}".format(connector.ConnectorID, status))
+            print("device status push fail:{},{}".format(connector.ConnectorID, status))
         else:
-            print("设备状态变化推送成功:{},{}".format(connector.ConnectorID, status))
+            print("device status push success:{},{}".format(connector.ConnectorID, status))
 
         time.sleep(0.5)
 

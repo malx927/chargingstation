@@ -30,10 +30,10 @@ app.conf.update(
             'task': 'echargenet.tasks.notification_equip_charge_status',
             'schedule':  timedelta(seconds=50),
         },
-        # 'notification_charge_order_info_for_bonus_task': {
-        #     'task': 'echargenet.tasks.notification_charge_order_info_for_bonus',
-        #     'schedule': timedelta(seconds=50),
-        # },
+        'notification_charge_order_info_for_bonus_task': {
+            'task': 'echargenet.tasks.notification_charge_order_info_for_bonus',
+            'schedule': timedelta(seconds=50),
+        },
         'notification_connector_status_task': {
             'task': 'echargenet.tasks.notification_connector_status',
             'schedule': crontab(minute=30, hour='1,4,7,10,11,13,16,19,22'),
