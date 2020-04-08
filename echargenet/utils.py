@@ -153,9 +153,17 @@ class EchargeNet(object):
             if "Authorization" in self.HEADERS:
                 del self.HEADERS["Authorization"]
         logger.info(send_data)
-        r = requests.post(url, data=json.dumps(send_data), headers=self.HEADERS)
-        result = r.json()
-        return result
+        try:
+            r = requests.post(url, data=json.dumps(send_data), headers=self.HEADERS)
+            r.raise_for_status()
+        except requests.RequestException as e:
+            res = dict()
+            res["Ret"] = 500
+            res["Msg"] = str(e)
+            return res
+        else:
+            result = r.json()
+            return result
 
     def get_query_token(self):
         """获取token"""
@@ -218,7 +226,7 @@ class EchargeNet(object):
             当设备状态发生变化，立即推送最新状态到市级平台 e 充网。
         """
         url = '{0}{1}'.format(self.E_CHARGE_URL, 'notification_stationStatus')
-        # 获得token
+        # 获得tokennotification_station_status
         dict_token = self.get_query_token()
         if dict_token["success"]:
             token = dict_token["access_token"]
