@@ -5,7 +5,7 @@ import decimal
 import json
 import logging
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import time
 from time import sleep
 from celery import shared_task
@@ -133,8 +133,8 @@ def notification_charge_order_info_for_bonus():
     使用要求：自充电桩停止充电并生成订单后，订单须在150秒内上报到市级平台e充网，如上报失败
     须按照以下频率推送订单信息(150/300/…./1800/3600/….，单位秒)
     """
-    start_date = datetime.date(2020, 4, 1)
-    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), status=2, begin_time__date__gte=start_date)
+    start_date = date(2020, 4, 7)
+    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), status=2, begin_time__date__gte=start_date, consum_money__gt=0)
     result ={}
     for order in orders:
         if order.begin_time is None or order.end_time is None:
