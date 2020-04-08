@@ -6,8 +6,10 @@ import json
 import logging
 import random
 from datetime import datetime, timedelta
+import time
 from time import sleep
 from celery import shared_task
+from celery.utils.log import get_task_logger
 from chargingorder.models import Order
 from chargingstation import settings
 from django.db.models import Q, Max, Count, Sum, F, Min
@@ -16,6 +18,8 @@ from echargenet.models import ConnectorInfo, CheckChargeOrder, DisputeOrder
 from echargenet.utils import data_encode, get_hmac_md5, EchargeNet, data_decode, get_order_status, \
     get_equipment_connector_status
 from stationmanager.models import ChargingGun
+
+log = get_task_logger(__name__)
 
 
 @shared_task
@@ -42,13 +46,13 @@ def notification_start_charge_result(**data):
     #     Data["StartChargeSeqStat"] = 5
     #     Data["StartTime"] = datetime.now().strptime("%Y-%m-%d %H:%M:%S")
 
-    logging.info(data)
+    log.info(data)
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     status = echarge.notification_start_charge_result(**data)
     if status > 0:
-        logging.info("notification_start_charge_result failure:", status)
+        log.info("notification_start_charge_result failure:", status)
     else:
-        print("notification_start_charge_result succcess:", status)
+        log.info("notification_start_charge_result succcess:", status)
 
 
 # 定时任务
@@ -91,12 +95,12 @@ def notification_equip_charge_status():
         result["TotalMoney"] = float(order.consum_money.quantize(decimal.Decimal("0.01")))
 
         echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
-        print("tasks.py:90:", result)
+        log.info(result)
         status = echarge.notification_equip_charge_status(**result)
         if status > 0:
-            print("推送充电状态失败!", status)
+            log.info("推送充电状态失败!", status)
         else:
-            print("推送充电状态成功!", status)
+            log.info("推送充电状态成功!", status)
 
 
 @shared_task
@@ -110,16 +114,16 @@ def notification_stop_charge_result(**data):
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
     status = echarge.notification_stop_charge_result(**data)
     if status > 0:
-        logging.info("notification_stop_charge_result failure", status)
+        log.info("notification_stop_charge_result failure", status)
     else:
-        logging.info("notification_stop_charge_result success", status)
+        log.info("notification_stop_charge_result success", status)
 
     connector_id = data.get("ConnectorID")
     connector_status = echarge.notification_station_status(connector_id, 0)  # 设置为空闲状态
     if status > 0:
-        print("118:notification_station_status failure", connector_status)
+        log("118:notification_station_status failure", connector_status)
     else:
-        print("120:notification_station_status success", connector_status)
+        log("120:notification_station_status success", connector_status)
 
 
 @shared_task
@@ -129,7 +133,8 @@ def notification_charge_order_info_for_bonus():
     使用要求：自充电桩停止充电并生成订单后，订单须在150秒内上报到市级平台e充网，如上报失败
     须按照以下频率推送订单信息(150/300/…./1800/3600/….，单位秒)
     """
-    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), status=2)
+    start_date = datetime.date(2020, 4, 1)
+    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), status=2, begin_time__date__gte=start_date)
     result ={}
     for order in orders:
         if order.begin_time is None or order.end_time is None:
@@ -182,7 +187,7 @@ def notification_charge_order_info_for_bonus():
             ret_crypt_data = ret_data["Data"]
             ret_decrypt_data = data_decode(ret_crypt_data)
             # 获取到code值
-            print(ret_decrypt_data["StartChargeSeq"])
+            log.info(ret_decrypt_data["StartChargeSeq"])
             ConfirmResult = ret_decrypt_data["ConfirmResult"]
         else:
             ConfirmResult = 99
@@ -191,9 +196,9 @@ def notification_charge_order_info_for_bonus():
         order.report_time = datetime.now()
         order.save()
         if ConfirmResult > 0:
-            print("notification_charge_order_info_for_bonus failure:", ConfirmResult)
+            log.info("notification_charge_order_info_for_bonus failure:", ConfirmResult)
         else:
-            print("notification_charge_order_info_for_bonus success:", ConfirmResult)
+            log.info("notification_charge_order_info_for_bonus success:", ConfirmResult)
 
 
 # 定时任务
@@ -208,6 +213,8 @@ def notification_connector_status():
             print("设备状态变化推送失败:{},{}".format(connector.ConnectorID, status))
         else:
             print("设备状态变化推送成功:{},{}".format(connector.ConnectorID, status))
+
+        time.sleep(0.5)
 
 
 # 定时任务
