@@ -134,7 +134,7 @@ def notification_charge_order_info_for_bonus():
     须按照以下频率推送订单信息(150/300/…./1800/3600/….，单位秒)
     """
     start_date = date(2020, 4, 7)
-    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0), status=2, begin_time__date__gte=start_date, consum_money__gt=0)
+    orders = Order.objects.filter(Q(report_result__isnull=True) | Q(report_result__gt=0),  charg_pile__is_subsidy=1, status=2, begin_time__date__gte=start_date, consum_money__gt=0)
     result ={}
     for order in orders:
         if order.begin_time is None or order.end_time is None:
