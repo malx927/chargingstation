@@ -36,7 +36,7 @@ app.conf.update(
         },
         'notification_connector_status_task': {
             'task': 'echargenet.tasks.notification_connector_status',
-            'schedule': crontab(minute=30, hour='1,4,7,10,11,13,16,19,22'),
+            'schedule': crontab(minute=30, hour='1,4,7,10,13,16,19,22'),
         },
         # 'check_charge_orders_task': {
         #     'task': 'echargenet.tasks.check_charge_orders',
