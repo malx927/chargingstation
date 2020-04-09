@@ -706,7 +706,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
         "pile_sn": pile_sn,
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
-        "charg_status": charg_status,
+        "charg_status": charg_status if charg_status == 1 else 2,
         "begin_reading": decimal.Decimal(begin_reading * settings.FACTOR_READINGS),
         "begin_time": datetime.datetime.now(),
         "status": 1,  # 未结帐
