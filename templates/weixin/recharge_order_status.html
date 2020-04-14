@@ -116,12 +116,11 @@
                 </div>
             </div>
             {% if not is_ac %}
-                {% with order.get_record as record %}
                  <div class="base-info-cell">
                     <div class="van-cell">
                         <div class="van-cell__title"><span>充电所需电压</span></div>
                         <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_voltage">{{ record.voltage|default:0 }}</span> V</div>
+                            <div class="coupon-item__action  item-action"><span id="id_voltage">0</span> V</div>
                         </div>
                     </div>
                 </div>
@@ -129,7 +128,7 @@
                     <div class="van-cell">
                         <div class="van-cell__title"><span>充电所需电流</span></div>
                         <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_current">{{ record.current|default:0 }}</span> A</div>
+                            <div class="coupon-item__action  item-action"><span id="id_current">0</span> A</div>
                         </div>
                     </div>
                 </div>
@@ -137,7 +136,7 @@
                     <div class="van-cell">
                         <div class="van-cell__title"><span>实际输出电压</span></div>
                         <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ record.output_voltage|default:0 }}</span> V</div>
+                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ order.output_voltage|default:0 }}</span> V</div>
                         </div>
                     </div>
                 </div>
@@ -145,18 +144,16 @@
                     <div class="van-cell">
                         <div class="van-cell__title"><span>实际输出电流</span></div>
                         <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</div>
+                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ order.output_current|default:0 }}</span> A</div>
                         </div>
                     </div>
                 </div>
-                {% endwith %}
             {% else %}
-                {% with order.get_record as record %}
                 <div class="base-info-cell">
                     <div class="van-cell">
                         <div class="van-cell__title"><span>实际输出电压</span></div>
                         <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ record.output_voltage|default:0 }}</span> V</div>
+                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ order.output_voltage|default:0 }}</span> V</div>
                         </div>
                     </div>
                 </div>
@@ -164,11 +161,10 @@
                     <div class="van-cell">
                         <div class="van-cell__title"><span>实际输出电流</span></div>
                         <div class="van-cell__value van-ellipsis">
-                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ record.output_current|default:0 }}</span> A</div>
+                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ order.output_current|default:0 }}</span> A</div>
                         </div>
                     </div>
                 </div>
-                {% endwith %}
             {% endif %}
 
             <div class="base-info-cell">
