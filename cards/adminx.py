@@ -1,7 +1,7 @@
 # coding=utf-8
 import xadmin
 from cards.models import CardUser, ChargingCard, CardRecharge, CardOrder
-from stationmanager.models import ChargingPile
+from stationmanager.models import ChargingPile, Station
 from xadmin.layout import Fieldset, Row, AppendedText, Main, Side
 
 
@@ -23,18 +23,19 @@ class ChargingCardAdmin(object):
     search_fields = ['card_num']
     list_filter = ['status', 'user', 'start_date']
     list_per_page = 50
+    exclude = ['sec_num']
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
-    readonly_fields = ["money"]
+    readonly_fields = ["money", 'cipher']
     object_list_template = "cards/cards_model_list.html"
     # list_display_links_details = True
 
     form_layout = (
         Fieldset(
             '储值卡信息',
-            Row('card_num', 'money'),
+            Row('card_num', 'station'),
             Row('status', 'user'),
-            Row('sec_num', "cipher"),
+            Row("cipher", "money"),
         ),
         Fieldset(
             '有效期限',
@@ -49,6 +50,32 @@ class ChargingCardAdmin(object):
             media += self.vendor('xadmin.plugin.details.js', 'xadmin.form.css')
             # media.add_js([self.static('stationmanager/js/xadmin.areacode.js')])
         return media
+
+    def formfield_for_dbfield(self, db_field,  **kwargs):
+        if db_field.name == 'station':
+            if self.request.user.is_superuser:
+                pass
+            elif self.request.user.station:
+                kwargs['queryset'] = Station.objects.filter(id=self.request.user.station_id)
+            elif self.request.user.seller:
+                kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)
+        return super().formfield_for_dbfield(db_field,  **kwargs)
+
+    def save_models(self):
+        obj = self.new_obj
+        request = self.request
+        if obj.station is None:
+            obj.station = request.user.station
+        super().save_models()
+
+    def queryset(self):
+        queryset = super().queryset()
+        if self.request.user.is_superuser:
+            return queryset
+        elif self.request.user.station:
+            return queryset.filter(station=self.request.user.station)
+        elif self.request.user.seller:
+            return queryset.filter(station__seller=self.request.user.seller)
 
 
 xadmin.site.register(ChargingCard, ChargingCardAdmin)

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from chargingstation import settings
+from stationmanager.models import Station
 
 
 class CardUser(models.Model):
@@ -35,6 +36,7 @@ class ChargingCard(models.Model):
     )
     card_num = models.CharField(verbose_name="卡号", max_length=128, unique=True)
     cipher = models.CharField(verbose_name="卡密钥", max_length=128)
+    station = models.ForeignKey(Station, verbose_name="充电站", blank=True, null=True, on_delete=models.SET_NULL)
     sec_num = models.CharField(verbose_name="备用卡号", max_length=128, blank=True, null=True)
     user = models.ForeignKey(CardUser, verbose_name="用户", blank=True, null=True, on_delete=models.SET_NULL)
     money = models.DecimalField(verbose_name="余额", default=0, max_digits=10, decimal_places=2)

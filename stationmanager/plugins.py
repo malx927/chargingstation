@@ -57,7 +57,7 @@ class DashBoardPlugin(BaseAdminPlugin):
                     station["total_fees"] = result.get("total_fees", 0)
                     station["times"] = result.get("times", 0)
 
-        print(stations_list)
+        # print(stations_list)
         context.update({'stations_list': stations_list})
         return context
 

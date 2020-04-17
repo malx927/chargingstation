@@ -263,9 +263,9 @@ class ChargingPileAdmin(object):
     list_display = ['name', 'pile_sn', 'pile_type', 'station', 'pile_mode', 'business_mode',
                     'get_work_status']
     search_fields = ['pile_sn', 'name', 'pile_type', 'station']
-    exclude = ["qrcode"]
+    exclude = ["qrcode", 'group']
     list_filter = ['pile_type', 'station', 'pile_mode', 'business_mode']
-    readonly_fields = ['group', 'user']
+    readonly_fields = ['user']
 
     model_icon = 'fa fa-sitemap'
     show_all_rel_details = False
@@ -320,7 +320,7 @@ class ChargingPileAdmin(object):
             ),
         ),
         Side(
-            Fieldset("其他信息", 'sub_status',  'sub_time', 'group', 'user', 'restart_nums'),
+            Fieldset("其他信息", 'sub_status',  'sub_time', 'user', 'restart_nums'),
         )
     )
 
