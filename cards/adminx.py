@@ -26,7 +26,7 @@ class ChargingCardAdmin(object):
     exclude = ['sec_num']
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
-    readonly_fields = ["money", 'cipher']
+    readonly_fields = ["money"]
     object_list_template = "cards/cards_model_list.html"
     # list_display_links_details = True
 
