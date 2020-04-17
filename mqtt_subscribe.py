@@ -697,7 +697,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
     # 订单
     out_trade_no = byte_msg[39:71].decode('utf-8').strip('\000')
     logging.info("订单号:{}".format(out_trade_no))
-    # 命令执行结果: 1准备充电作业，0充电枪未连接等符充电作业
+    # 充电状态
     charg_status = byte_msg[71]
     begin_reading = byte2integer(byte_msg, 72, 76)
     # 保留（25字节）
