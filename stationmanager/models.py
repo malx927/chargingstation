@@ -192,7 +192,7 @@ class ChargingPile(models.Model):
     qrcode = models.ImageField(verbose_name='二维码', upload_to='qrcode/', blank=True, null=True)
     is_subsidy = models.IntegerField(verbose_name='运营补贴', default=0, choices=((0, '否'), (1, '运营补贴')))
     sub_status = models.IntegerField(verbose_name='订阅状态', default=0, choices=((0, '离线'), (1, '订阅')))
-    sub_time = models.DateTimeField(verbose_name='订阅时间', blank=True, null=True)
+    sub_time = models.DateTimeField(verbose_name='出厂时间', blank=True, null=True)
     group = models.ForeignKey(Group, verbose_name='单位', blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='添加用户', blank=True, null=True)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)

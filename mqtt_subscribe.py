@@ -34,7 +34,7 @@ from stationmanager.models import ChargingPile, MqttSubData, ChargingGun,  Charg
 from codingmanager.constants import *
 from chargingorder.utils import uchar_checksum, byte2integer, get_pile_sn, get_32_byte, get_byte_daytime, \
     get_data_nums, get_byte_version, get_datetime_from_byte, message_escape, save_charging_cmd_to_db, \
-    send_data_to_client, user_account_deduct_money, user_update_pile_gun
+    send_data_to_client, user_account_deduct_money, user_update_pile_gun, get_byte_date
 from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
@@ -185,10 +185,86 @@ def message_dispatch(topic, byte_msg):
 
 # 0x0b
 def pile_request_device_info(topic, byte_msg):
-    pass
+    """
+    充电桩查询设备信息 说明：充电桩->服务器，48字节
+    """
+    logging.info("0x0a Enter pile_request_device_info function")
+
+    data_nums = get_data_nums(byte_msg)
+    # 读取电桩编码(sn)
+    pile_sn = get_pile_sn(byte_msg)
+    # sn号
+    device_sn = byte_msg[38:70].decode('utf-8').strip('\000')
+
+    logging.info("充电桩Sn编码:{}, sn：{}".format(pile_sn, device_sn))
+
+    # 回复电桩
+    data = {
+        "pile_sn": pile_sn,
+        "device_sn": device_sn,
+    }
+    server_response_device_info(**data)
+    logging.info("0x0a Leave pile_request_device_info function")
 
 
- # 0x0a
+def server_response_device_info(*args, **kwargs):
+    """0x8b
+    服务器下发设备信 说明：服务器->充电桩，回复0b命令 （56字节）
+    """
+    logging.info("0x8a Enter server_response_device_info")
+    pile_sn = kwargs.get("pile_sn", None)
+    if pile_sn is None:
+        logging.info("No Charging Pile SN")
+        return
+
+    b_pile_sn = get_32_byte(pile_sn)
+    b_command = CMD_RESPONSE_DEVICE_INFO
+
+    device_sn = kwargs.get("device_sn", "")
+    b_device_sn = get_32_byte(device_sn)
+
+    pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
+    sub_time = pile.sub_time
+    if sub_time:
+        sub_date = sub_time.date()
+        b_sub_date = get_byte_date(sub_date)
+        logging.info("datetme:{}".format(sub_date))
+    else:
+        b_sub_date = bytes(4)
+
+    pile_type = pile.pile_type_id
+    b_pile_type = bytes([pile_type])
+
+    gun_nums = pile.get_guns().count()
+    b_gun_nums = bytes([gun_nums])
+
+    station_id = pile.station_id
+    b_station_id = station_id.to_bytes(4, byteorder="big")
+
+    longitude = pile.station.longitude
+    latitude = pile.station.latitude
+    b_longitude = int(longitude * 1000000).to_bytes(4, byteorder="big")
+    b_latitude = int(latitude * 1000000).to_bytes(4, byteorder="big")
+
+    logging.info("{},{},{},{},{}".format(pile_type, gun_nums, station_id, longitude, latitude))
+
+    b_blank = bytes(5)
+
+    b_data = b''.join([b_command, b_device_sn, b_sub_date, b_pile_type, b_gun_nums, b_station_id, b_longitude, b_latitude, b_blank])
+
+    data_len = (len(b_data)).to_bytes(2, byteorder='big')
+    rand = bytes([0])
+    byte_proto_data = b"".join([PROTOCAL_HEAD, b_pile_sn, rand, data_len, b_data])
+    checksum = bytes([uchar_checksum(byte_proto_data)])
+    byte_data = b"".join([b_pile_sn, rand, data_len, b_data, checksum])
+    byte_data = message_escape(byte_data)
+    b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
+    server_publish(pile_sn, b_reply_proto)
+
+    logging.info("0x8a Leave server_response_device_info")
+
+
+# 0x0a
 def pile_request_user_balance(topic, byte_msg):
     """
     充电桩查询余额

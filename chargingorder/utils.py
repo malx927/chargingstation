@@ -107,6 +107,21 @@ def get_datetime_from_byte(byte_msg):
     return date_time
 
 
+def get_byte_date(dt):
+    """
+    返回四字节的时间
+    :param dt:
+    :return:
+    """
+    high_year, low_year = divmod(dt.year, 100)
+    b_high_year = bytes([high_year])
+    b_low_year = bytes([low_year])
+    b_month = bytes([dt.month])
+    b_day = bytes([dt.day])
+    ret_value = b''.join([b_high_year, b_low_year, b_month, b_day])
+    return ret_value
+
+
 def char_checksum(data, byteorder='big'):
     """
     char_checksum 按字节计算校验和。每个字节被翻译为带符号整数
