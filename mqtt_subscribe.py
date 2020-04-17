@@ -176,10 +176,19 @@ def message_dispatch(topic, byte_msg):
 
     elif byte_msg == CMD_PILE_REQUEST_BALANCE:
         pile_request_user_balance(topic, byte_msg)
+
+    elif byte_msg == CMD_PILE_REQUEST_DEVICE_INFO:
+        pile_request_device_info(topic, byte_msg)
+
     logging.info("*****************leave message_dispach****************")
 
 
-# 0x0a
+# 0x0b
+def pile_request_device_info(topic, byte_msg):
+    pass
+
+
+ # 0x0a
 def pile_request_user_balance(topic, byte_msg):
     """
     充电桩查询余额
@@ -209,6 +218,7 @@ def pile_request_user_balance(topic, byte_msg):
     logging.info("0x0a Leave pile_request_user_balance function")
 
 
+# 0x8a
 def server_response_user_balance(*args, **kwargs):
     """
     服务器回复查询余额
@@ -241,6 +251,7 @@ def server_response_user_balance(*args, **kwargs):
         logging.info(card)
         balance = int(card.money * 100)
 
+    logging.info("balance:{}".format(balance))
     b_pile_sn = get_32_byte(pile_sn)
     b_command = CMD_RESPONSE_BALANCE
     b_user_flag = bytes([user_flag])
