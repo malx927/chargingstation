@@ -174,7 +174,92 @@ def message_dispatch(topic, byte_msg):
     elif byte_command == CMD_PILE_UPLOAD_BILL:   # 上报离线充电帐单
         pile_upload_offline_bill(topic, byte_msg)
 
+    elif byte_msg == CMD_PILE_REQUEST_BALANCE:
+        pile_request_user_balance(topic, byte_msg)
     logging.info("*****************leave message_dispach****************")
+
+
+# 0x0a
+def pile_request_user_balance(topic, byte_msg):
+    """
+    充电桩查询余额
+    说明：充电桩->服务器，请求充电 （56字节）
+    """
+    logging.info("0x0a Enter pile_request_user_balance function")
+
+    data_nums = get_data_nums(byte_msg)
+    # 读取电桩编码(sn)
+    pile_sn = get_pile_sn(byte_msg)
+
+    # 用户标识
+    user_flag = byte_msg[38]
+    cardnum_ordernum = byte_msg[39:73].decode('utf-8').strip('\000')
+    password = byte_msg[73:91].decode('utf-8').strip('\000')
+
+    logging.info("充电桩Sn编码:{}, 用户标识：{}， 用户名：{}， password:{}".format(pile_sn, user_flag, cardnum_ordernum, password))
+
+    # 回复电桩
+    data = {
+        "pile_sn": pile_sn,
+        "user_flag": user_flag,
+        "cardnum_ordernum": cardnum_ordernum,
+        "password": password,
+    }
+    server_response_user_balance(**data)
+    logging.info("0x0a Leave pile_request_user_balance function")
+
+
+def server_response_user_balance(*args, **kwargs):
+    """
+    服务器回复查询余额
+    说明：服务器->充电桩，回复0a命令 （56字节）
+    """
+    logging.info("0x8a Enter server_response_user_balance")
+    pile_sn = kwargs.get("pile_sn", None)
+    if pile_sn is None:
+        logging.info("No Charging Pile SN")
+        return
+
+    user_flag = kwargs.get("user_flag", None)
+    if user_flag is None:
+        logging.info("user_flag does not exist")
+        return
+
+    cardnum_ordernum = kwargs.get("cardnum_ordernum", None)
+    password = kwargs.get("password", None)
+
+    balance = 0
+    if user_flag == 1:      # 订单用户
+        order = Order.objects.filter(out_trade_no=cardnum_ordernum).first()
+        logging.info(order)
+        if order:
+            user = UserInfo.objects.filter(openid=order.openid).first()
+            if user:
+                balance = int((user.account_balance() - order.consum_money) * 100)
+    elif user_flag == 2:       # 2RFID卡用户
+        card = ChargingCard.objects.filter(card_num=cardnum_ordernum, cipher=password).first()
+        logging.info(card)
+        balance = int(card.money * 100)
+
+    b_pile_sn = get_32_byte(pile_sn)
+    b_command = CMD_RESPONSE_BALANCE
+    b_user_flag = bytes([user_flag])
+    b_cardnum_ordernum = get_32_byte(cardnum_ordernum, 34)
+    b_balance = balance.to_bytes(4, byteorder='big')
+    b_blank = bytes(8)
+
+    b_data = b''.join([b_command, b_user_flag, b_cardnum_ordernum, b_balance, b_blank])
+
+    data_len = (len(b_data)).to_bytes(2, byteorder='big')
+    rand = bytes([0])
+    byte_proto_data = b"".join([PROTOCAL_HEAD, b_pile_sn, rand, data_len, b_data])
+    checksum = bytes([uchar_checksum(byte_proto_data)])
+    byte_data = b"".join([b_pile_sn, rand, data_len, b_data, checksum])
+    byte_data = message_escape(byte_data)
+    b_reply_proto = b"".join([PROTOCAL_HEAD, byte_data, PROTOCAL_TAIL])
+    server_publish(pile_sn, b_reply_proto)
+
+    logging.info("0x8a Leave server_response_user_balance")
 
 
 # 0x09
@@ -209,7 +294,7 @@ def pile_upload_offline_bill(topic, byte_msg):
     # 各个时间段电量
     b_interval_readings = byte_msg[97, 121]
 
-    _readings = [b_interval_readings[i:i+2] for i in range(0, len(b_interval_readings), 2)]
+    _readings = [b_interval_readings[i:i + 2] for i in range(0, len(b_interval_readings), 2)]
 
     # 回复电桩
     data = {
@@ -218,6 +303,7 @@ def pile_upload_offline_bill(topic, byte_msg):
         "out_trade_no": out_trade_no,
     }
     server_reply_offline_bill(**data)
+
     logging.info("0x09 Leave pile_upload_offline_bill function")
 
 
@@ -432,6 +518,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
             "out_trade_no": out_trade_no,
             "charg_pile": charg_pile,
             "start_model": start_model,   # 储值卡启动
+            "balance": card.money,
         }
         order = Order.objects.create(**params)
         logging.info(order)
@@ -958,6 +1045,7 @@ def server_reply_charging_info_handler(*args, **kwargs):
     """
     pile_charging_status_handler
     服务器->充电桩，服务器主动向充电桩发送帐单信息，收到06命令的回复（48字节）。
+    2020-04- 17 增加余额数据
     """
     logging.info(kwargs)
     pile_sn = kwargs.get("pile_sn")
@@ -983,11 +1071,14 @@ def server_reply_charging_info_handler(*args, **kwargs):
     # 总的电表数
     total_reading = kwargs.get("total_reading", 0)
     b_total_reading = total_reading.to_bytes(4, byteorder="big")
+    # 余额
+    balance = kwargs.get("balance", 0)
+    b_balance = balance.to_bytes(4, byteorder="big")
     # 保留
-    b_blank = bytes(6)
+    b_blank = bytes(2)
 
     b_data = b''.join(
-        [b_command, b_gun_num, b_out_trade_no, b_consum_money, b_total_reading, b_blank])
+        [b_command, b_gun_num, b_out_trade_no, b_consum_money, b_total_reading, b_balance, b_blank])
     data_len = (len(b_data)).to_bytes(2, byteorder='big')
     # rand = bytes([random.randint(0, 2)])
     b_rand = bytes([0])
@@ -1149,12 +1240,14 @@ def save_pile_charg_status_to_db(**data):
         return
 
     # 回复充电状态数据
+    balance = order.get_balance()
     reply_charging_data = {
         "pile_sn": pile_sn,
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
         "total_reading": int(order.get_total_reading() * 100),
+        "balance": int(balance.quantize(decimal.Decimal("0.01")) * 100)
     }
     logging.info(reply_charging_data)
     server_reply_charging_info_handler(**reply_charging_data)

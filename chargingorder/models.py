@@ -102,6 +102,9 @@ class Order(models.Model):
     def get_record(self):
         return self.records.all().first()
 
+    def get_balance(self):
+        return self.balance - self.consum_money
+
     def get_work_status(self):
         gun = self.charg_pile.charginggun_set.filter(gun_num=self.gun_num).first()
         if gun:

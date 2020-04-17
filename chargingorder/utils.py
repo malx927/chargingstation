@@ -244,7 +244,7 @@ def user_account_deduct_money(order):
 
                 order.pay_time = datetime.datetime.now()
                 order.cash_fee = consum_money
-                order.balance = user.account_balance()
+                order.balance = user.account_balance() - consum_money
                 order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
                 if order.start_model == 0 and subscribe == 1:
                     send_charging_end_message_to_user(order)

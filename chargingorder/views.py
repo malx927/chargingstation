@@ -202,7 +202,7 @@ class RechargeView(View):
             charging_policy_value = int(request.POST.get("charg_soc_val", "0"))
 
         data["charging_policy_value"] = charging_policy_value
-        balance = int(get_account_balance_amount(openid) * 100)
+        balance = int(order.balance * 100)
         logger.info("余额：{}".format(balance))
         data["balance"] = balance
 
@@ -225,6 +225,7 @@ class RechargeView(View):
         out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.now().strftime('%Y%m%d%H%M%S'),
                                              random.randint(10000, 100000))
 
+        balance = get_account_balance_amount(openid)
         gun = self.get_charging_gun(request)
         params = {
             "gun_num": int(gun_num),
@@ -235,6 +236,7 @@ class RechargeView(View):
             "out_trade_no": out_trade_no,
             "charg_pile": gun.charg_pile,
             "gun": gun,
+            "balance": balance,
         }
         sub_account = SubAccount.objects.filter(sub_user__openid=openid).first()
         if sub_account:
