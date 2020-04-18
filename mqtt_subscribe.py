@@ -252,7 +252,7 @@ def server_response_device_info(*args, **kwargs):
     b_longitude = int(longitude * 1000000).to_bytes(4, byteorder="big")
     b_latitude = int(latitude * 1000000).to_bytes(4, byteorder="big")
 
-    logging.info("{},{},{},{},{}, {}".format(pile_type, gun_nums, station_id, longitude, latitude, b_sub_date))
+    logging.info("{},{},{},{},{}, {}".format(b_pile_type, b_gun_nums, b_station_id, b_longitude, b_longitude, b_sub_date))
 
     b_blank = bytes(5)
 
