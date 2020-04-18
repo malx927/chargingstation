@@ -243,19 +243,19 @@ def server_response_device_info(*args, **kwargs):
     gun_nums = pile.get_guns().count()
     b_gun_nums = bytes([gun_nums])
 
-    station_id = pile.station_id
-    b_station_id = station_id.to_bytes(4, byteorder="big")
+    seller_id = pile.station.seller_id
+    b_seller_id = seller_id.to_bytes(4, byteorder="big")
 
     longitude = pile.station.longitude
     latitude = pile.station.latitude
     b_longitude = int(longitude * 1000000).to_bytes(4, byteorder="big")
     b_latitude = int(latitude * 1000000).to_bytes(4, byteorder="big")
 
-    logging.info("{},{},{},{},{}, {}".format(b_pile_type, b_gun_nums, b_station_id, b_longitude, b_latitude, b_sub_date))
+    logging.info("{},{},{},{},{}, {}".format(b_pile_type, b_gun_nums, b_seller_id, b_longitude, b_latitude, b_sub_date))
 
     b_blank = bytes(5)
 
-    b_data = b''.join([b_command, b_device_sn, b_sub_date, b_pile_type, b_gun_nums, b_station_id, b_longitude, b_latitude, b_blank])
+    b_data = b''.join([b_command, b_device_sn, b_sub_date, b_pile_type, b_gun_nums, b_seller_id, b_longitude, b_latitude, b_blank])
 
     data_len = (len(b_data)).to_bytes(2, byteorder='big')
     rand = bytes([0])
@@ -560,12 +560,16 @@ def pile_card_charging_request_hander(topic, byte_msg):
         return
 
     card = ChargingCard.objects.filter(start_date__lte=cur_time, end_date__gte=cur_time, status=1, card_num=card_num, cipher=password).first()
-
     if not card:
         logging.info("card number or user does not exits")
         return
 
-    pile_gun = ChargingGun.objects.select_related("charg_pile").filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
+    pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
+    if card.seller and card.seller_id != pile.station.seller_id:
+        logging.info("此卡不属于此运营商,无法充电")
+        return
+
+    pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
     if not pile_gun:
         logging.info("{}-{} 不存在".format(pile_sn, gun_num))
         return
@@ -600,7 +604,6 @@ def pile_card_charging_request_hander(topic, byte_msg):
         name = card.user.name if card.user else openid
         out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
 
-        charg_pile = pile_gun.charg_pile
         start_model = 1
         params = {
             "gun_num": gun_num,
@@ -608,7 +611,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
             "name": name,
             "charg_mode": 0,    # 充满为止
             "out_trade_no": out_trade_no,
-            "charg_pile": charg_pile,
+            "charg_pile": pile,
             "start_model": start_model,   # 储值卡启动
             "balance": card.money,
         }
@@ -629,15 +632,15 @@ def pile_card_charging_request_hander(topic, byte_msg):
             'subscribe_min': 0,
         }
 
-        charg_policy = charg_pile.charg_policy  # 充电策略是否使用(D0：1使用充电策略，0系统默认策略)(电站还是电桩为准)
+        charg_policy = pile.charg_policy  # 充电策略是否使用(D0：1使用充电策略，0系统默认策略)(电站还是电桩为准)
         data["use_policy_flag"] = charg_policy
         # 1使用充电策略
         if charg_policy == 1:
             data["continue_charg_status"] = 0  # 断网可继续充电  1断网可继续充电，0不可以(那些用户？)
-            data["occupy_status"] = charg_pile.occupy_status  # 收取占位费 1收取占位费，0不收取
-            data["subscribe_status"] = charg_pile.subscribe_status  # 收取预约费
-            data["low_fee_status"] = charg_pile.low_offset  # 收取小电流补偿费
-            data["low_restrict_status"] = charg_pile.low_restrict  # 限制小电流输出
+            data["occupy_status"] = pile.occupy_status  # 收取占位费 1收取占位费，0不收取
+            data["subscribe_status"] = pile.subscribe_status  # 收取预约费
+            data["low_fee_status"] = pile.low_offset  # 收取小电流补偿费
+            data["low_restrict_status"] = pile.low_restrict  # 限制小电流输出
 
         data["start_model"] = start_model
         charging_policy_value = 0

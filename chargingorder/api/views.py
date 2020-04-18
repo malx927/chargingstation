@@ -38,7 +38,7 @@ class OrderDayStats(APIView):
 
         if flag is None:    # 当天
             cur_time = datetime.datetime.now().date()
-            results = queryset.filter(status=2, begin_time__date=cur_time)\
+            results = queryset.filter(begin_time__date=cur_time)\
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("consum_money"),
                            times=Sum((F("end_time") - F("begin_time"))/(1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
         elif flag == "1":   # 昨天
@@ -76,12 +76,12 @@ class OrderMonthStats(APIView):
 
         if month is None:  # 当月
             cur_time = datetime.datetime.now()
-            results = queryset.filter(status=2, begin_time__year=cur_time.year, begin_time__month=cur_time.month) \
+            results = queryset.filter(begin_time__year=cur_time.year, begin_time__month=cur_time.month) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("consum_money"),
                            times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
         else:  # 任意月
             s_date = datetime.datetime.strptime(month, "%Y-%m")
-            results = queryset.filter(status=2, begin_time__year=s_date.year, begin_time__month=s_date.month) \
+            results = queryset.filter(begin_time__year=s_date.year, begin_time__month=s_date.month) \
                 .aggregate(readings=Sum("total_readings"), counts=Count("id"), total_fees=Sum("consum_money"),
                            times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60), output_field=DecimalField(decimal_places=2)))
 

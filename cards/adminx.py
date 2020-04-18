@@ -1,7 +1,7 @@
 # coding=utf-8
 import xadmin
 from cards.models import CardUser, ChargingCard, CardRecharge, CardOrder
-from stationmanager.models import ChargingPile, Station
+from stationmanager.models import ChargingPile, Station, Seller
 from xadmin.layout import Fieldset, Row, AppendedText, Main, Side
 
 
@@ -19,9 +19,9 @@ xadmin.site.register(CardUser, CardUserAdmin)
 
 class ChargingCardAdmin(object):
     """储值卡"""
-    list_display = ['card_num', 'money', 'status', 'user', 'start_date', 'end_date', 'add_time', 'startup']
+    list_display = ['card_num', 'seller', 'money', 'status', 'user', 'start_date', 'end_date', 'add_time', 'startup']
     search_fields = ['card_num']
-    list_filter = ['status', 'user', 'start_date']
+    list_filter = ['status', 'seller', 'user', 'start_date']
     list_per_page = 50
     exclude = ['sec_num']
     model_icon = 'fa fa-file-text'
@@ -33,7 +33,7 @@ class ChargingCardAdmin(object):
     form_layout = (
         Fieldset(
             '储值卡信息',
-            Row('card_num', 'station'),
+            Row('card_num', 'seller'),
             Row('status', 'user'),
             Row("cipher", "money"),
         ),
@@ -52,20 +52,20 @@ class ChargingCardAdmin(object):
         return media
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
-        if db_field.name == 'station':
+        if db_field.name == 'seller':
             if self.request.user.is_superuser:
                 pass
             elif self.request.user.station:
-                kwargs['queryset'] = Station.objects.filter(id=self.request.user.station_id)
+                kwargs['queryset'] = Seller.objects.filter(id=self.request.user.station.seller_id)
             elif self.request.user.seller:
-                kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)
+                kwargs['queryset'] = Seller.objects.filter(id=self.request.user.seller_id)
         return super().formfield_for_dbfield(db_field,  **kwargs)
 
     def save_models(self):
         obj = self.new_obj
         request = self.request
         if obj.station is None:
-            obj.station = request.user.station
+            obj.seller = request.user.seller
         super().save_models()
 
     def queryset(self):
@@ -73,9 +73,9 @@ class ChargingCardAdmin(object):
         if self.request.user.is_superuser:
             return queryset
         elif self.request.user.station:
-            return queryset.filter(station=self.request.user.station)
+            return queryset.filter(seller=self.request.user.station.seller)
         elif self.request.user.seller:
-            return queryset.filter(station__seller=self.request.user.seller)
+            return queryset.filter(seller=self.request.user.seller)
 
 
 xadmin.site.register(ChargingCard, ChargingCardAdmin)
