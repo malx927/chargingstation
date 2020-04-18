@@ -225,6 +225,10 @@ def server_response_device_info(*args, **kwargs):
     b_device_sn = get_32_byte(device_sn)
 
     pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
+    if pile is None:
+        logging.info("No ChargingPile******************")
+        return
+
     sub_time = pile.sub_time
     if sub_time:
         sub_date = sub_time.date()
@@ -247,7 +251,7 @@ def server_response_device_info(*args, **kwargs):
     b_longitude = int(longitude * 1000000).to_bytes(4, byteorder="big")
     b_latitude = int(latitude * 1000000).to_bytes(4, byteorder="big")
 
-    logging.info("{},{},{},{},{}".format(pile_type, gun_nums, station_id, longitude, latitude))
+    logging.info("{},{},{},{},{}, {}".format(pile_type, gun_nums, station_id, longitude, latitude, sub_date))
 
     b_blank = bytes(5)
 
