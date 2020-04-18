@@ -230,6 +230,7 @@ def server_response_device_info(*args, **kwargs):
         return
 
     sub_time = pile.sub_time
+    logging.info(sub_time)
     if sub_time:
         sub_date = sub_time.date()
         b_sub_date = get_byte_date(sub_date)
@@ -251,7 +252,7 @@ def server_response_device_info(*args, **kwargs):
     b_longitude = int(longitude * 1000000).to_bytes(4, byteorder="big")
     b_latitude = int(latitude * 1000000).to_bytes(4, byteorder="big")
 
-    logging.info("{},{},{},{},{}, {}".format(pile_type, gun_nums, station_id, longitude, latitude, sub_date))
+    logging.info("{},{},{},{},{}, {}".format(pile_type, gun_nums, station_id, longitude, latitude, b_sub_date))
 
     b_blank = bytes(5)
 
