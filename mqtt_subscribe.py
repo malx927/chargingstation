@@ -150,6 +150,7 @@ def message_dispatch(topic, byte_msg):
     logging.info('************************enter message_dispach*******************************')
 
     byte_command = byte_msg[37:38]
+    logging.info(byte_command)
     if byte_command == CMD_PILE_STATUS:     # 充电桩状态上报
         pile_status_handler_v12(topic, byte_msg)
 
