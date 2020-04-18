@@ -175,10 +175,10 @@ def message_dispatch(topic, byte_msg):
     elif byte_command == CMD_PILE_UPLOAD_BILL:   # 上报离线充电帐单
         pile_upload_offline_bill(topic, byte_msg)
 
-    elif byte_msg == CMD_PILE_REQUEST_BALANCE:
+    elif byte_command == CMD_PILE_REQUEST_BALANCE:
         pile_request_user_balance(topic, byte_msg)
 
-    elif byte_msg == CMD_PILE_REQUEST_DEVICE_INFO:
+    elif byte_command == CMD_PILE_REQUEST_DEVICE_INFO:
         pile_request_device_info(topic, byte_msg)
 
     logging.info("*****************leave message_dispach****************")
