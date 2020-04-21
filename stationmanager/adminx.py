@@ -291,7 +291,7 @@ class ChargingPileAdmin(object):
                         Row('station', 'pile_mode'),
                         Row('business_mode', 'fireware'),
                         Row('symbol_4g', 'symbol_eth'),
-                        Row('max_gun', 'offline_price'),
+                        Row('sub_time'),
                         Row('is_subsidy', 'faults'),
                     ),
                     Inline(ChargingGun),
@@ -320,7 +320,7 @@ class ChargingPileAdmin(object):
             ),
         ),
         Side(
-            Fieldset("其他信息", 'sub_status',  'sub_time', 'user', 'restart_nums'),
+            Fieldset("其他信息", 'sub_status',  'user', 'max_gun', 'restart_nums'),
         )
     )
 

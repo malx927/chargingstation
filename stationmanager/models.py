@@ -187,7 +187,6 @@ class ChargingPile(models.Model):
     low_offset_value = models.IntegerField(verbose_name='小电流补偿(每分钟)', blank=True, default=0)
     subscribe_fee = models.IntegerField(verbose_name='预约费(每5分钟)', blank=True, default=0)
     occupy_fee = models.IntegerField(verbose_name='占位费', blank=True, default=0)
-    offline_price = models.ForeignKey('ChargingPrice', verbose_name='离线充电策略', blank=True, null=True)
     faults = models.ForeignKey(FaultCode, verbose_name='故障原因', on_delete=models.SET_NULL, blank=True, null=True)
     qrcode = models.ImageField(verbose_name='二维码', upload_to='qrcode/', blank=True, null=True)
     is_subsidy = models.IntegerField(verbose_name='运营补贴', default=0, choices=((0, '否'), (1, '运营补贴')))
