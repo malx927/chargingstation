@@ -1335,7 +1335,7 @@ def save_pile_charg_status_to_db(**data):
         return
 
     # 回复充电状态数据
-    balance = order.get_balance()
+    balance = order.get_balance() if order.start_model != 2 else 0
     reply_charging_data = {
         "pile_sn": pile_sn,
         "gun_num": gun_num,
