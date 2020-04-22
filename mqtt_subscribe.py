@@ -1335,14 +1335,19 @@ def save_pile_charg_status_to_db(**data):
         return
 
     # 回复充电状态数据
-    balance = order.get_balance() if order.start_model != 2 else 0
+    if order.start_model == 2:
+        balance = 0
+    else:
+        balanc = order.get_balance()
+        balance = int(balanc.quantize(decimal.Decimal("0.01")) * 100)
+
     reply_charging_data = {
         "pile_sn": pile_sn,
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
         "total_reading": int(order.get_total_reading() * 100),
-        "balance": int(balance.quantize(decimal.Decimal("0.01")) * 100)
+        "balance": balance
     }
     logging.info(reply_charging_data)
     server_reply_charging_info_handler(**reply_charging_data)
