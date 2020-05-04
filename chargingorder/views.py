@@ -112,6 +112,10 @@ class RechargeView(View):
                     logger.info(context)
                     return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
+            user = UserInfo.objects.filter(pile_sn=pile_sn, gun_num=gun_num).first()
+            if user and user.openid != openid:
+                return render(request, template_name="chargingorder/charging_pile_status.html", context={"pile_gun": pile_gun})
+
             if pile_gun.work_status == 0 or pile_gun.work_status is None:       # 空闲状态
                 context = {
                     "pile_sn": pile_gun.charg_pile.pile_sn,
