@@ -118,20 +118,13 @@ class RechargeRecord(models.Model):
     """
     out_trade_no = models.CharField(verbose_name='订单编号', max_length=32)
     name = models.CharField(verbose_name='用户名', max_length=24, blank=True, default='')
-    account_number = models.CharField(verbose_name='充值帐号', max_length=24, blank=True, default='')
-    recharge_type = models.IntegerField(verbose_name='充值方式', choices=((1, 'IC卡'), (2, '微信'), (3, '现金')))
+    recharge_type = models.IntegerField(verbose_name='充值方式', choices=((1, '现金'), (2, '微信')))
     telephone = models.CharField(verbose_name='电话号码', max_length=16, blank=True, default='')
-    ic_card = models.CharField(verbose_name='IC卡号', max_length=16, blank=True, default='')
-    ic_pwd1 = models.CharField(verbose_name='IC卡密钥1', max_length=12, blank=True, default='')
-    ic_pwd2 = models.CharField(verbose_name='IC卡密钥2', max_length=12, blank=True, default='')
     openid = models.CharField(verbose_name='微信号(openid)', max_length=32)
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32, null=True, blank=True)
-    pay_bank = models.CharField(verbose_name='付款银行', max_length=32, null=True, blank=True)
     total_fee = models.DecimalField(verbose_name='应收款', max_digits=7, decimal_places=2, blank=True, null=True)
     cash_fee = models.DecimalField(verbose_name='实收款', max_digits=7, decimal_places=2, blank=True, null=True)
     pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作人', blank=True, null=True,
-                             on_delete=models.SET_NULL)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True, auto_now=False)
     status = models.IntegerField(verbose_name='支付状态', default=0, choices=PAY_ORDER_STATUS)
 
