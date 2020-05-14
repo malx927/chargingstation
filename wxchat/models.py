@@ -4,6 +4,8 @@ import datetime
 from django.contrib.auth.models import Group
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
+
 from codingmanager.constants import *
 from codingmanager.models import PriceType
 # Create your models here.
@@ -113,8 +115,9 @@ class UserInfo(models.Model):
             return 1
 
     def balance_reset(self):
-        reset_url = "/wxchat/balance_reset/?user_id={}".format(self.id)
-        charging = " <button class='btn btn-xs btn-success' data-toggle='modal' data-target='#myModal' data-uri='{}'>账户清零</a>".format(reset_url)
+        url = reverse("wxchat-balance-reset")
+        reset_url = url + "?user_id={}".format(self.id)
+        charging = "<button class='btn btn-xs btn-success' data-toggle='modal' data-target='#myModal' data-uri='{}'>账户清零</a>".format(reset_url)
         return mark_safe(charging)
 
     balance_reset.short_description = "选项"
@@ -314,3 +317,16 @@ class SubAccountConsume(models.Model):
     class Meta:
         verbose_name = '附属账户消费记录'
         verbose_name_plural = verbose_name
+
+
+class UserBalanceResetRecord(models.Model):
+    """用户账号清零记录"""
+    name = models.CharField(verbose_name='姓名', max_length=24, blank=True, null=True)
+    nickname = models.CharField(verbose_name='昵称', max_length=64, help_text="微信昵称")
+    openid = models.CharField(verbose_name='微信ID', max_length=120, blank=True, null=True)
+    telephone = models.CharField(verbose_name='手机号码', max_length=18, blank=True, default='')
+    total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2)
+    consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
+    binding_amount = models.DecimalField(verbose_name='绑定金额', default=0, blank=True, max_digits=6, decimal_places=2)
+    op_name = models.CharField(verbose_name='操作人', max_length=24, blank=True, null=True)
+    oper_time = models.DateTimeField(verbose_name='操作时间', auto_now_add=True)

@@ -166,7 +166,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" data-dismiss="modal" id="save-edit-btn">账号清零</button>
+                    <button type="button"  class="btn btn-primary" data-dismiss="modal" id="save-edit-btn">账号清零</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 </div>
             </div>
@@ -174,12 +174,31 @@
     </div>
     <script>
         $("#save-edit-btn").click(function () {
-            $("#id_form").submit();
+            var user_id = $("#user_id").val();
+            data = {
+                user_id: user_id,
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+            };
+            $.ajax({
+              type: 'POST',
+              url: '{% url "wechat-api-balance-reset" %}',
+              dataType: 'json',
+              data: data,
+              timeout: 5000,
+              success: function(data){
+                  console.log(data.status)
+                  if(data.status === 200){
+                      window.location.reload(true)
+                  }
+              },
+              error: function(error){
+                  console.log(JSON.stringify(error));
+              }
+            });
         })
         $('#myModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var uri = button.attr('data-uri');
-
             $(this).find('.modal-body').load(uri, function (response, status, xhr) {
                 if (status == "error") {
                     var msg = "Sorry but there was an error: ";
