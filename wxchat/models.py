@@ -8,6 +8,7 @@ from codingmanager.constants import *
 from codingmanager.models import PriceType
 # Create your models here.
 from django.db.models import Max, Count, Sum
+from django.utils.safestring import mark_safe
 from stationmanager.models import Seller, Station, ChargingPile
 
 
@@ -110,6 +111,13 @@ class UserInfo(models.Model):
             return obj['max_id'] + 1
         else:
             return 1
+
+    def balance_reset(self):
+        reset_url = "/wxchat/balance_reset/?user_id={}".format(self.id)
+        charging = " <button class='btn btn-xs btn-success' data-toggle='modal' data-target='#myModal' data-uri='{}'>账户清零</a>".format(reset_url)
+        return mark_safe(charging)
+
+    balance_reset.short_description = "选项"
 
 
 class RechargeRecord(models.Model):

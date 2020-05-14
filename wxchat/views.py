@@ -654,3 +654,15 @@ class SubAccountUpdateAmount(View):
         # return render(request, 'index.html', {'formset': formset})
 
 
+class UserBalanceResetView(View):
+    """用户账号清零"""
+    @method_decorator(login_required)
+    def get(self, request, *args, **kwargs):
+        user_id = request.GET.get("user_id")
+        user = UserInfo.objects.filter(pk=user_id).first()
+
+        context = {
+            "user": user,
+            "action": request.get_full_path()
+        }
+        return render(request, template_name="wxchat/user_balance_reset.html", context=context)

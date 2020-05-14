@@ -46,13 +46,16 @@ class UserInfoAdmin(object):
     """
     充电(微信)用户
     """
-    list_display = ['name', 'nickname', 'openid', 'user_type', 'seller', 'binding_amount', 'telephone', 'total_money',
-                    'consume_money', 'account_balance']
+    list_display = ['name', 'nickname', 'openid', 'user_type','binding_amount', 'telephone', 'total_money',
+                    'consume_money', 'account_balance', 'balance_reset']
     search_fields = ['name', 'openid', 'telephone', 'nickname']
     list_filter = ['user_type', 'seller']
     list_per_page = 50
+    reversion_enable = True
+    use_related_menu = False
     style_fields = {"is_freeze": "radio-inline"}
     model_icon = 'fa fa-weixin'
+    object_list_template = "wxchat/userinfo_model_list.html"
 
     form_layout = (
         Main(
