@@ -6,20 +6,21 @@
             </div>
             <div class="panel-body ">
                 <div class="form-group">
+                    <input type="hidden" value="{{ user.id }}" id="user_id">
                     <div class="control-label" for="">用户名:</div>
-                    <div class="controls">
+                    <div class="controls form-control-static" style="padding-top:20px!important;">
                         {{ user.name|default:'无' }}
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="">充值总额</div>
-                    <div class="controls">
+                    <div class="controls form-control-static" style="padding-top:20px!important;">
                         {{ user.total_money|floatformat:2 }}元
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="">消费总额</div>
-                    <div class="controls">
+                    <div class="controls form-control-static" style="padding-top:20px!important;">
                         {{ user.consume_money|floatformat:2 }}元
                     </div>
                 </div>
