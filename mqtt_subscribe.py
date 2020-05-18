@@ -1339,6 +1339,8 @@ def save_pile_charg_status_to_db(**data):
         balance = 0
     else:
         balanc = order.get_balance()
+        if balanc < 0:
+            balanc = 0
         balance = int(balanc.quantize(decimal.Decimal("0.01")) * 100)
 
     reply_charging_data = {
