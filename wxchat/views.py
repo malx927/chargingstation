@@ -361,6 +361,10 @@ def pay_notify(request):
                         user.out_trade_no = out_trade_no
                         user.last_charg_time = datetime.now()
                         user.save(update_fields=["total_money", "out_trade_no", "last_charg_time"])
+                        # 订单同步余额
+                        if user.out_trade_no:
+                            balance = user.account_balance()
+                            Order.objects.filter(out_trade_no=user.out_trade_no, status__lt=2).update(balance=balance)
                 except UserInfo.DoesNotExist as ex:
                     values = {
                         "openid": openid,
