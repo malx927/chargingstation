@@ -14,6 +14,10 @@ class Order(models.Model):
     """
     充电订单
     """
+    RESULT = (
+        (0, '上报'),
+        (None,  '空'),
+    )
     out_trade_no = models.CharField(verbose_name='订单编号', max_length=32)  # 电桩编号 + YYYYMMDD + random
     openid = models.CharField(verbose_name='用户ID(openid)', max_length=64, blank=True, null=True,)
     name = models.CharField(verbose_name='姓名(或昵称)', max_length=64, blank=True, null=True,)
@@ -56,7 +60,7 @@ class Order(models.Model):
     balance = models.DecimalField(verbose_name='余额(元)', blank=True, default=0, max_digits=8, decimal_places=2)
     start_charge_seq = models.CharField(verbose_name='e充电订单号', max_length=32, blank=True, null=True,)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    report_result = models.IntegerField(verbose_name='上报确认', blank=True, null=True)
+    report_result = models.IntegerField(verbose_name='上报确认', blank=True, null=True, choices=RESULT)
     report_time = models.DateTimeField(verbose_name='上报确认时间', blank=True, null=True)
     output_voltage = models.IntegerField(verbose_name='输出电压(V)', blank=True, default=0)
     output_current = models.IntegerField(verbose_name='输出电流(A)', blank=True, default=0)
