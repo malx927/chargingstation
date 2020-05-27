@@ -330,3 +330,11 @@ class UserBalanceResetRecord(models.Model):
     binding_amount = models.DecimalField(verbose_name='绑定金额', default=0, blank=True, max_digits=6, decimal_places=2)
     op_name = models.CharField(verbose_name='操作人', max_length=24, blank=True, null=True)
     oper_time = models.DateTimeField(verbose_name='操作时间', auto_now_add=True)
+
+    def __str__(self):
+        return '{}'.format(self.nickname)
+
+    class Meta:
+        verbose_name = '账号清零记录'
+        verbose_name_plural = verbose_name
+

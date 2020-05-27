@@ -351,21 +351,6 @@ class ChargingPriceDetail(models.Model):
         verbose_name_plural = verbose_name
         ordering = ["begin_time"]
 
-# mqtt订阅消息记录
-class MqttSubData(models.Model):
-    topic = models.CharField(verbose_name='题目', max_length=100)
-    recv_time = models.DateTimeField(verbose_name='接收时间')
-    qos = models.IntegerField(verbose_name='服务质量',)
-    message = models.CharField(verbose_name='消息体', max_length=300)
-    retain = models.BooleanField(verbose_name='保留信息', blank=True, default=False)
-
-    def __str__(self):
-        return self.topic
-
-    class Meta:
-        verbose_name = '订阅消息记录'
-        verbose_name_plural = verbose_name
-
 
 class PowerModuleStatus(models.Model):
     """

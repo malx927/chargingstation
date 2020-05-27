@@ -30,7 +30,7 @@ django.setup()
 
 from django.conf import settings
 from channels.layers import get_channel_layer
-from stationmanager.models import ChargingPile, MqttSubData, ChargingGun,  ChargingPrice
+from stationmanager.models import ChargingPile, ChargingGun,  ChargingPrice
 from codingmanager.constants import *
 from chargingorder.utils import uchar_checksum, byte2integer, get_pile_sn, get_32_byte, get_byte_daytime, \
     get_data_nums, get_byte_version, get_datetime_from_byte, message_escape, save_charging_cmd_to_db, \
@@ -58,22 +58,6 @@ DEVICENAME = 'server_main'
 
 SUB_TOPIC = 'sub'
 PUB_TOPIC = 'pub'
-
-
-def save_subscribe_msg(msg):
-    """
-    保存订阅消息
-    :param msg:
-    :return:
-    """
-    msg_data = {
-        'topic': msg.topic,
-        'recv_time': datetime.datetime.now(),
-        'qos': msg.qos,
-        'message': msg.payload,
-        'retain': msg.retain
-    }
-    MqttSubData.objects.create(**msg_data)
 
 
 # 更新充电桩订阅状态

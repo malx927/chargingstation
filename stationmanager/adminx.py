@@ -20,7 +20,7 @@ from xadmin import views
 from xadmin.plugins.inline import Inline
 from xadmin.views import Dashboard, CommAdminView
 from xadmin.views.website import LoginView
-from .models import Seller, Station, ChargingPile, ChargingPrice, ChargingPriceDetail, MqttSubData, ChargingGun, \
+from .models import Seller, Station, ChargingPile, ChargingPrice, ChargingPriceDetail, ChargingGun, \
     PowerModuleStatus, StationImage, FaultChargingGun
 
 site.register_plugin(DashBoardPlugin, Dashboard)
@@ -564,28 +564,6 @@ class PowerModuleStatusAdmin(object):
 
 xadmin.site.register(PowerModuleStatus, PowerModuleStatusAdmin)
 
-# class ChargingUniformPriceAdmin(object):
-#     list_display = ['type', 'power_fee', 'service_fee']
-#     fields = ['type', 'power_fee', 'service_fee']
-#     model_icon = 'fa fa-minus-square'
-#
-#     def queryset(self):
-#         queryset = super(ChargingUniformPriceAdmin, self).queryset()
-#         return queryset.filter(type=1)
-#
-#     def formfield_for_dbfield(self, db_field,  **kwargs):
-#         if db_field.name == 'type':
-#             kwargs['queryset'] = PriceType.objects.filter(id=1)
-#         return super(ChargingUniformPriceAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
-
-
-# mqtt订阅销售记录
-# class MqttSubDataAdmin(object):
-#     list_display = ['topic', 'recv_time', 'qos', 'message', 'retain']
-#     search_fields = ['topic', 'recv_time', 'retain', 'message']
-#     list_filter = ['recv_time']
-#     model_icon = 'fa fa-minus-square'
-# xadmin.site.register(MqttSubData, MqttSubDataAdmin)
 
 
 
