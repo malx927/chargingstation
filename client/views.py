@@ -3,7 +3,7 @@ import datetime
 from django.db.models import Sum
 from django.shortcuts import render, redirect
 
-from cards.models import CardUser, ChargingCard, CardRecharge
+from cards.models import ChargingCard, CardRecharge
 from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView
@@ -12,26 +12,27 @@ from chargingorder.models import Order
 
 
 def login(request):
+    pass
     """
     用户登录
     """
-    if request.method == 'POST':
-        name = request.POST.get('username')
-        password = request.POST.get('password')
-        user = CardUser.objects.filter(name=name, password=password).first()
-        if not user:
-            return render(request, 'client/login.html', {'msg': '用户名或密码错误'})
-        elif not user.is_active:
-            return render(request, 'client/login.html', {'msg': '用户未激活'})
-        else:
-            user.last_login = datetime.datetime.now()
-            user.save()
-            request.session["user_id"] = user.id
-            request.session["username"] = user.name
-            # init_permission(user, request)
-            return redirect(reverse("client:index"))
-    else:
-        return render(request, 'client/login.html')
+    # if request.method == 'POST':
+    #     name = request.POST.get('username')
+    #     password = request.POST.get('password')
+    #     user = CardUser.objects.filter(name=name, password=password).first()
+    #     if not user:
+    #         return render(request, 'client/login.html', {'msg': '用户名或密码错误'})
+    #     elif not user.is_active:
+    #         return render(request, 'client/login.html', {'msg': '用户未激活'})
+    #     else:
+    #         user.last_login = datetime.datetime.now()
+    #         user.save()
+    #         request.session["user_id"] = user.id
+    #         request.session["username"] = user.name
+    #         # init_permission(user, request)
+    #         return redirect(reverse("client:index"))
+    # else:
+    #     return render(request, 'client/login.html')
 
 
 def logout(request):
@@ -186,24 +187,25 @@ class CardOrderListView(ListView):
 
 
 class PasswordChangeView(View):
+    pass
     """修改密码"""
-    def get(self, request, *args, **kwargs):
-        user_id = request.session.get("user_id", None)
-        if not user_id:
-            return redirect(reverse("client:login"))
-        return render(request, template_name="client/change_password.html")
-
-    def post(self, request, *args, **kwargs):
-        user_id = request.POST.get("user_id")
-        password = request.POST.get("password")
-        password1 = request.POST.get("password1")
-        if password != password1:
-            msg = "两次密码不一致,请重新输入"
-        else:
-            CardUser.objects.filter(id=user_id).update(password=password)
-            return redirect(reverse("client:login"))
-
-        context = {
-            "msg": msg,
-        }
-        return render(request, template_name="client/change_password.html", context=context)
+    # def get(self, request, *args, **kwargs):
+    #     user_id = request.session.get("user_id", None)
+    #     if not user_id:
+    #         return redirect(reverse("client:login"))
+    #     return render(request, template_name="client/change_password.html")
+    #
+    # def post(self, request, *args, **kwargs):
+    #     user_id = request.POST.get("user_id")
+    #     password = request.POST.get("password")
+    #     password1 = request.POST.get("password1")
+    #     if password != password1:
+    #         msg = "两次密码不一致,请重新输入"
+    #     else:
+    #         CardUser.objects.filter(id=user_id).update(password=password)
+    #         return redirect(reverse("client:login"))
+    #
+    #     context = {
+    #         "msg": msg,
+    #     }
+    #     return render(request, template_name="client/change_password.html", context=context)

@@ -269,7 +269,7 @@ class ChargingPileAdmin(object):
 
     model_icon = 'fa fa-sitemap'
     show_all_rel_details = False
-    list_editable = ['pile_type', 'pile_sn']
+    # list_editable = ['pile_type', 'pile_sn']
     refresh_times = [3, 5]  # 计时刷新
     save_as = True
     style_fields = {
@@ -336,9 +336,9 @@ class ChargingPileAdmin(object):
             return queryset.filter(station__seller=self.request.user.seller)
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
-        if db_field.name == 'seller':
+        if db_field.name == 'station':
             if not self.request.user.is_superuser:
-                kwargs['queryset'] = Seller.objects.filter(id=self.request.user.seller.id)
+                kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)
         return super(ChargingPileAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
 
     def save_models(self):
@@ -529,18 +529,8 @@ class ChargingPriceAdmin(object):
             return queryset.filter(station__seller=self.request.user.seller)
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
-        if db_field.name == 'charg_pile':
-            if self.request.user.is_superuser:
-                pass
-            elif self.request.user.station:
-                kwargs['queryset'] = ChargingPile.objects.filter(station=self.request.user.station)
-            elif self.request.user.seller:
-                kwargs['queryset'] = ChargingPile.objects.filter(station__seller=self.request.user.seller)
-
         if db_field.name == 'station':
-            if self.request.user.is_superuser:
-                pass
-            elif self.request.user.station:
+            if self.request.user.station:
                 kwargs['queryset'] = Station.objects.filter(id=self.request.user.station.id)
             elif self.request.user.seller:
                 kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)

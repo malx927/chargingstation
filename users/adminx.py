@@ -17,7 +17,7 @@ class MyUserAdmin(object):
     list_filter = ('is_staff', 'is_active')
     search_fields = ('username', 'first_name', 'last_name', 'telephone', 'email')
     ordering = ('username',)
-    exclude = ('is_superuser', )
+    # exclude = ('is_superuser', )
     style_fields = {'user_permissions': 'm2m_transfer'}
     model_icon = 'fa fa-user'
     # relfield_style = 'fk-ajax'
@@ -58,7 +58,7 @@ class MyUserAdmin(object):
                 ),
                 Side(
                     Fieldset(_('Status'),
-                             'is_active', 'is_staff'
+                             'is_active', 'is_staff', 'is_superuser'
                              ),
                 )
             )

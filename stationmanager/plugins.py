@@ -7,7 +7,6 @@ from xadmin.plugins.utils import get_context_dict
 import datetime
 __author__ = 'Administrator'
 
-from xadmin.sites import site
 from xadmin.views import BaseAdminPlugin, Dashboard
 
 
@@ -15,7 +14,7 @@ class DashBoardPlugin(BaseAdminPlugin):
     is_dashboard = False
 
     def init_request(self, *args, **kwargs):
-        if self.request.get_full_path() == '/ydadmin/':
+        if self.request.get_full_path() == '/ydadmin/' or self.request.get_full_path() == '/ydlogin/':
             self.is_dashboard = True
         return bool(self.is_dashboard)
 
@@ -36,13 +35,23 @@ class DashBoardPlugin(BaseAdminPlugin):
         # context.update({'stations': stations})
         # context.update({'fault_guns': fault_guns})
         curr_date = datetime.datetime.now().date()
+        orders = Order.objects.filter(begin_time__date=curr_date)
+        stations = Station.objects.all()
+        if self.request.user.is_superuser:
+            pass
+        elif self.request.user.station:
+            orders = orders.filter(charg_pile__station=self.request.user.station)
+            stations = stations.filter(id=self.request.user.station.id)
+        elif self.request.user.seller:
+            orders = orders.filter(charg_pile__station__seller=self.request.user.seller)
+            stations = stations.filter(seller=self.request.user.seller)
 
-        today_results = Order.objects.select_related("charg_pile").filter(begin_time__date=curr_date).values(
-            station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
+        today_results = orders.values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
             .annotate(total_readings=Sum("total_readings", output_field=FloatField()), counts=Count("id"),
                       total_fees=Sum("consum_money", output_field=FloatField()),
                       times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60))).order_by("station_id")
-        stations = Station.objects.values("id", "name")
+
+        stations = stations.values("id", "name")
 
         stations_list = list(stations)
         for station in stations_list:

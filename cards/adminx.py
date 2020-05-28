@@ -1,29 +1,29 @@
 # coding=utf-8
 import xadmin
-from cards.models import CardUser, ChargingCard, CardRecharge, CardOrder
+from cards.models import ChargingCard, CardRecharge, CardOrder
 from stationmanager.models import ChargingPile, Station, Seller
 from xadmin.layout import Fieldset, Row, AppendedText, Main, Side
 
 
-class CardUserAdmin(object):
-    """储值卡用户"""
-    list_display = ['name', 'password', 'telephone', 'address', 'bank', 'account', 'is_active', 'add_time']
-    search_fields = ['name', 'telephone', 'address', 'bank', 'account']
-    list_per_page = 50
-    model_icon = 'fa fa-file-text'
-    show_all_rel_details = False
+# class CardUserAdmin(object):
+#     """储值卡用户"""
+#     list_display = ['name', 'password', 'telephone', 'address', 'bank', 'account', 'is_active', 'add_time']
+#     search_fields = ['name', 'telephone', 'address', 'bank', 'account']
+#     list_per_page = 50
+#     model_icon = 'fa fa-file-text'
+#     show_all_rel_details = False
 
 
-xadmin.site.register(CardUser, CardUserAdmin)
+# xadmin.site.register(CardUser, CardUserAdmin)
 
 
 class ChargingCardAdmin(object):
     """储值卡"""
-    list_display = ['card_num', 'seller', 'money', 'status', 'user', 'start_date', 'end_date', 'add_time', 'startup']
-    search_fields = ['card_num']
-    list_filter = ['status', 'seller', 'user', 'start_date']
+    list_display = ['card_num', 'seller', 'name', 'telephone', 'money', 'status', 'add_time', 'startup']
+    search_fields = ['card_num', 'telephone', 'name']
+    list_filter = ['status', 'seller']
     list_per_page = 50
-    exclude = ['sec_num']
+    exclude = ['sec_num', 'cipher']
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
     readonly_fields = ["money"]
@@ -34,11 +34,13 @@ class ChargingCardAdmin(object):
         Fieldset(
             '储值卡信息',
             Row('card_num', 'seller'),
-            Row('status', 'user'),
-            Row("cipher", "money"),
+            Row('station', 'status'),
+            Row('name', 'telephone'),
+            Row('money', None),
         ),
         Fieldset(
             '有效期限',
+            'is_valid_date',
             Row('start_date', "end_date"),
         ),
     )
@@ -59,12 +61,21 @@ class ChargingCardAdmin(object):
                 kwargs['queryset'] = Seller.objects.filter(id=self.request.user.station.seller_id)
             elif self.request.user.seller:
                 kwargs['queryset'] = Seller.objects.filter(id=self.request.user.seller_id)
+
+        if db_field.name == 'station':
+            if self.request.user.is_superuser:
+                pass
+            elif self.request.user.station:
+                kwargs['queryset'] = Station.objects.filter(id=self.request.user.station.id)
+            elif self.request.user.seller:
+                kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)
+
         return super().formfield_for_dbfield(db_field,  **kwargs)
 
     def save_models(self):
         obj = self.new_obj
         request = self.request
-        if obj.station is None:
+        if obj.seller is None:
             obj.seller = request.user.seller
         super().save_models()
 
@@ -83,10 +94,9 @@ xadmin.site.register(ChargingCard, ChargingCardAdmin)
 
 class CardRechargeAdmin(object):
     """储值卡充值"""
-    list_display = ['card', 'user', 'money', 'op_user', 'add_time']
+    list_display = ['card', 'money', 'op_user', 'add_time']
     search_fields = ['card__card_num']
-    readonly_fields = ['card', 'user', 'money', 'op_user']
-    list_filter = ['user']
+    readonly_fields = ['card', 'money', 'op_user']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
