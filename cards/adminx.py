@@ -19,9 +19,9 @@ from xadmin.layout import Fieldset, Row, AppendedText, Main, Side
 
 class ChargingCardAdmin(object):
     """储值卡"""
-    list_display = ['card_num', 'seller', 'name', 'telephone', 'money', 'status', 'add_time', 'startup']
+    list_display = ['card_num', 'seller', 'station', 'telephone', 'money', 'status', 'add_time', 'startup']
     search_fields = ['card_num', 'telephone', 'name']
-    list_filter = ['status', 'seller']
+    list_filter = ['status', 'seller', 'station']
     list_per_page = 50
     exclude = ['sec_num', 'cipher']
     model_icon = 'fa fa-file-text'
@@ -84,7 +84,7 @@ class ChargingCardAdmin(object):
         if self.request.user.is_superuser:
             return queryset
         elif self.request.user.station:
-            return queryset.filter(seller=self.request.user.station.seller)
+            return queryset.filter(station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(seller=self.request.user.seller)
 
@@ -95,7 +95,7 @@ xadmin.site.register(ChargingCard, ChargingCardAdmin)
 class CardRechargeAdmin(object):
     """储值卡充值"""
     list_display = ['card', 'money', 'op_user', 'add_time']
-    search_fields = ['card__card_num']
+    search_fields = ['card']
     readonly_fields = ['card', 'money', 'op_user']
     list_per_page = 50
     model_icon = 'fa fa-file-text'

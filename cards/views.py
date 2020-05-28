@@ -1,3 +1,5 @@
+from django.db.models import F
+
 from cards.forms import CardRechargeForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -15,6 +17,7 @@ class CardsStartupView(View):
     def get(self, request, *args, **kwargs):
         status = request.GET.get("status")
         c_id = request.GET.get("c_id")
+
         ChargingCard.objects.filter(pk=c_id).update(status=status)
         return redirect("/ydadmin/cards/chargingcard/")
 
@@ -24,12 +27,8 @@ class RechargeMoneyView(View):
     def get(self, request, *args, **kwargs):
         c_id = request.GET.get("c_id")
         card = ChargingCard.objects.filter(pk=c_id).first()
-        inital = {}
         if card:
-            inital["card"] = [card.id]
-            if card.user:
-                inital["user"] = [card.user_id]
-            form = CardRechargeForm(initial={"card": [card.id, ], "user": [card.user_id,]})
+            form = CardRechargeForm(initial={"card": card.card_num})
         else:
             form = None
 
@@ -48,7 +47,8 @@ class RechargeMoneyView(View):
             instance = form.save(commit=False)
             instance.op_user = request.user
             instance.save()
-            money = instance.card.money
-            instance.card.money = money + instance.money
-            instance.card.save()
+            ChargingCard.objects.filter(card_num=instance.card).update(money=F("money") + instance.money)
+        else:
+            print(form)
+
         return redirect("/ydadmin/cards/chargingcard/")

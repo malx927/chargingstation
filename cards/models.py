@@ -61,6 +61,18 @@ class ChargingCard(models.Model):
         verbose_name = '储值卡'
         verbose_name_plural = verbose_name
 
+    # def stations(self):
+    #     station_list = []
+    #     for station in self.station.all():
+    #         station_list.append(station.name)
+    #
+    #     if station_list:
+    #         return "\".join(station_list)
+    #     else:
+    #         return '空'
+
+    # stations.short_description = '充电站'
+
     def startup(self):
         start_url = "/cards/cards_startup/?c_id={}&status={}".format(self.id, 1)
         stop_url = "/cards/cards_startup/?c_id={}&status={}".format(self.id, 0)
@@ -75,14 +87,13 @@ class ChargingCard(models.Model):
 
 class CardRecharge(models.Model):
     """充值记录表"""
-    card = models.ForeignKey(ChargingCard, verbose_name="储蓄卡", on_delete=models.CASCADE)
-    # user = models.ForeignKey(CardUser, verbose_name="储蓄卡用户", on_delete=models.CASCADE, blank=True, null=True)
+    card = models.CharField(verbose_name="储蓄卡", max_length=128)
     money = models.IntegerField(verbose_name="充值金额(元)", default=0)
     op_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作人', blank=True, null=True)
     add_time = models.DateTimeField(verbose_name="充值时间", auto_now_add=True)
 
     def __str__(self):
-        return self.card.card_num
+        return self.card
 
     class Meta:
         verbose_name = '储值卡充值记录'
