@@ -46,7 +46,7 @@ class ChargingCard(models.Model):
     sec_num = models.CharField(verbose_name="备用卡号", max_length=128, blank=True, null=True)
     money = models.DecimalField(verbose_name="余额", default=0, max_digits=10, decimal_places=2)
     status = models.IntegerField(verbose_name="状态", choices=STATUS, default=1)
-    is_valid_date = models.BooleanField(verbose_name='设置有效期', default=0 , choices=VALID_STATUS)
+    is_valid_date = models.BooleanField(verbose_name='设置有效期', default=0, choices=VALID_STATUS)
     start_date = models.DateField(verbose_name="生效开始时间", blank=True, null=True)
     end_date = models.DateField(verbose_name="生效结束时间", blank=True, null=True)
     pile_sn = models.CharField(verbose_name='电桩SN', max_length=64, blank=True, null=True)

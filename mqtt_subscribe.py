@@ -5,15 +5,12 @@ import os
 import random
 import sys
 import redis
-import json
-import time
-import base64
 import signal
 import datetime
 import logging
-import binascii
+
 import paho.mqtt.client as mqtt
-from asgiref.sync import async_to_sync
+
 from django.db.models import F, Sum, DecimalField
 
 # logging.basicConfig(level=logging.INFO, filename='./logs/chargingstation.log',
@@ -29,19 +26,18 @@ import django
 django.setup()
 
 from django.conf import settings
-from channels.layers import get_channel_layer
 from stationmanager.models import ChargingPile, ChargingGun,  ChargingPrice
 from codingmanager.constants import *
 from chargingorder.utils import uchar_checksum, byte2integer, get_pile_sn, get_32_byte, get_byte_daytime, \
     get_data_nums, get_byte_version, get_datetime_from_byte, message_escape, save_charging_cmd_to_db, \
     send_data_to_client, user_account_deduct_money, user_update_pile_gun, get_byte_date
 from codingmanager.models import FaultCode
-from chargingorder.models import OrderRecord, Order, GroupName, OrderChargDetail, ChargingStatusRecord, \
+from chargingorder.models import OrderRecord, Order,  OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
-from wxchat.models import UserInfo, UserAcountHistory
+from wxchat.models import UserInfo
 from echargenet.tasks import notification_start_charge_result, notification_stop_charge_result
 from wxchat.utils import send_charging_start_message_to_user
-from cards.models import ChargingCard, CardUser
+from cards.models import ChargingCard
 from stationmanager.signals import update_operator_info
 from stationmanager.signals import operator_info_init
 from stationmanager.signals import operator_info_delete
@@ -535,23 +531,36 @@ def pile_card_charging_request_hander(topic, byte_msg):
     card_num = byte_msg[45:77].decode('utf-8').strip('\000')
     logging.info('卡号: {}'.format(card_num))
 
-    cur_time = datetime.datetime.now().date()
-
     password = byte_msg[77:93].decode('utf-8').strip('\000')
     logging.info("password:{}".format(password))
     if card_type != 1:  # IC卡
         logging.info("不是IC卡，类型错误。")
         return
 
-    card = ChargingCard.objects.filter(start_date__lte=cur_time, end_date__gte=cur_time, status=1, card_num=card_num, cipher=password).first()
+    cur_time = datetime.datetime.now().date()
+    # 判断卡号是否有效
+    card = ChargingCard.objects.filter(status=1, card_num=card_num, cipher=password).first()
     if not card:
-        logging.info("card number or user does not exits")
+        logging.info("此卡{}不存在或者处于禁用状态".format(card_num))
         return
+    # 判断此卡是否有时间限制
+    if card.is_valid_date == 1:
+        if card.start_date is None or card.end_date is None:
+            logging.warning("有效截止时间不能为空")
+            return
+        elif cur_time > card.end_date:
+            logging.warning("此卡{}已经过期".format(card_num))
+            return
 
     pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
     if card.seller and card.seller_id != pile.station.seller_id:
         logging.info("此卡不属于此运营商,无法充电")
         return
+
+    if card.station.count() > 0:
+        if not card.station.filter(id=pile.station_id).exists():
+            logging.info("此卡不属于该充电场,无法充电")
+            return
 
     pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
     if not pile_gun:
@@ -585,14 +594,13 @@ def pile_card_charging_request_hander(topic, byte_msg):
     if oper_type == 1 and card.money > settings.ACCOUNT_BALANCE:
         # 创建订单(充满为止), 发送充电命令
         openid = card.card_num
-        name = card.user.name if card.user else openid
         out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
 
-        start_model = 1
+        start_model = 1  # 储值卡启动
         params = {
             "gun_num": gun_num,
             "openid": openid,
-            "name": name,
+            "name": openid,
             "charg_mode": 0,    # 充满为止
             "out_trade_no": out_trade_no,
             "charg_pile": pile,
