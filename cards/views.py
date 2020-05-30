@@ -46,6 +46,7 @@ class RechargeMoneyView(View):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.op_user = request.user
+            instance.seller = request.user.seller
             instance.save()
             ChargingCard.objects.filter(card_num=instance.card).update(money=F("money") + instance.money)
         else:

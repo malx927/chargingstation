@@ -94,21 +94,42 @@ xadmin.site.register(ChargingCard, ChargingCardAdmin)
 
 class CardRechargeAdmin(object):
     """储值卡充值"""
-    list_display = ['card', 'money', 'op_user', 'add_time']
+    list_display = ['seller', 'card', 'money', 'op_user', 'add_time']
     search_fields = ['card']
-    readonly_fields = ['card', 'money', 'op_user']
+    list_filter = ['seller']
+    readonly_fields = ['card', 'money', 'op_user', 'seller']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
 
     def has_add_permission(self):
+        if self.request.user.is_superuser:
+            return True
         return False
 
     def has_change_permission(self, obj=None):
+        if self.request.user.is_superuser:
+            return True
         return False
 
     def has_delete_permission(self, obj=None):
+        if self.request.user.is_superuser:
+            return True
         return False
+
+    def save_models(self):
+        obj = self.new_obj
+        request = self.request
+        if obj.seller is None:
+            obj.seller = request.user.seller
+        super().save_models()
+
+    def queryset(self):
+        queryset = super().queryset()
+        if self.request.user.is_superuser:
+            return queryset
+        elif self.request.user.seller:
+            return queryset.filter(seller=self.request.user.seller)
 
 
 xadmin.site.register(CardRecharge, CardRechargeAdmin)
