@@ -109,12 +109,12 @@ class OrderAdmin(object):
 
     def queryset(self):
         queryset = super(OrderAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        elif self.request.user.station:
+        if self.request.user.station:
             return queryset.filter(charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(charg_pile__station__seller=self.request.user.seller)
+        else:
+            return queryset
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         if db_field.name == 'charg_pile':
@@ -194,12 +194,12 @@ class OrderRecordAdmin(object):
 
     def queryset(self):
         queryset = super(OrderRecordAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        elif self.request.user.station:
+        if self.request.user.station:
             return queryset.filter(order__charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(order__charg_pile__station__seller=self.request.user.seller)
+        else:
+            return queryset
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         if db_field.name == 'order':

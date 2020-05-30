@@ -82,10 +82,11 @@ class SellerAdmin(object):
 
     def queryset(self):
         queryset = super(SellerAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        else:
+        if self.request.user.seller:
             return queryset.filter(id=self.request.user.seller.id)
+        elif self.request.user.station:
+            return Seller.objects.none()
+        return queryset
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         if db_field.name == 'parent':
@@ -188,12 +189,12 @@ class StationAdmin(object):
 
     def queryset(self):
         queryset = super(StationAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        elif self.request.user.station:
+        if self.request.user.station:
             return queryset.filter(id=self.request.user.station.id)
         elif self.request.user.seller:
             return queryset.filter(seller=self.request.user.seller)
+        else:
+            return queryset
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         # print(self.new_obj)
@@ -328,12 +329,12 @@ class ChargingPileAdmin(object):
 
     def queryset(self):
         queryset = super(ChargingPileAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        elif self.request.user.station:
+        if self.request.user.station:
             return queryset.filter(station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(station__seller=self.request.user.seller)
+        else:
+            return queryset
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         if db_field.name == 'station':
@@ -418,12 +419,12 @@ class ChargingGunAdmin(object):
 
     def queryset(self):
         queryset = super(ChargingGunAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        elif self.request.user.station:
+        if self.request.user.station:
             return queryset.filter(charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(charg_pile__station__seller=self.request.user.seller)
+        else:
+            return queryset
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         if db_field.name == 'charg_pile':
@@ -470,12 +471,12 @@ class FaultChargingGunAdmin(object):
 
     def queryset(self):
         queryset = super(FaultChargingGunAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        elif self.request.user.station:
+        if self.request.user.station:
             return queryset.filter(charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(charg_pile__station__seller=self.request.user.seller)
+        else:
+            return queryset
 
     form_layout = (
         Fieldset('',
@@ -498,7 +499,7 @@ class ChargingPriceDetailInline(object):
     model = ChargingPriceDetail
     extra = 3
     style = 'table'
-    max_num = 12
+    max_num = 8
 
 
 class ChargingPriceAdmin(object):
@@ -521,12 +522,12 @@ class ChargingPriceAdmin(object):
 
     def queryset(self):
         queryset = super(ChargingPriceAdmin, self).queryset()
-        if self.request.user.is_superuser:
-            return queryset
-        elif self.request.user.station:
+        if self.request.user.station:
             return queryset.filter(station=self.request.user.station)
         elif self.request.user.seller:
             return queryset.filter(station__seller=self.request.user.seller)
+        else:
+            return queryset
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         if db_field.name == 'station':
