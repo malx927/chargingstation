@@ -47,7 +47,7 @@ class MyUserAdmin(object):
                              Row('first_name', 'last_name'),
                              Row('telephone', 'email'),
                              Row('seller', 'station'),
-                             Row("groups_client", "wx_user"),
+                             Row("groups_client", None),
                              ),
                     Fieldset(_('Permissions'),
                              'groups', 'user_permissions'
