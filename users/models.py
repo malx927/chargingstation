@@ -14,4 +14,4 @@ class UserProfile(AbstractUser):
     seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.SET_NULL)
     station = models.ForeignKey(Station, verbose_name='充电站', blank=True, null=True, on_delete=models.SET_NULL)
     groups_client = models.ForeignKey(GroupClients, verbose_name='集团客户名称', blank=True, null=True, on_delete=models.SET_NULL)
-
+    is_oper_mgr = models.BooleanField(verbose_name='运营商管理', default=False, help_text='指明该用户管理运营商信息权限')

@@ -58,7 +58,7 @@ class MyUserAdmin(object):
                 ),
                 Side(
                     Fieldset(_('Status'),
-                             'is_active', 'is_staff', 'is_superuser'
+                             'is_active', 'is_staff', 'is_superuser', 'is_oper_mgr'
                              ),
                 )
             )

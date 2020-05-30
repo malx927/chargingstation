@@ -23,12 +23,11 @@ class ChargingCardAdmin(object):
     search_fields = ['card_num', 'telephone', 'name']
     list_filter = ['status', 'seller', 'station']
     list_per_page = 50
-    exclude = ['sec_num', 'cipher']
+    exclude = ['sec_num', 'cipher', 'pile_sn', 'gun_num']
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
     readonly_fields = ["money"]
     object_list_template = "cards/cards_model_list.html"
-    # list_display_links_details = True
 
     form_layout = (
         Fieldset(
@@ -45,6 +44,22 @@ class ChargingCardAdmin(object):
         ),
     )
 
+    def get_form_layout(self):
+        if self.request.user.is_oper_mgr or self.request.user.is_superuser:
+            self.form_layout = None
+
+        return super().get_form_layout()
+
+    def get_list_display(self):
+        if self.request.user.is_oper_mgr or self.request.user.is_superuser:
+            self.list_display =  ['card_num', 'seller', 'station', 'telephone', 'money', 'status', 'add_time']
+        return super().get_list_display()
+
+    # def get_readonly_fields(self):
+    #     if self.request.user.is_oper_mgr or self.request.user.is_superuser:
+    #         self.readonly_fields = ['card_num', 'name', 'seller', 'station', 'telephone', 'money', 'status', 'is_valid_date', 'start_date', 'end_date']
+    #     return self.readonly_fields
+
     def get_media(self):
         media = super(ChargingCardAdmin, self).get_media()
         path = self.request.get_full_path()
@@ -52,6 +67,21 @@ class ChargingCardAdmin(object):
             media += self.vendor('xadmin.plugin.details.js', 'xadmin.form.css')
             # media.add_js([self.static('stationmanager/js/xadmin.areacode.js')])
         return media
+
+    def has_add_permission(self):
+        if self.request.user.is_superuser or self.request.user.is_oper_mgr:
+            return False
+        return True
+
+    def has_change_permission(self, obj=None):
+        if self.request.user.is_superuser or self.request.user.is_oper_mgr:
+            return False
+        return True
+
+    def has_delete_permission(self, obj=None):
+        if self.request.user.is_superuser or self.request.user.is_oper_mgr:
+            return False
+        return True
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         if db_field.name == 'seller':
