@@ -20,7 +20,7 @@ xadmin.site.register(InvoiceTitle, InvoiceTitleAdmin)
 
 class UserRefundAdmin(object):
     list_display = ["out_refund_no", "name", "nickname", "out_trade_no", "total_fee", "refund_fee", "refund_id", 'status']
-    search_fields = ['out_refund_no', 'name', 'telephone', 'out_trade_no', 'refund_id']
+    search_fields = ['out_refund_no', 'name', 'out_trade_no', 'refund_id']
     list_filter = ['status']
     model_icon = 'fa fa-random'
 
