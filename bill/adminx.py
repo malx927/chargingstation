@@ -2,7 +2,7 @@
 
 import xadmin
 
-from .models import InvoiceTitle
+from .models import InvoiceTitle, UserRefund, WxRefundRecord
 
 
 class InvoiceTitleAdmin(object):
@@ -17,54 +17,21 @@ class InvoiceTitleAdmin(object):
 
 xadmin.site.register(InvoiceTitle, InvoiceTitleAdmin)
 
-#
-# class StationInfoAdmin(object):
-#     list_display = ["StationID", "OperatorID", "EquipmentOwnerID", "StationName", "CountryCode", "AreaCode", "Address"]
-#     search_fields = ['StationName']
-#     list_filter = ['OperatorID']
-#     model_icon = 'fa fa-random'
-#     relfield_style = 'fk_ajax'
-#
-#
-# xadmin.site.register(StationInfo, StationInfoAdmin)
-#
-#
-# class EquipmentInfoAdmin(object):
-#     """
-#     充电桩管理
-#     """
-#     list_display = ["EquipmentID", "EquipmentName", "StationID",  "EquipmentType", "Power"]
-#     list_display_links = ["EquipmentID", "EquipmentName"]
-#     model_icon = 'fa fa-random'
-#
-#
-# xadmin.site.register(EquipmentInfo, EquipmentInfoAdmin)
-#
-#
-# class ConnectorInfoAdmin(object):
-#     list_display = ["ConnectorID", "EquipmentID", "ConnectorName", "ConnectorType", "VoltageUpperLimits", "VoltageLowerLimits",
-#                     "Current", "Power", "Status"]
-#     model_icon = 'fa fa-random'
-#
-#
-# xadmin.site.register(ConnectorInfo, ConnectorInfoAdmin)
-#
-#
-# class CheckChargeOrderAdmin(object):
-#     """推送订单核对结果"""
-#     list_display = ["CheckOrderSeq", "StartTime", "EndTime", "TotalDisputeOrder", "TotalDisputePower", "TotalDisputeMoney"]
-#     search_fields =["CheckOrderSeq"]
-#     model_icon = 'fa fa-random'
-#
-#
-# xadmin.site.register(CheckChargeOrder, CheckChargeOrderAdmin)
-#
-#
-# class DisputeOrderAdmin(object):
-#     """单项订单"""
-#     list_display = ["order", "StartChargeSeq", "TotalPower", "TotalMoney"]
-#     search_fields =["order__CheckOrderSeq", "StartChargeSeq"]
-#     model_icon = 'fa fa-random'
-#
-#
-# xadmin.site.register(DisputeOrder, DisputeOrderAdmin)
+
+class UserRefundAdmin(object):
+    list_display = ["out_refund_no", "name", "nickname", "out_trade_no", "total_fee", "refund_fee", "refund_id", 'status']
+    search_fields = ['out_refund_no', 'name', 'telephone', 'out_trade_no', 'refund_id']
+    list_filter = ['status']
+    model_icon = 'fa fa-random'
+
+
+xadmin.site.register(UserRefund, UserRefundAdmin)
+
+
+class WxRefundRecordAdmin(object):
+    list_display = ["return_code", "result_code", "appid", "mch_id", "out_trade_no", "out_refund_no", "refund_id", "refund_fee", "total_fee", 'return_msg']
+    search_fields = ['out_trade_no', 'out_refund_no', 'refund_id', 'transaction_id']
+    model_icon = 'fa fa-random'
+
+
+xadmin.site.register(WxRefundRecord, WxRefundRecordAdmin)
