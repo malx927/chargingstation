@@ -242,7 +242,7 @@ class OrderPayView(View):
                 'return_code': "FAIL",
                 'return_msg': u"请输入充值金额",
             }
-            logging.info(errors)
+            logger.info(errors)
             return HttpResponse(json.dumps(errors))
 
         out_trade_no = '{0}{1}{2}{3}'.format('P', settings.MCH_ID, datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
@@ -253,7 +253,7 @@ class OrderPayView(View):
             "total_fee": int(money),
             "recharge_type": recharge_type,
         }
-        logging.info(order_data)
+        logger.info(order_data)
         order = RechargeRecord.objects.create(**order_data)
         if order:
             total_fee = int(order.total_fee * 100)
