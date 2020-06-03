@@ -1,0 +1,6 @@
+#id_address, #id_bank_account{
+    max-width:600px!important;
+}
+#id_title,#id_tax_number{
+    max-width: 400px!important;
+}
