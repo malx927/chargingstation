@@ -352,12 +352,16 @@ def pay_notify(request):
                     name = ''
 
                 cash_fee = res_data['cash_fee'] / 100
+
+                coupon_fee_0 = res_data.get('coupon_fee_0', 0) / 100
+                coupon_fee_1 = res_data.get('coupon_fee_1', 0) / 100
+
                 data = {
                     "openid": openid,
                     "name": name,
                     "total_fee": res_data['total_fee'] / 100,
                     "transaction_id": res_data['transaction_id'],
-                    "cash_fee": cash_fee,
+                    "cash_fee": cash_fee + coupon_fee_0 + coupon_fee_1,
                     "status": 1,
                     "pay_time": pay_time,
                     "recharge_type": 2,     # 微信支付
