@@ -1,6 +1,7 @@
 # -*-coding:utf-8-*-
 
 import xadmin
+from django.urls import reverse
 from xadmin import views
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText
 from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord, RechargeList, \
@@ -168,10 +169,20 @@ class RechargeRecordAdmin(object):
     """
     用户充值记录表
     """
-    list_display = ('out_trade_no', 'name', 'recharge_type', 'pay_time', 'total_fee', 'cash_fee', 'status')
+    list_display = ('out_trade_no', 'name', 'recharge_type', 'pay_time', 'total_fee', 'cash_fee', 'status', 'refund')
     search_fields = ['out_trade_no', 'name']
     list_per_page = 50
     model_icon = 'fa fa-weixin'
+
+    def refund(self, instance):
+        refund_url = reverse("wxchat-refund")
+        change_list = self.get_model_url(RechargeRecord, "changelist")
+        # print('changelist:', change_list)
+        return """<a class='btn btn-xs btn-success' href={}?out_trade_no={}&change_list={}>退款</a>""" .format(refund_url, instance.out_trade_no, change_list)
+
+    refund.short_description = "退款"
+    refund.allow_tags = True
+    refund.is_column = True
 
 
 xadmin.site.register(RechargeRecord, RechargeRecordAdmin)

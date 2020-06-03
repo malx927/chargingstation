@@ -81,6 +81,21 @@ def getJsApiSign(request):
     return sign_package
 
 
+# 退款
+def order_refund(*arg, **kwargs):
+    transaction_id = kwargs.get('transaction_id', '')
+    out_trade_no = kwargs.get('out_trade_no', '')
+    out_refund_no = kwargs.get('out_refund_no', '')
+    total_fee = kwargs.get('total_fee', 0)
+    refund_fee = kwargs.get('refund_fee', 0)
+    if total_fee == 0 or refund_fee == 0:
+        return None
+    wxPay = WeixinPay()
+    ret = wxPay.refund.apply(total_fee=total_fee, refund_fee=refund_fee, out_trade_no=out_trade_no,transaction_id=transaction_id, out_refund_no=out_refund_no)
+
+    return ret
+
+
 @csrf_exempt
 def wechat(request):
     if request.method == 'GET':
@@ -685,3 +700,27 @@ class UserBalanceResetView(View):
             "action": request.get_full_path()
         }
         return render(request, template_name="wxchat/user_balance_reset.html", context=context)
+
+
+class RefundView(View):
+    """
+    退款请求
+    """
+    def get(self, request, *args, **kwargs):
+        out_trade_no = request.GET.get("out_trade_no", None)
+        change_list = request.GET.get("change_list", None)
+        record = RechargeRecord.objects.filter(out_trade_no=out_trade_no).first()
+        if record:
+            out_refund_no = '{0}{1}{2}'.format('T', datetime.now().strftime('%Y%m%d%H%M%S'),
+                                              random.randint(10000, 100000))
+            refund_data = {
+                'out_trade_no': record.out_trade_no,
+                'out_refund_no': out_refund_no,
+                'total_fee': record.total_fee,
+                'refund_fee': record.cash_fee,
+            }
+            logger.info(refund_data)
+            ret = order_refund(**refund_data)
+            logger.info(ret)
+
+        return HttpResponseRedirect(change_list)
