@@ -55,10 +55,10 @@ def WeixinPay():
      创建微信支付对象
     :return:
     """
-    wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY, mch_id=settings.MCH_ID)
-    # wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY,
-    #                   mch_id=settings.MCH_ID, mch_cert=settings.API_CLIENT_CERT_PATH,
-    #                   mch_key=settings.API_CLIENT_KEY_PATH)
+    # wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY, mch_id=settings.MCH_ID)
+    wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY,
+                      mch_id=settings.MCH_ID, mch_cert=settings.API_CLIENT_CERT_PATH,
+                      mch_key=settings.API_CLIENT_KEY_PATH)
     return wxPay
 
 
