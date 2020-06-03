@@ -1,5 +1,6 @@
 # -*-coding:utf-8-*-
 import decimal
+import logging
 import random
 import time
 from datetime import datetime
@@ -30,6 +31,8 @@ from wxchat.forms import RegisterForm, SubAccountForm
 from stationmanager.utils import create_qrcode
 from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection, \
     SubAccount
+
+logger = logging.getLogger("django")
 
 redis_client = Redis.from_url(settings.REDIS_URL)
 session_interface = RedisStorage(
@@ -239,6 +242,7 @@ class OrderPayView(View):
                 'return_code': "FAIL",
                 'return_msg': u"请输入充值金额",
             }
+            logging.info(errors)
             return HttpResponse(json.dumps(errors))
 
         out_trade_no = '{0}{1}{2}{3}'.format('P', settings.MCH_ID, datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
@@ -249,6 +253,7 @@ class OrderPayView(View):
             "total_fee": int(money),
             "recharge_type": recharge_type,
         }
+        logging.info(order_data)
         order = RechargeRecord.objects.create(**order_data)
         if order:
             total_fee = int(order.total_fee * 100)
@@ -266,6 +271,7 @@ class OrderPayView(View):
             data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, attach=attach, notify_url=settings.NOTIFY_URL, user_id=openid)
             prepay_id = data.get('prepay_id', None)
             save_data = dict(data)
+            logger.info(save_data)
             # 保存统一订单数据
             WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
@@ -281,6 +287,7 @@ class OrderPayView(View):
                 'errcode':  wxe.errcode,
                 'errmsg':   wxe.errmsg
             }
+            logger.info(errors)
             RechargeRecord.objects.filter(out_trade_no=out_trade_no).delete()
             return HttpResponse(json.dumps(errors))
 
@@ -317,6 +324,7 @@ def pay_notify(request):
         result_data = wxPay.parse_payment_result(request.body)  # 签名验证
         # 保存支付成功返回数据
         res_data = dict(result_data)
+        logger.info(res_data)
         WxPayResult.objects.create(**res_data)
         # 查询订单,判断是否正确
         transaction_id = res_data.get('transaction_id', None)
@@ -354,7 +362,7 @@ def pay_notify(request):
                     "pay_time": pay_time,
                     "recharge_type": 2,     # 微信支付
                 }
-
+                logger.info(data)
                 RechargeRecord.objects.update_or_create(defaults=data, out_trade_no=out_trade_no)
 
                 try:
@@ -376,12 +384,13 @@ def pay_notify(request):
                         "out_trade_no": out_trade_no,
                         "last_charg_time": datetime.now()
                     }
+                    logger.info(values)
                     user = UserInfo.objects.create(**values)
                 # 发送模板消息给客户
                 # sendTempMessageToUser(order)
         return HttpResponse(xml)
     except InvalidSignatureException as error:
-        print(error)
+        logger.info(error)
 
 
 class RegisterView(View):

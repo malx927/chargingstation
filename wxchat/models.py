@@ -202,13 +202,17 @@ class WxPayResult(models.Model):
     cash_fee_type = models.CharField(verbose_name='现金支付货币类型', max_length=16, null=True, blank=True)
     coupon_fee = models.IntegerField(verbose_name='总代金券金额', null=True, blank=True)
     coupon_count = models.IntegerField(verbose_name='代金券使用数量', null=True, blank=True)
-    coupon_type = models.CharField(verbose_name='代金券类型', max_length=16, null=True, blank=True)
-    coupon_id = models.CharField(verbose_name='代金券ID', max_length=20, null=True, blank=True)
+    coupon_type_0 = models.CharField(verbose_name='代金券类型', max_length=16, null=True, blank=True)
+    coupon_id_0 = models.CharField(verbose_name='代金券ID', max_length=20, null=True, blank=True)
     coupon_fee_0 = models.IntegerField(verbose_name='单个代金券支付金额', null=True, blank=True)
+    coupon_type_1 = models.CharField(verbose_name='代金券类型', max_length=16, null=True, blank=True)
+    coupon_id_1 = models.CharField(verbose_name='代金券ID', max_length=20, null=True, blank=True)
+    coupon_fee_1 = models.IntegerField(verbose_name='单个代金券支付金额', null=True, blank=True)
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32, null=True, blank=True)
     out_trade_no = models.CharField(verbose_name='商户订单号', max_length=32, null=True, blank=True)
     attach = models.CharField(verbose_name='商家数据包', max_length=128, null=True, blank=True)
     time_end = models.CharField(verbose_name='支付完成时间', max_length=14, null=True, blank=True)
+    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 
     class Meta:
         verbose_name = '微信支付结果'

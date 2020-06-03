@@ -134,7 +134,7 @@ xadmin.site.register(SubAccount, SubAccountAdmin)
 # 微信统一支付结果
 class WxUnifiedOrderResultAdmin(object):
     list_display = ('return_code', 'appid', 'mch_id', 'device_info', 'result_code', 'err_code', 'trade_type',
-                    'prepay_id', 'code_url')
+                    'prepay_id', 'code_url', 'create_time')
     search_fields = ['prepay_id']
     list_per_page = 50
     model_icon = 'fa fa-weixin'
