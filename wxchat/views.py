@@ -716,8 +716,8 @@ class RefundView(View):
             refund_data = {
                 'out_trade_no': record.out_trade_no,
                 'out_refund_no': out_refund_no,
-                'total_fee': record.total_fee,
-                'refund_fee': record.cash_fee,
+                'total_fee': int(record.total_fee * 100),
+                'refund_fee': int(record.cash_fee * 100),
             }
             logger.info(refund_data)
             ret = order_refund(**refund_data)
