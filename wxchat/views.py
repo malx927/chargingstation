@@ -512,6 +512,7 @@ class UserDetailView(View):
             user_id = kwargs.get("id", None)
             user = UserInfo.objects.get(pk=user_id)
         except UserInfo.DoesNotExist as ex:
+            logger.info(ex)
             user = None
         context = {
             "user": user,
