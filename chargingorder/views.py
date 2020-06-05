@@ -93,6 +93,12 @@ class RechargeView(View):
                 "errmsg": "请先关注亚电新能源公众号"
             }
             return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+        # 账号申请退款后，冻结此账号，退款后恢复
+        if user_info and user_info.is_freeze == 1:
+            context = {
+                "errmsg": "您的账号已被冻结，暂时无法充电"
+            }
+            return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
 
         if not get_account_balance(openid):
             redirect_url = "{0}?url={1}".format(reverse('wxchat-order-pay'), request.get_full_path())

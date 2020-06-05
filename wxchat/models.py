@@ -122,6 +122,12 @@ class UserInfo(models.Model):
 
     balance_reset.short_description = "选项"
 
+    def update_freeze(self, is_freeze, reason):
+        self.is_freeze = is_freeze
+        # self.freeze_time = freeze_time
+        self.freeze_reason = reason
+        # self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
+
 
 class RechargeRecord(models.Model):
     """

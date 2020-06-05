@@ -49,7 +49,10 @@
         <div class="user-info__bind-wrapper">
           <div class="user-info__bind">
             <button class="van-button van-button--primary van-button--small" id="recharge"><span class="van-button__text">扫码充电</span></button>
-            <button class="van-button van-button--primary van-button--small" id="refund"><span class="van-button__text">退款申请</span></button>
+             <form action="{% url 'bill:wxchat-apply-refund' %}" method="post">
+                 {% csrf_token %}
+                 <button class="van-button van-button--primary van-button--small" id="refund" type="submit"><span class="van-button__text">退款申请</span></button>
+             </form>
           </div>
         </div>
       </div>

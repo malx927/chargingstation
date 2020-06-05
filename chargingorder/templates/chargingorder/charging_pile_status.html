@@ -3,10 +3,16 @@
 {% block container %}
     {% if errmsg %}
     <div class="valign-wrapper" style="height: 93vh">
+       <div class="container">
         <div class="row">
             <p class="center-align"><i class="material-icons red-text size-10rem">highlight_off</i></p>
             <p class="center-align flow-text">{{ errmsg }}</p>
         </div>
+        <div class="row center-align">
+            <button class="btn waves-effect waves-light cyan" id="id_return">返回<i class="large material-icons right">replay</i></button>
+        </div>
+      </div>
+
     </div>
     {% endif %}
     {% if pile_gun %}
@@ -34,10 +40,10 @@
                    <div class="col s8"><p class="cyan  order-item" id="id_work_status">{{ pile_gun.get_work_status_display|default:'' }}</p></div>
                </div>
            </li>
-
     </ul>
     {% endif%}
 {% endblock container %}
+{% block bottomjs %}
  {% if pile_gun%}
  <script>
 $(function () {
@@ -68,5 +74,12 @@ $(function () {
     });
 </script>
  {% endif%}
-{% block bottomjs %}
+
+<script>
+    $(function () {
+        $("#id_return").click(function () {
+             window.history.go(-1);
+        })
+    })
+</script>
 {% endblock %}

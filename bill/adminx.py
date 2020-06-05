@@ -55,14 +55,14 @@ class UserRefundAdmin(object):
         ),
     )
 
-    def has_add_permission(self):
-        return False
-
-    def has_change_permission(self, obj=None):
-        return False
-
-    def has_delete_permission(self, obj=None):
-        return False
+    # def has_add_permission(self):
+    #     return False
+    #
+    # def has_change_permission(self, obj=None):
+    #     return False
+    #
+    # def has_delete_permission(self, obj=None):
+    #     return False
 
 
 xadmin.site.register(UserRefund, UserRefundAdmin)
