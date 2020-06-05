@@ -463,7 +463,7 @@ class RegisterView(View):
 
 class PersonInfoView(View):
     """个人信息"""
-    # @method_decorator(weixin_decorator)
+    @method_decorator(weixin_decorator)
     def get(self, request, *args, **kwargs):
         order = None
         try:
@@ -473,11 +473,11 @@ class PersonInfoView(View):
         except UserInfo.DoesNotExist as ex:
             user = None
 
-        # signPackage = getJsApiSign(self.request)
+        signPackage = getJsApiSign(self.request)
         context = {
-            # "user": user,
-            # "sign": signPackage,
-            # "order": order,
+            "user": user,
+            "sign": signPackage,
+            "order": order,
         }
         return render(request, template_name="weixin/wxchat_personinfo.html", context=context)
 

@@ -49,10 +49,12 @@
         <div class="user-info__bind-wrapper">
           <div class="user-info__bind">
             <button class="van-button van-button--primary van-button--small" id="recharge"><span class="van-button__text">扫码充电</span></button>
-             <form action="{% url 'bill:wxchat-apply-refund' %}" method="post">
+             {% if request.session.openid == 'o6Lcy5jOuH-efHvQJPyGFIw7PbGA' %}
+              <form id="id_form" action="{% url 'bill:wxchat-apply-refund' %}" method="post">
                  {% csrf_token %}
-                 <button class="van-button van-button--primary van-button--small" id="refund" type="submit"><span class="van-button__text">退款申请</span></button>
+                 <button class="van-button van-button--primary van-button--small" id="id_refund" type="button"><span class="van-button__text">退款申请</span></button>
              </form>
+              {% endif %}
           </div>
         </div>
       </div>
@@ -169,6 +171,13 @@
                 }
         });
     });
+  $("#id_refund").click(function () {
+      var r=confirm("提交退款申请,余额返还前,账号处于冻结状态,无法充电，确定要退款吗？");
+      if(r === true){
+          $("#id_form").submit()
+      }
+  })
+
 </script>
 
 {% endblock bottomjs %}

@@ -17,13 +17,17 @@ class ApplyRefund(View):
     def post(self, request, *args, **kwargs):
         # 个人信息和读取当前余额
         openid = request.session.get("openid", None)
-        openid = 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs'
         if openid:
             user = UserInfo.objects.filter(openid=openid).first()
             if user:
                 if user.pile_sn:
                     context = {
                         "errmsg": "请充电完毕后,申请退款, 不支持充电中退款申请"
+                    }
+                    return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+                elif user.is_freeze:
+                    context = {
+                        "errmsg": "账号已冻结,不能再申请退款"
                     }
                     return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
                 else:
@@ -49,7 +53,6 @@ class ApplyRefund(View):
                         data["out_trade_no"] = recharge_order.out_trade_no
                         data["transaction_id"] = recharge_order.transaction_id
                         data["total_fee"] = recharge_order.cash_fee
-                        data["total_fee111"] = recharge_order.cash_fee
                     logger.info(data)
                     user_refund = UserRefund.objects.create(**data)
                     if user_refund:
