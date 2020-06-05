@@ -47,8 +47,7 @@ class UserInfoAdmin(object):
     """
     充电(微信)用户
     """
-    list_display = ['name', 'nickname', 'openid', 'user_type','binding_amount', 'telephone', 'total_money',
-                    'consume_money', 'account_balance', 'balance_reset']
+    list_display = ['name', 'nickname', 'openid', 'telephone', 'total_money', 'consume_money', 'account_balance', 'is_freeze', 'balance_reset']
     search_fields = ['name', 'openid', 'telephone', 'nickname']
     list_filter = ['user_type', 'seller']
     list_per_page = 50
