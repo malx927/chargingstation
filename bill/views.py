@@ -52,9 +52,9 @@ class ApplyRefund(View):
                         data["total_fee111"] = recharge_order.cash_fee
                     logger.info(data)
                     user_refund = UserRefund.objects.create(**data)
-                    # if user_refund:
+                    if user_refund:
                         # 冻结账户
-                        # user.is_freeze =
+                        user.update_freeze(1, '退款冻结')
                     return render(request, template_name='weixin/user_refund_detail.html', context={"refund": user_refund})
 
         context = {

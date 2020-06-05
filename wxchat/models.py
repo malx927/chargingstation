@@ -124,9 +124,13 @@ class UserInfo(models.Model):
 
     def update_freeze(self, is_freeze, reason):
         self.is_freeze = is_freeze
-        # self.freeze_time = freeze_time
-        self.freeze_reason = reason
-        # self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
+        if is_freeze == 1:
+            self.freeze_time = datetime.datetime.now()
+            self.freeze_reason = reason
+        else:
+            self.freeze_time = None
+            self.freeze_reason = None
+        self.save(update_fields=['is_freeze', 'freeze_time', 'freeze_reason'])
 
 
 class RechargeRecord(models.Model):
