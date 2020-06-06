@@ -1,30 +1,89 @@
-<div class="form-container">
-    <form id="id_form" method="post" action="{{ action }}">{% csrf_token %}
-    <div class="col-sm-12 form-horizontal">
-        <div class="panel panel-default fieldset unsort no_title">
-            <div class="panel-heading"><i class="icon fa fa-chevron-up chevron"></i>
-                <h3 class="panel-title"></h3>
-            </div>
-            <div class="panel-body ">
-                <div class="form-group">
-                    <div class="control-label" for="{{ form.card.id_for_label }}">{{ form.card.label }}</div>
-                    <div class="controls">
-                        {{ form.card }}
-                        <span class="text-danger">{{ form.card.errors.0 }}</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="control-label" for="{{ form.money.id_for_label }}">{{ form.money.label }}</div>
-                    <div class="controls">
-                        <div class="input-group">
-                            {{ form.money }}
-                            <div class="input-group-addon">元</div>
-                        </div>
-                        <span class="text-danger">{{ form.money.errors.0 }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </form>
-</div>
+<table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>退款单号</th>
+          <th>客户姓名</th>
+          <th>原订单编号</th>
+          <th>订单金额(元)</th>
+          <th>退款金额(元)</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for refund in refund_list %}
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{ refund.out_refund_no }}</td>
+          <td>{{ refund.user_refund.name }}</td>
+          <td>{{ refund.out_trade_no }}</td>
+          <td>{{ refund.total_fee }}</td>
+          <td>{{ refund.refund_fee }}</td>
+          <td>
+              <button class="btn btn-primary btn-xs refund-btn" data-item="{{ refund.id }}">退款</button>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+</table>
+<script>
+    $(function () {
+        $(".refund-btn").click(function (event) {
+            var button = $(event.target);
+            var id = button.attr('data-item');
+            console.log(id);
+            var params ={
+                id: id,
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+            };
+            console.log(params)
+            $.ajax({
+                type: 'POST',
+                url: '',
+                dataType: 'json',
+                data: params,
+                timeout: 5000,
+                success: function(data){
+                    console.log(JSON.stringify(data));
+                },
+                complete: function(){
+                },
+                error: function(error){
+
+                }
+            });
+        });
+        function getStatsData(params){
+            var category = params.category;
+            $("#stats").empty();
+            $.ajax({
+                type: 'GET',
+                url: '{% url "order-category-stats" %}',
+                dataType: 'json',
+                data: params,
+                timeout: 5000,
+                success: function(data){
+                    console.log(JSON.stringify(data));
+                    if(category == "1") {
+                        var temp = seller_template(data)
+                        console.log(temp);
+                        $("#stats").append(temp);
+                    }else if(category=="2"){
+                        var temp = station_template(data)
+                        console.log(temp);
+                        $("#stats").append(temp);
+                    }else if(category=="3"){
+                        var temp = pile_template(data)
+                        console.log(temp);
+                        $("#stats").append(temp);
+                    }
+                },
+                complete: function(){
+                },
+                error: function(error){
+
+                }
+            });
+        }
+    })
+</script>

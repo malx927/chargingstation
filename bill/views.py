@@ -3,12 +3,13 @@ import random
 
 from django.db.models import F
 from django.forms import model_to_dict
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views import View
 import datetime
 from wxchat.models import UserInfo, RechargeRecord
-from .models import UserRefund, UserRefundDetail
+from wxchat.views import order_refund
+from .models import UserRefund, UserRefundDetail, WxRefundRecord
 
 logger = logging.getLogger("django")
 
@@ -92,7 +93,10 @@ class ApplyRefundListView(View):
             logger.info(order_list)
             refund_list = self.create_refund_order(order_list, refund.id)
         logger.info(refund_list)
-        return HttpResponse()
+        context = {
+            "refund_list": refund_list
+        }
+        return render(request, template_name="bill/user_refund.html", context=context)
 
     def get_orders(self, openid, balance):
         last_year = datetime.datetime.now() + datetime.timedelta(days=-365)
@@ -135,3 +139,46 @@ class ApplyRefundListView(View):
 
         refund_list = UserRefundDetail.objects.filter(user_refund_id=user_refund_id)
         return refund_list
+
+
+class RefundView(View):
+    """
+    退款请求
+    """
+    def post(self, request, *args, **kwargs):
+        refund_id = request.POST.get("id")
+        try:
+            user_refund_detail = UserRefundDetail.objects.get(pk=refund_id)
+            refund_data = {
+                'out_trade_no': user_refund_detail.out_trade_no,
+                'out_refund_no': user_refund_detail.out_refund_no,
+                'transaction_id': user_refund_detail.transaction_id,
+                'total_fee': int(user_refund_detail.total_fee * 100),
+                'refund_fee': int(user_refund_detail.cash_fee * 100),
+            }
+            logger.info(refund_data)
+            ret = order_refund(**refund_data)
+            logger.info(ret)
+            WxRefundRecord.objects.create(**ret)
+            if 'return_code' in ret and 'result_code' in ret and ret['return_code'] == 'SUCCESS' and ret['result_code'] == 'SUCCESS':
+                user_refund_detail.refund_id = ret["refund_id"]
+                user_refund_detail.status = 1
+                user_refund_detail.save()
+                msg = {
+                    "status_code": 201,
+                    "errmsg": "用户退款成功"
+                }
+            else:
+                msg = {
+                    "status_code": 401,
+                    "errmsg": "用户退款失败:{}[{}]".format(ret["return_msg"], ret["err_code_des"])
+                }
+        except UserRefundDetail as ex:
+            logger.info(ex)
+            msg = {
+                "status_code": 401,
+                "errmsg": "订单不存在"
+            }
+            logger.info(ex)
+
+        return JsonResponse(msg)

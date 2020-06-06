@@ -165,20 +165,17 @@
                 <div class="modal-body">
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" data-dismiss="modal" id="save-edit-btn">退款</button>
+{#                    <button type="submit" class="btn btn-primary" data-dismiss="modal" id="save-edit-btn">退款</button>#}
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        $("#save-edit-btn").click(function () {
-            $("#id_form").submit();
-        })
         $('#myModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var uri = button.attr('data-uri');
-
+            console.log(uri);
             $(this).find('.modal-body').load(uri, function (response, status, xhr) {
                 if (status == "error") {
                     var msg = "Sorry but there was an error: ";

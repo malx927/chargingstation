@@ -109,6 +109,14 @@ class WxRefundRecord(models.Model):
     cash_fee = models.IntegerField(verbose_name='现金支付金额(分)', blank=True, null=True)
     cash_fee_type = models.CharField(verbose_name='标价币种', max_length=16, null=True, blank=True)
     cash_refund_fee = models.IntegerField(verbose_name='现金退款金额(分)', blank=True, null=True)
+    coupon_refund_fee = models.IntegerField(verbose_name='代金券退款总金额', null=True, blank=True)
+    coupon_refund_count = models.IntegerField(verbose_name='退款代金券使用数量', null=True, blank=True)
+    coupon_type_0 = models.CharField(verbose_name='代金券类型1', max_length=8, null=True, blank=True)
+    coupon_refund_fee_0 = models.IntegerField(verbose_name='单个代金券退款金额', null=True, blank=True)
+    coupon_refund_id_0 = models.CharField(verbose_name='退款代金券ID', max_length=20, null=True, blank=True)
+    coupon_type_1 = models.CharField(verbose_name='代金券类型1', max_length=8, null=True, blank=True)
+    coupon_refund_fee_1 = models.IntegerField(verbose_name='单个代金券退款金额', null=True, blank=True)
+    coupon_refund_id_1 = models.CharField(verbose_name='退款代金券ID', max_length=20, null=True, blank=True)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 
     class Meta:
