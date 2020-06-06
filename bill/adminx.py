@@ -1,9 +1,10 @@
 # coding=utf8
 
 import xadmin
+from django.urls import reverse
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText, Col, TabHolder, Tab
 
-from .models import InvoiceTitle, UserRefund, WxRefundRecord
+from .models import InvoiceTitle, UserRefund, WxRefundRecord, UserRefundDetail
 
 
 class InvoiceTitleAdmin(object):
@@ -38,22 +39,40 @@ xadmin.site.register(InvoiceTitle, InvoiceTitleAdmin)
 
 
 class UserRefundAdmin(object):
-    list_display = ["out_refund_no", "name", "nickname", "out_trade_no", "total_fee", "refund_fee", "refund_id", 'status']
-    search_fields = ['out_refund_no', 'name', 'out_trade_no', 'refund_id']
+    list_display = ["code", "name", "nickname", "telephone", 'openid', "refund_fee", 'status', "refund"]
+    search_fields = ["code", 'openid', 'name', 'nickname', 'telephone']
     list_filter = ['status']
     model_icon = 'fa fa-random'
+    object_list_template = "bill/refund_model_list.html"
 
-    form_layout = (
-        Fieldset(
-            '用户退款信息',
-            Row('out_refund_no', 'name'),
-            Row('nickname', 'openid'),
-            Row('telephone', 'out_trade_no'),
-            Row('transaction_id', 'refund_id'),
-            Row('refund_fee', 'total_fee'),
-            Row('status', 'update_time'),
-        ),
-    )
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
+
+    def refund(self, instance):
+        url = reverse("wxchat-apply-refund-list")
+        refund_url = "{}?openid={}&id={}".format(url, instance.openid, instance.id)
+        refund_btn = "<a class='btn btn-xs btn-danger' data-toggle='modal' data-target='#myModal' data-uri='{}'>退款</a>".format(refund_url)
+        return refund_btn
+
+    refund.short_description = "退款"
+    refund.allow_tags = True
+    refund.is_column = True
+
+
+xadmin.site.register(UserRefund, UserRefundAdmin)
+
+
+class UserRefundDetailAdmin(object):
+    list_display = ["out_refund_no", "user_refund", 'openid', "out_trade_no", "transaction_id", "refund_fee", "refund_id", "update_time", 'status']
+    search_fields = ['openid', 'user_refund__name', 'user_refund__nickname', 'out_trade_no', 'out_refund_no', 'refund_id', 'transaction_id']
+    list_filter = ['status']
+    model_icon = 'fa fa-random'
 
     # def has_add_permission(self):
     #     return False
@@ -65,7 +84,7 @@ class UserRefundAdmin(object):
     #     return False
 
 
-xadmin.site.register(UserRefund, UserRefundAdmin)
+xadmin.site.register(UserRefundDetail, UserRefundDetailAdmin)
 
 
 class WxRefundRecordAdmin(object):

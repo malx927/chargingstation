@@ -15,63 +15,34 @@
     <h2 class="block-header">退款申请</h2>
     <a class="coupon-item__action header_right" href="javascript:window.history.go(-1)">返回</a>
     <div class="van-cell-group van-hairline--top-bottom">
-      {% if user %}
-      <div class="base-info-cell">
-        <div class="setting-image-cell">
-          <div class="van-cell van-cell--clickable">
-            <div class="van-cell__title"><span>头像</span></div>
-            <div class="van-cell__value">
-              <div class="van-uploader">
-                <div class="avatar-image-wrapper">
-                  <div class="avatar-image" style="background-image: url('{{ user.headimgurl }}'); width: 30px; height: 30px;"></div>
-                </div><input type="file" accept="image/*" disabled="disabled" class="van-uploader__input">
-              </div>
-            </div>
-            <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-          </div>
-        </div>
-      </div>
+      {% if user_refund %}
       <div class="base-info-cell">
         <div class="van-cell van-cell--clickable">
           <div class="van-cell__title"><span>姓名</span></div>
-          <div class="van-cell__value van-ellipsis"><span>{{ user.name|default:'空' }}</span></div>
+          <div class="van-cell__value van-ellipsis"><span>{{ user_refund.name|default:'空' }}</span></div>
           <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
         </div>
       </div>
       <div class="base-info-cell">
         <div class="van-cell van-cell--clickable">
           <div class="van-cell__title"><span>昵称</span></div>
-          <div class="van-cell__value van-ellipsis"><span>{{ user.nickname|default:'空' }}</span></div>
+          <div class="van-cell__value van-ellipsis"><span>{{ user_refund.nickname|default:'空' }}</span></div>
           <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
         </div>
       </div>
       <div class="base-info-cell">
         <div class="van-cell">
           <div class="van-cell__title"><span>手机号</span></div>
-          <div class="van-cell__value van-ellipsis"><span>{{ user.telephone }}</span></div>
+          <div class="van-cell__value van-ellipsis"><span>{{ user_refund.telephone }}</span></div>
         </div>
       </div>
-{#      <div class="base-info-cell">#}
-{#        <div class="van-cell van-cell--clickable">#}
-{#          <div class="van-cell__title"><span>性别</span></div>#}
-{#          <div class="van-cell__value"><span>{{ user.get_sex_display }}</span></div>#}
-{#          <i class="van-icon van-icon-arrow van-cell__right-icon"></i>#}
-{#        </div>#}
-{#      </div>#}
       <div class="base-info-cell">
         <div>
           <div class="van-cell van-cell--clickable">
-            <div class="van-cell__title"><span>车牌号</span></div>
-            <div class="van-cell__value van-ellipsis"><span>{{ user.car_number|default:'空' }}</span></div>
+            <div class="van-cell__title"><span>待退金额</span></div>
+            <div class="van-cell__value van-ellipsis"><span>{{ user_refund.refund_fee|default:'' }}元</span></div>
             <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
           </div>
-        </div>
-      </div>
-      <div class="base-info-cell">
-        <div class="van-cell van-cell--clickable" value="请选择">
-          <div class="van-cell__title"><span>车型</span></div>
-          <div class="van-cell__value van-ellipsis"><span>{{ user.car_type|default:'空' }}</span></div>
-          <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
         </div>
       </div>
       <div class="base-info-cell">

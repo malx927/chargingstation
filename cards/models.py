@@ -79,7 +79,7 @@ class ChargingCard(models.Model):
         charging_url = "/cards/recharge_money/?c_id={}".format(self.id)
         startup = " <a class='btn btn-xs btn-default' href='{}'>启用</a> ".format(start_url)
         stop = " <a class='btn btn-xs btn-danger' href='{}'>禁用</a> ".format(stop_url)
-        charging = " <button class='btn btn-xs btn-success' data-toggle='modal' data-target='#myModal' data-uri='{}'>充值</a>".format(charging_url)
+        charging = " <a class='btn btn-xs btn-success' data-toggle='modal' data-target='#myModal' data-uri='{}'>充值</a>".format(charging_url)
         return mark_safe(startup + stop + charging)
 
     startup.short_description = "选项"

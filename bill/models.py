@@ -35,25 +35,49 @@ class UserRefund(models.Model):
     用户退款记录
     """
     REFUND_STATUS = (
+        (0, '未退款'),
+        (1, '已退款')
+    )
+    code = models.CharField(verbose_name='申请单号', max_length=32)
+    openid = models.CharField(verbose_name='微信ID', max_length=120)
+    name = models.CharField(verbose_name='姓名', max_length=24, blank=True, null=True)
+    nickname = models.CharField(verbose_name='昵称', max_length=64, help_text="微信昵称")
+    telephone = models.CharField(verbose_name='手机号码', max_length=18, blank=True, default='')
+    refund_fee = models.DecimalField(verbose_name='退款金额(元)', max_digits=7, decimal_places=2, blank=True, null=True)
+    status = models.IntegerField(verbose_name='退款状态', choices=REFUND_STATUS, default=0)
+    update_time = models.DateTimeField(verbose_name='退款时间', blank=True, null=True)
+    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '用户退款申请'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.code
+
+
+class UserRefundDetail(models.Model):
+    """
+    用户退款明细
+    """
+    REFUND_STATUS = (
         (0, '失败'),
         (1, '成功')
     )
     out_refund_no = models.CharField(verbose_name='退款单号', max_length=64)
-    name = models.CharField(verbose_name='姓名', max_length=24, blank=True, null=True)
-    nickname = models.CharField(verbose_name='昵称', max_length=64, help_text="微信昵称")
+    user_refund = models.ForeignKey(UserRefund, verbose_name='申请单号', blank=True, null=True, on_delete=models.SET_NULL)
     openid = models.CharField(verbose_name='微信ID', max_length=120, blank=True, null=True)
-    telephone = models.CharField(verbose_name='手机号码', max_length=18, blank=True, default='')
     out_trade_no = models.CharField(verbose_name='原订单编号', max_length=128)
     transaction_id = models.CharField(verbose_name='原微信订单号', max_length=128, null=True, blank=True)
     total_fee = models.DecimalField(verbose_name='订单金额(元)', max_digits=7, decimal_places=2, blank=True, null=True)
     refund_fee = models.DecimalField(verbose_name='退款金额(元)', max_digits=7, decimal_places=2, blank=True, null=True)
-    refund_id = models.CharField(verbose_name='退款单号', max_length=32, blank=True, null=True)
+    refund_id = models.CharField(verbose_name='微信退款单号', max_length=32, blank=True, null=True)
     status = models.IntegerField(verbose_name='退款状态', choices=REFUND_STATUS, blank=True, null=True)
     update_time = models.DateTimeField(verbose_name='退款时间', blank=True, null=True)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 
     class Meta:
-        verbose_name = '用户退款记录'
+        verbose_name = '用户退款明细'
         verbose_name_plural = verbose_name
 
     def __str__(self):

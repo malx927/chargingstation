@@ -33,5 +33,5 @@ urlpatterns = [
     url('^stats/', include("statistic.urls")),
     url('^cards/', include("cards.urls")),
     url('^client/', include("client.urls", namespace="client")),
-    url('^bill/', include("bill.urls", namespace="bill")),
+    url('^bill/', include("bill.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

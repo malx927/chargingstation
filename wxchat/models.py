@@ -146,6 +146,7 @@ class RechargeRecord(models.Model):
     total_fee = models.DecimalField(verbose_name='应收款', max_digits=7, decimal_places=2, blank=True, null=True)
     cash_fee = models.DecimalField(verbose_name='实收款', max_digits=7, decimal_places=2, blank=True, null=True)
     pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
+    refund_fee = models.DecimalField(verbose_name="退款金额", max_digits=7, decimal_places=2, default=0)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True, auto_now=False)
     status = models.IntegerField(verbose_name='支付状态', default=0, choices=PAY_ORDER_STATUS)
 

@@ -481,9 +481,6 @@ class PersonInfoView(View):
         }
         return render(request, template_name="weixin/wxchat_personinfo.html", context=context)
 
-    def post(self, request, *args, **kwargs):
-        pass
-
 
 class OrderRemoveView(View):
     """删除未支付的订单"""
