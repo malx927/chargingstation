@@ -20,7 +20,7 @@ from io import BytesIO
 from django.views.decorators.csrf import csrf_exempt
 from redis import Redis
 from wechatpy import parse_message, create_reply, WeChatClient, WeChatPay
-from wechatpy.exceptions import InvalidSignatureException, WeChatPayException
+from wechatpy.exceptions import InvalidSignatureException, WeChatPayException, WeChatClientException
 from wechatpy.pay import dict_to_xml
 from wechatpy.replies import TransferCustomerServiceReply, ImageReply, VoiceReply
 from wechatpy.session.redisstorage import RedisStorage
@@ -91,8 +91,11 @@ def order_refund(*arg, **kwargs):
     if total_fee == 0 or refund_fee == 0:
         return None
     wxPay = WeixinPay()
-    ret = wxPay.refund.apply(total_fee=total_fee, refund_fee=refund_fee, out_trade_no=out_trade_no, transaction_id=transaction_id, out_refund_no=out_refund_no)
-
+    try:
+        ret = wxPay.refund.apply(total_fee=total_fee, refund_fee=refund_fee, out_trade_no=out_trade_no, transaction_id=transaction_id, out_refund_no=out_refund_no)
+    except WeChatClientException as ex:
+        print(ex)
+        return ex
     return ret
 
 
