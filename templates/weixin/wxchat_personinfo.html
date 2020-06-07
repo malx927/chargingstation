@@ -49,12 +49,12 @@
         <div class="user-info__bind-wrapper">
           <div class="user-info__bind">
             <button class="van-button van-button--primary van-button--small" id="recharge"><span class="van-button__text">扫码充电</span></button>
-{#             {% if request.session.openid == 'o6Lcy5jOuH-efHvQJPyGFIw7PbGA' %}#}
+              {% if user %}
               <form id="id_form" action="{% url 'wxchat-apply-refund' %}" method="post">
                  {% csrf_token %}
-                 <button class="van-button van-button--primary van-button--small" id="id_refund" type="button"><span class="van-button__text">退款申请</span></button>
+                 <button class="van-button van-button--primary van-button--small" id="id_refund" type="button" {% if user.account_balance == 0 %} disabled {% endif %}><span class="van-button__text">退款申请</span></button>
              </form>
-{#              {% endif %}#}
+              {% endif %}
           </div>
         </div>
       </div>
