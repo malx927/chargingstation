@@ -101,6 +101,7 @@ class WxRefundRecord(models.Model):
     out_trade_no = models.CharField(verbose_name='商户订单号', max_length=32, null=True, blank=True)
     out_refund_no = models.CharField(verbose_name='退款单号', max_length=64, null=True, blank=True)
     refund_id = models.CharField(verbose_name='微信退款单号', max_length=32)
+    refund_channel = models.CharField(verbose_name='微信退款单号', max_length=16, null=True, blank=True)
     refund_fee = models.IntegerField(verbose_name='退款金额(分)', blank=True, null=True)
     settlement_refund_fee = models.IntegerField(verbose_name='应结退款金额(分)', blank=True, null=True)
     total_fee = models.IntegerField(verbose_name='标价金额(分)', blank=True, null=True)
