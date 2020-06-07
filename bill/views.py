@@ -209,9 +209,12 @@ class UserUnfreezeView(View):
         try:
             user = UserInfo.objects.get(openid=openid)
             user.is_freeze = 0
+            user.total_money = 0
+            user.consume_money = 0
+            user.binding_amount = 0
             user.freeze_time = None
             user.freeze_reason = None
-            user.save(update_fields=["is_freeze", "freeze_time", "freeze_reason"])
+            user.save(update_fields=["is_freeze", "freeze_time", "freeze_reason", "total_money", "consume_money", "binding_amount"])
             msg = {
                 "status_code": 201,
                 "message": "解冻成功"
