@@ -44,6 +44,7 @@ class UserRefund(models.Model):
     nickname = models.CharField(verbose_name='昵称', max_length=64, help_text="微信昵称")
     telephone = models.CharField(verbose_name='手机号码', max_length=18, blank=True, default='')
     refund_fee = models.DecimalField(verbose_name='退款金额(元)', max_digits=7, decimal_places=2, blank=True, null=True)
+    actual_fee = models.DecimalField(verbose_name='实退金额(元)', max_digits=7, decimal_places=2, blank=True, null=True)
     status = models.IntegerField(verbose_name='退款状态', choices=REFUND_STATUS, default=0)
     update_time = models.DateTimeField(verbose_name='退款时间', blank=True, null=True)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)

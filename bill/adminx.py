@@ -56,11 +56,14 @@ class UserRefundAdmin(object):
 
     def refund(self, instance):
         url = reverse("wxchat-apply-refund-list")
+        unfreeze_url = reverse("wxchat-user-unfreeze")
         refund_url = "{}?openid={}&id={}".format(url, instance.openid, instance.id)
-        refund_btn = "<a class='btn btn-xs btn-danger' data-toggle='modal' data-target='#myModal' data-uri='{}'>退款</a>".format(refund_url)
-        return refund_btn
+        unfreeze_url = "{}?openid={}".format(unfreeze_url, instance.openid)
+        refund_btn = "<a class='btn btn-xs btn-danger' data-toggle='modal' data-target='#myModal' data-uri='{}'>退款</a> ".format(refund_url)
+        unfreeze_btn = " <a class='btn btn-xs btn-primary unfreeze-btn' data-uri='{}'>解冻</a>".format(unfreeze_url)
+        return refund_btn + unfreeze_btn
 
-    refund.short_description = "退款"
+    refund.short_description = "操作"
     refund.allow_tags = True
     refund.is_column = True
 

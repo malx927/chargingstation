@@ -170,8 +170,17 @@ class RefundView(View):
 
             if 'return_code' in ret and 'result_code' in ret and ret['return_code'] == 'SUCCESS' and ret['result_code'] == 'SUCCESS':
                 user_refund_detail.refund_id = ret["refund_id"]
-                user_refund_detail.status = 1
+                user_refund_detail.status = 1  # 单笔退款成功
+                user_refund_detail.update_time = datetime.datetime.now()
                 user_refund_detail.save()
+                user_refund = user_refund_detail.user_refund
+                user_refund.actual_fee += user_refund_detail.refund_fee
+                if user_refund.refund_fee == user_refund.actual_fee:
+                    user_refund.status = 1  # 退款成功
+                    user_refund.save(update_fields=['actual_fee', 'status'])
+                else:
+                    user_refund.save(update_fields=['actual_fee'])
+
                 msg = {
                     "status_code": 201,
                     "message": "用户退款成功"
@@ -188,5 +197,29 @@ class RefundView(View):
                 "errmsg": "订单不存在"
             }
             logger.info(ex)
+
+        return JsonResponse(msg)
+
+
+class UserUnfreezeView(View):
+    """账号解冻"""
+    def post(self, request, *args, **kwargs):
+        openid = request.GET.get("openid")
+        print(openid)
+        try:
+            user = UserInfo.objects.get(openid=openid)
+            user.is_freeze = 0
+            user.freeze_time = None
+            user.freeze_reason = None
+            user.save(update_fields=["is_freeze", "freeze_time", "freeze_reason"])
+            msg = {
+                "status_code": 201,
+                "message": "解冻成功"
+            }
+        except UserInfo.DoesNotExist as ex:
+            msg = {
+                "status_code": 401,
+                "errmsg": "用户不存在"
+            }
 
         return JsonResponse(msg)

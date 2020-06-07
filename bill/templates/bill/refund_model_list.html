@@ -183,6 +183,35 @@
                 }
             });
         })
+        $(".unfreeze-btn").click(function (event) {
+            var button = $(event.target);
+            var url = button.attr('data-uri');
+            console.log(url);
+            var params ={
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+            };
+            console.log(params)
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: 'json',
+                data: params,
+                timeout: 5000,
+                success: function(data){
+                    console.log(JSON.stringify(data));
+                    if(data.status_code === 201){
+                        alert(data.message)
+                    }else{
+                        alert(data.errmsg)
+                    }
+                },
+                complete: function(){
+                },
+                error: function(error){
+
+                }
+            });
+        });
     </script>
 {% endblock %}
 
