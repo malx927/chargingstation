@@ -27,5 +27,4 @@ urlpatterns = [
     url(r'^updateuser/$', UpdateUserName.as_view(), name='wxchat-update-user'),
     url(r'^subupdateamount/$', SubAccountUpdateAmount.as_view(), name='wxchat-update-amount'),
     url(r'^balancereset/$', UserBalanceResetView.as_view(), name='wxchat-balance-reset'),
-    url(r'^refund/$', RefundView.as_view(), name='wxchat-refund'),
 ]

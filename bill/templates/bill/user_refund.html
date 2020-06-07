@@ -39,12 +39,17 @@
             console.log(params)
             $.ajax({
                 type: 'POST',
-                url: '',
+                url: "{% url 'wxchat-refund' %}",
                 dataType: 'json',
                 data: params,
                 timeout: 5000,
                 success: function(data){
                     console.log(JSON.stringify(data));
+                    if(data.status_code === 201){
+                        alert(data.message)
+                    }else{
+                        alert(data.errmsg)
+                    }
                 },
                 complete: function(){
                 },

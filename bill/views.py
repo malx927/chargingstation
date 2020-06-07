@@ -146,7 +146,7 @@ class RefundView(View):
     退款请求
     """
     def post(self, request, *args, **kwargs):
-        refund_id = request.POST.get("id")
+        refund_id = request.POST.get("id", None)
         try:
             user_refund_detail = UserRefundDetail.objects.get(pk=refund_id)
             refund_data = {
@@ -154,7 +154,7 @@ class RefundView(View):
                 'out_refund_no': user_refund_detail.out_refund_no,
                 'transaction_id': user_refund_detail.transaction_id,
                 'total_fee': int(user_refund_detail.total_fee * 100),
-                'refund_fee': int(user_refund_detail.cash_fee * 100),
+                'refund_fee': int(user_refund_detail.refund_fee * 100),
             }
             logger.info(refund_data)
             ret = order_refund(**refund_data)
@@ -166,14 +166,14 @@ class RefundView(View):
                 user_refund_detail.save()
                 msg = {
                     "status_code": 201,
-                    "errmsg": "用户退款成功"
+                    "message": "用户退款成功"
                 }
             else:
                 msg = {
                     "status_code": 401,
                     "errmsg": "用户退款失败:{}[{}]".format(ret["return_msg"], ret["err_code_des"])
                 }
-        except UserRefundDetail as ex:
+        except UserRefundDetail.DoesNotExist as ex:
             logger.info(ex)
             msg = {
                 "status_code": 401,
