@@ -162,7 +162,7 @@ class RefundView(View):
             if "status_code" in ret and ret["status_code"] == 401:
                 msg = {
                     "status_code": ret["status_code"],
-                    "message": ret["errmsg"]
+                    "errmsg": ret["errmsg"]
                 }
                 return JsonResponse(msg)
 
@@ -174,7 +174,7 @@ class RefundView(View):
                 user_refund_detail.save()
                 msg = {
                     "status_code": 201,
-                    "errmsg": "用户退款成功"
+                    "message": "用户退款成功"
                 }
             else:
                 msg = {
