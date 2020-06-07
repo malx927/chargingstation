@@ -174,7 +174,7 @@ class RefundView(View):
                 user_refund_detail.save()
                 msg = {
                     "status_code": 201,
-                    "message": "用户退款成功"
+                    "errmsg": "用户退款成功"
                 }
             else:
                 msg = {

@@ -58,37 +58,5 @@
                 }
             });
         });
-        function getStatsData(params){
-            var category = params.category;
-            $("#stats").empty();
-            $.ajax({
-                type: 'GET',
-                url: '{% url "order-category-stats" %}',
-                dataType: 'json',
-                data: params,
-                timeout: 5000,
-                success: function(data){
-                    console.log(JSON.stringify(data));
-                    if(category == "1") {
-                        var temp = seller_template(data)
-                        console.log(temp);
-                        $("#stats").append(temp);
-                    }else if(category=="2"){
-                        var temp = station_template(data)
-                        console.log(temp);
-                        $("#stats").append(temp);
-                    }else if(category=="3"){
-                        var temp = pile_template(data)
-                        console.log(temp);
-                        $("#stats").append(temp);
-                    }
-                },
-                complete: function(){
-                },
-                error: function(error){
-
-                }
-            });
-        }
     })
 </script>
