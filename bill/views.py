@@ -173,13 +173,18 @@ class RefundView(View):
                 user_refund_detail.status = 1  # 单笔退款成功
                 user_refund_detail.update_time = datetime.datetime.now()
                 user_refund_detail.save()
+                refund_fee = user_refund_detail.refund_fee
                 user_refund = user_refund_detail.user_refund
-                user_refund.actual_fee += user_refund_detail.refund_fee
+                user_refund.actual_fee += refund_fee
+                user_refund.update_time = datetime.datetime.now()
                 if user_refund.refund_fee == user_refund.actual_fee:
                     user_refund.status = 1  # 退款成功
                     user_refund.save(update_fields=['actual_fee', 'status'])
                 else:
                     user_refund.save(update_fields=['actual_fee'])
+                # 将退款金额同步到用户充值记录相应的订单内
+
+                RechargeRecord.objects.filter(out_trade_no=user_refund_detail.out_trade_no).update(refund_fee=F("refund_fee") + refund_fee)
 
                 msg = {
                     "status_code": 201,
