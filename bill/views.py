@@ -159,7 +159,15 @@ class RefundView(View):
             logger.info(refund_data)
             ret = order_refund(**refund_data)
             logger.info(ret)
+            if "status_code" in ret and ret["status_code"] == 401:
+                msg = {
+                    "status_code": ret["status_code"],
+                    "message": ret["errmsg"]
+                }
+                return JsonResponse(msg)
+
             WxRefundRecord.objects.create(**ret)
+
             if 'return_code' in ret and 'result_code' in ret and ret['return_code'] == 'SUCCESS' and ret['result_code'] == 'SUCCESS':
                 user_refund_detail.refund_id = ret["refund_id"]
                 user_refund_detail.status = 1

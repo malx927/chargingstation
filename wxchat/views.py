@@ -93,9 +93,16 @@ def order_refund(*arg, **kwargs):
     wxPay = WeixinPay()
     try:
         ret = wxPay.refund.apply(total_fee=total_fee, refund_fee=refund_fee, out_trade_no=out_trade_no, transaction_id=transaction_id, out_refund_no=out_refund_no)
-    except WeChatClientException as ex:
-        print(ex)
-        return ex
+    except WeChatPayException as ex:
+        logger.info(ex)
+        ret = {
+            'status_code': 401,
+            "return_code": ex.return_code,
+            "return_msg": ex.return_msg,
+            "errcode": ex.errcode,
+            "errmsg": ex.errmsg,
+        }
+        return ret
     return ret
 
 
