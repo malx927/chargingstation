@@ -51,8 +51,8 @@ class UserRefundAdmin(object):
     def has_change_permission(self, obj=None):
         return False
 
-    def has_delete_permission(self, obj=None):
-        return False
+    # def has_delete_permission(self, obj=None):
+    #     return False
 
     def refund(self, instance):
         url = reverse("wxchat-apply-refund-list")
@@ -77,14 +77,14 @@ class UserRefundDetailAdmin(object):
     list_filter = ['status']
     model_icon = 'fa fa-random'
 
-    # def has_add_permission(self):
-    #     return False
-    #
-    # def has_change_permission(self, obj=None):
-    #     return False
-    #
-    # def has_delete_permission(self, obj=None):
-    #     return False
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
 
 
 xadmin.site.register(UserRefundDetail, UserRefundDetailAdmin)

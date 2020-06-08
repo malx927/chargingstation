@@ -29,7 +29,12 @@
     {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a>
   {% endif %}
 {% endblock nav_btns %}
-
+{% block messages %}
+    {{ block.super }}
+    <div id="my_alert" class="alert alert-dismissable alert-success">
+          <button type="button" class="close" data-dismiss="alert">×</button>
+    </div>
+{% endblock messages %}
 {% block content %}
   <div class="content-toolbar btn-toolbar pull-right clearfix">
     {% view_block 'top_toolbar' %}
@@ -172,6 +177,9 @@
         </div>
     </div>
     <script>
+    $(function () {
+        $("#my_alert").hide();
+
         $('#myModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var uri = button.attr('data-uri');
@@ -182,7 +190,7 @@
                     modal.find('.modal-body').html(msg + xhr.status + " " + (typeof xhr === 'string' ? xhr : xhr.responseText || xhr.statusText || 'Unknown error!'));
                 }
             });
-        })
+        });
         $(".unfreeze-btn").click(function (event) {
             var button = $(event.target);
             var url = button.attr('data-uri');
@@ -199,11 +207,7 @@
                 timeout: 5000,
                 success: function(data){
                     console.log(JSON.stringify(data));
-                    if(data.status_code === 201){
-                        alert(data.message)
-                    }else{
-                        alert(data.errmsg)
-                    }
+                    show_alert(data);
                 },
                 complete: function(){
                 },
@@ -212,6 +216,22 @@
                 }
             });
         });
+    });
+
+    function show_alert(data) {
+        if(data.status_code ===201)
+        {
+            $("#my_alert")[0].innerHTML = data.message;
+        }else{
+            $("#my_alert").removeClass('alert-success alert-info alert-warning alert-danger').addClass('alert-danger');
+            $("#my_alert")[0].innerHTML = data.errmsg;
+        }
+        $("#my_alert").fadeTo(2000, 500).slideUp(500, function(){
+            $("#my_alert").hide();
+        });
+
+    }
+
     </script>
 {% endblock %}
 
