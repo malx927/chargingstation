@@ -72,7 +72,7 @@ xadmin.site.register(UserRefund, UserRefundAdmin)
 
 
 class UserRefundDetailAdmin(object):
-    list_display = ["out_refund_no", "user_refund", 'openid', "out_trade_no", "transaction_id", "refund_fee", "refund_id", "update_time", 'status']
+    list_display = ["out_refund_no", "user_refund", 'openid', "out_trade_no", "refund_fee", "refund_id", "update_time", 'status']
     search_fields = ['openid', 'user_refund__name', 'user_refund__nickname', 'out_trade_no', 'out_refund_no', 'refund_id', 'transaction_id']
     list_filter = ['status']
     model_icon = 'fa fa-random'

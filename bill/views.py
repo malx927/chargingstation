@@ -149,6 +149,13 @@ class RefundView(View):
         refund_id = request.POST.get("id", None)
         try:
             user_refund_detail = UserRefundDetail.objects.get(pk=refund_id)
+            if user_refund_detail.status == 1:
+                msg = {
+                    "status_code": 401,
+                    "errmsg": "用户退款已经成功,无须再次操作"
+                }
+                return JsonResponse(msg)
+
             refund_data = {
                 'out_trade_no': user_refund_detail.out_trade_no,
                 'out_refund_no': user_refund_detail.out_refund_no,
@@ -179,9 +186,9 @@ class RefundView(View):
                 user_refund.update_time = datetime.datetime.now()
                 if user_refund.refund_fee == user_refund.actual_fee:
                     user_refund.status = 1  # 退款成功
-                    user_refund.save(update_fields=['actual_fee', 'status'])
+                    user_refund.save(update_fields=['actual_fee', 'status', 'update_time'])
                 else:
-                    user_refund.save(update_fields=['actual_fee'])
+                    user_refund.save(update_fields=['actual_fee', 'update_time'])
                 # 将退款金额同步到用户充值记录相应的订单内
 
                 RechargeRecord.objects.filter(out_trade_no=user_refund_detail.out_trade_no).update(refund_fee=F("refund_fee") + refund_fee)
