@@ -83,8 +83,8 @@ class UserRefundDetailAdmin(object):
     def has_change_permission(self, obj=None):
         return False
 
-    def has_delete_permission(self, obj=None):
-        return False
+    # def has_delete_permission(self, obj=None):
+    #     return False
 
 
 xadmin.site.register(UserRefundDetail, UserRefundDetailAdmin)
