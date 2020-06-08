@@ -31,6 +31,9 @@
 </table>
 <script>
     $(function () {
+
+        $("#refund_alert").hide();
+
         $(".refund-btn").click(function (event) {
             var button = $(event.target);
             var id = button.attr('data-item');
