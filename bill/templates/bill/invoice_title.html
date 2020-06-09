@@ -1,0 +1,90 @@
+{% extends 'wxchat/base.html' %}{% load static %}
+{% block extra %}
+    <style>
+    h4.header2 {
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+    </style>
+{% endblock extra%}
+{% block title %}发票抬头信息{% endblock %}
+{% block container %}
+    <h4 class="header2">发票抬头信息</h4>
+    <form class="col s12" name="invoice_form" action="{% url 'wxchat-register' %}" method="post">{% csrf_token %}
+    <div class="row">
+        <div class="col s6 m6 center-align">
+            <input class="with-gap" name="category" type="radio" id="id_category_0" value="0" checked/>
+            <label for="id_category_0">公司发票</label>
+        </div>
+        <div class="col s6 m6 center-align">
+            <input class="with-gap" name="category" type="radio" id="id_category_1" value="1" />
+            <label for="id_category_1">个人发票</label>
+        </div>
+    </div>
+    <div class="row">
+{#        <input type="hidden" id="openid" name="openid" value="{{ openid|default:'' }}">#}
+{#        <input type="hidden" id="url" name="url" value="{{ url|default:'' }}">#}
+
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">subject</i>
+            <input id="id_title" name="title" type="text" class="validate" required >
+            <label for="id_title">请填写发票抬头</label>
+            {% if errors.id_title.0 %}<span>{{ errors.id_title.0 }}</span>{% endif %}
+        </div>
+        <div class="input-field col s12 m6" id="id_tax_number_block">
+            <i class="material-icons prefix">credit_card</i>
+            <input id="id_tax_number" name="tax_number" type="text" class="validate" required>
+            <label for="id_tax_number">请填写税务识别号</label>
+            {% if errors.tax_number.0 %}<span>{{ errors.tax_number.0 }}</span>{% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">contacts</i>
+            <input id="id_address" name="address" type="text" required>
+            <label for="id_address">请填写地址</label>
+            {% if errors.address.0 %}<span>{{ errors.address.0 }}</span>{% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">phone</i>
+            <input id="id_telephone" name="telephone" type="text" required>
+            <label for="id_telephone">请填写电话</label>
+            {% if errors.telephone.0 %}<span>{{ errors.telephone.0 }}</span>{% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">info_outline</i>
+            <input id="id_bank_account" name="bank_account" type="text" required>
+            <label for="id_bank_account">请填写开户行及账号</label>
+            {% if errors.bank_account.0 %}<span>{{ errors.bank_account.0 }}</span>{% endif %}
+        </div>
+        <div class="input-field col s12 m6">
+            <i class="material-icons prefix">email</i>
+            <input id="id_email" name="email" type="text" required>
+            <label for="id_email">请填写邮箱</label>
+            {% if errors.email.0 %}<span>{{ errors.email.0 }}</span>{% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class=" col s6 center-align">
+         <button class="btn waves-effect waves-light blue-grey lighten-3" type="button">返回</button>
+        </div>
+        <div class=" col s6 center-align">
+        <button class="btn waves-effect waves-light cyan " type="submit" name="action">提交</button>
+        </div>
+    </div>
+    </form>
+{% endblock container %}
+{% block bottomjs %}
+<script>
+    $(function () {
+        $("input[id^='id_category']").click(function (event) {
+            console.log(event.target.value)
+            var cate = event.target.value;
+            if(cate === "0"){
+                $("#id_tax_number_block").css("display", "block")
+            }else{
+                $("#id_tax_number_block").css("display", 'none')
+            }
+        })
+    })
+</script>
+
+{% endblock bottomjs %}

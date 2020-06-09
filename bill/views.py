@@ -238,3 +238,12 @@ class UserUnfreezeView(View):
             }
 
         return JsonResponse(msg)
+
+
+class InvoiceTitleView(View):
+    """
+    发票抬头
+    """
+    def get(self, request, *args, **kwargs):
+
+        return render(request, template_name='bill/invoice_title.html')

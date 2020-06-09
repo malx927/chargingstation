@@ -11,6 +11,8 @@ class InvoiceTitle(models.Model):
         (0, '电子发票'),
         (1, '纸质发票')
     )
+    openid = models.CharField(verbose_name='微信ID', max_length=120)
+    name = models.CharField(verbose_name='姓名', max_length=64, blank=True, null=True)
     title = models.CharField(verbose_name='发票抬头', max_length=128)
     category = models.IntegerField(verbose_name='发票类型', default=0, choices=CATEGORY)
     tax_number = models.CharField(verbose_name='税务识别号', max_length=64, blank=True, null=True)
@@ -18,7 +20,8 @@ class InvoiceTitle(models.Model):
     telephone = models.CharField(verbose_name='电话', max_length=32, blank=True, null=True)
     bank_account = models.CharField(verbose_name='开户行及账号', max_length=256, blank=True, null=True)
     email = models.CharField(verbose_name='邮箱', max_length=128, blank=True, null=True)
-    invoice_style = models.IntegerField(verbose_name='发票介质', blank=True, null=True, choices=INVOICE_STYLE)
+    total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2)
+    consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
     update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
     add_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
 
