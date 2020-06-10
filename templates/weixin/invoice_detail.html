@@ -1,0 +1,79 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block extra %}
+    <style>
+    .header_right{
+        position:absolute;
+        right:14px;
+        top:10px;
+        width: 50px;
+    }
+    </style>
+{% endblock %}
+{% block title %}用户申请发票详情{% endblock %}
+{% block content %}
+  <div class="app-content">
+    <h2 class="block-header">发票抬头信息</h2>
+    <a class="coupon-item__action header_right" href="{% url 'wxchat-personinfo' %}">返回</a>
+    <div class="van-cell-group van-hairline--top-bottom">
+      {% if invoice %}
+      <div class="base-info-cell">
+        <div class="van-cell van-cell--clickable">
+          <div class="van-cell__title"><span>发票类型</span></div>
+          <div class="van-cell__value van-ellipsis"><span>{{ invoice.get_category_display }}</span></div>
+        </div>
+      </div>
+      <div class="base-info-cell">
+        <div class="van-cell van-cell--clickable">
+          <div class="van-cell__title"><span>发票抬头</span></div>
+          <div class="van-cell__value van-ellipsis"><span>{{ invoice.title|default:'' }}</span></div>
+
+        </div>
+      </div>
+      {% if invoice.category == 0 %}
+      <div class="base-info-cell">
+        <div class="van-cell van-cell--clickable">
+          <div class="van-cell__title"><span>税务识别号</span></div>
+          <div class="van-cell__value van-ellipsis"><span>{{ invoice.tax_number|default:'' }}</span></div>
+
+        </div>
+      </div>
+      {% endif %}
+      <div class="base-info-cell">
+        <div class="van-cell">
+          <div class="van-cell__title"><span>地址</span></div>
+          <div class="van-cell__value van-ellipsis"><span>{{ invoice.address }}</span></div>
+        </div>
+      </div>
+      <div class="base-info-cell">
+        <div>
+          <div class="van-cell van-cell--clickable">
+            <div class="van-cell__title"><span>电话</span></div>
+            <div class="van-cell__value van-ellipsis "><span>{{ invoice.telephone|default:'' }}</span></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="base-info-cell">
+        <div>
+          <div class="van-cell van-cell--clickable">
+            <div class="van-cell__title"><span>开户行及账号</span></div>
+            <div class="van-cell__value van-ellipsis"><span>{{ invoice.bank_account|default:'' }}</span></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="base-info-cell">
+        <div>
+          <div class="van-cell">
+            <div class="van-cell__title"><span>邮箱</span></div>
+            <div class="van-cell__value van-ellipsis"><span>{{ invoice.email|default:'' }}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="base-info-cell">
+        <div class="address-info-cell"></div>
+      </div>
+    </div>
+   {% endif %}
+  </div>
+{% endblock %}

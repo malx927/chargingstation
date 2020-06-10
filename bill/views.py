@@ -1,15 +1,17 @@
 import logging
 import random
 
+from bill.forms import InvoiceTitleForm
 from django.db.models import F
 from django.forms import model_to_dict
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.views import View
 import datetime
 from wxchat.models import UserInfo, RechargeRecord
 from wxchat.views import order_refund
-from .models import UserRefund, UserRefundDetail, WxRefundRecord
+from .models import UserRefund, UserRefundDetail, WxRefundRecord, InvoiceTitle
 
 logger = logging.getLogger("django")
 
@@ -245,5 +247,39 @@ class InvoiceTitleView(View):
     发票抬头
     """
     def get(self, request, *args, **kwargs):
+        openid = request.session.get("openid", None)
+        context = {
+            "openid": openid,
+        }
+        return render(request, template_name='bill/invoice_title.html', context=context)
 
-        return render(request, template_name='bill/invoice_title.html')
+    def post(self, request, *args, **kwargs):
+        form = InvoiceTitleForm(request.POST)
+        openid = request.session.get("openid", None)
+        context = {
+            "openid": openid,
+        }
+        if form.is_valid():
+            obj = form.save(commit=False)
+            openid = form.cleaned_data['openid']
+            user = UserInfo.objects.filter(openid=openid).first()
+            if user:
+                obj.name = user.name if user.name else user.nickname
+                obj.consume_money = user.consume_money
+                obj.total_money = user.total_money
+            obj.save()
+            return HttpResponseRedirect(reverse('invoice-title-detail', args=(obj.id,)))
+        else:
+            print(form.errors)
+
+        return render(request, template_name='bill/invoice_title.html', context=context)
+
+
+class InvoiceTitleDetailView(View):
+    """
+    发票
+    """
+    def get(self, request, *args, **kwargs):
+        invoice_id = kwargs.get("pk")
+        invoice = InvoiceTitle.objects.filter(id=invoice_id).first()
+        return render(request, template_name='weixin/invoice_detail.html', context={"invoice": invoice})

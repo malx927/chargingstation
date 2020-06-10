@@ -11,7 +11,7 @@ class InvoiceTitle(models.Model):
         (0, '电子发票'),
         (1, '纸质发票')
     )
-    openid = models.CharField(verbose_name='微信ID', max_length=120)
+    openid = models.CharField(verbose_name='微信ID', max_length=120, blank=True, null=True)
     name = models.CharField(verbose_name='姓名', max_length=64, blank=True, null=True)
     title = models.CharField(verbose_name='发票抬头', max_length=128)
     category = models.IntegerField(verbose_name='发票类型', default=0, choices=CATEGORY)

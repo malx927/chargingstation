@@ -11,7 +11,8 @@ class InvoiceTitleForm(forms.ModelForm):
 
     class Meta:
         model = InvoiceTitle
-        fields = ["title", "category", "tax_number", "address", "telephone", "bank_account", "email", "invoice_style"]
+        fields = ["title", "category", "tax_number", "address", "telephone", "bank_account",
+                  "email", "openid"]
 
         # widgets = {
         #     'card': forms.TextInput(attrs={'class': "form-control", "readonly": "true"}),
