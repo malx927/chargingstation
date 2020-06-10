@@ -11,8 +11,9 @@ class InvoiceTitleAdmin(object):
     """
     发票抬头信息
     """
-    list_display = ["name", "title", "category", "tax_number", "address", "telephone", "bank_account", "email"]
+    list_display = ["name", "title", "category", "tax_number", "address", "telephone", "bank_account", "email", "is_write"]
     search_fields = ["title", "name", "openid", "telephone"]
+    list_filter = ['is_write']
     model_icon = 'fa fa-random'
 
     form_layout = (
