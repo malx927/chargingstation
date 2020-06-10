@@ -11,18 +11,20 @@ class InvoiceTitleAdmin(object):
     """
     发票抬头信息
     """
-    list_display = ["title", "category", "tax_number", "address", "telephone", "bank_account", "email", "invoice_style"]
-    search_fields = ["OperatorName"]
+    list_display = ["name", "title", "category", "tax_number", "address", "telephone", "bank_account", "email"]
+    search_fields = ["title", "name", "openid", "telephone"]
     model_icon = 'fa fa-random'
 
     form_layout = (
             Fieldset(
                 '发票抬头信息',
+                Row('name', 'openid'),
                 Row('title', 'category'),
                 Row('tax_number', 'telephone'),
                 Row('address'),
                 Row('bank_account'),
-                Row('email', 'invoice_style'),
+                Row('email', None),
+                Row('total_money', 'consume_money'),
             ),
     )
 

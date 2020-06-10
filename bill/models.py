@@ -7,9 +7,9 @@ class InvoiceTitle(models.Model):
         (0, '公司发票'),
         (1, '个人发票')
     )
-    INVOICE_STYLE = (
-        (0, '电子发票'),
-        (1, '纸质发票')
+    INVOICE_WRITE = (
+        (0, '未开'),
+        (1, '已开')
     )
     openid = models.CharField(verbose_name='微信ID', max_length=120, blank=True, null=True)
     name = models.CharField(verbose_name='姓名', max_length=64, blank=True, null=True)
@@ -22,6 +22,7 @@ class InvoiceTitle(models.Model):
     email = models.CharField(verbose_name='邮箱', max_length=128, blank=True, null=True)
     total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2)
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
+    is_write = models.IntegerField(verbose_name='开票确认', default=0, choices=INVOICE_WRITE)
     update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
     add_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
 
