@@ -180,6 +180,7 @@ def notification_charge_order_info_for_bonus():
             result["StopReason"] = 3  # 充电机设备故障
 
         echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
+        print('EchargeNet: ', id(echarge))
         ret_data = echarge.notification_charge_order_info_for_bonus(**result)
 
         if "Ret" in ret_data and ret_data["Ret"] == 0:
@@ -207,6 +208,7 @@ def notification_connector_status():
     """定时推送设备接口状态"""
     connectors = ConnectorInfo.objects.filter(EquipmentID__is_subsidy=1)
     echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
+    print('notification_connector_status: EchargeNet: ', id(echarge))
     for connector in connectors:
         status = echarge.notification_station_status(connector.ConnectorID, connector.Status)
         if status > 0:
