@@ -199,11 +199,7 @@ class EchargeNet(object):
 
                 logger.info("{}--{}".format(access_token, token_available_time))
 
-                if token_available_time < 60:
-                    r.set(self.ACCESS_TOKEN_KEY, access_token, token_available_time)
-                else:
-                    r.set(self.ACCESS_TOKEN_KEY, access_token, token_available_time - 60)
-
+                r.set(self.ACCESS_TOKEN_KEY, access_token, token_available_time)
                 res = {
                     "success": True,
                     "access_token": access_token,
