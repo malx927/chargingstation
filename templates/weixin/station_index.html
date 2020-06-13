@@ -5,6 +5,13 @@
 {% endblock js %}
 {% block title %}附近充电站{% endblock %}
 {% block content %}
+    {% if order %}
+    <div class="block-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>充电中:</div>
+        <div style="overflow: hidden; text-overflow: ellipsis;">{{order.out_trade_no}}</div>
+        <a class="coupon-item__action1" href="{% url 'order-recharge-status' %}?out_trade_no={{ order.out_trade_no }}">查看</a>
+    </div>
+    {% endif %}
     <div class="page">
          <div>
              <form action="#" id="form1">
