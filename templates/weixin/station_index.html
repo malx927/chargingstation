@@ -3,15 +3,44 @@
 {% include 'wxchat/include/jssdk.html' %}
     <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=TOLBZ-NWYLP-A5SD6-VKAJC-UZLHQ-XKB7X&libraries=geometry"></script>
 {% endblock js %}
+{% block extra %}
+    <link rel="stylesheet"  href="{% static 'jqueryconfirm/jquery-confirm.min.css' %}">
+    <script src="{% static 'jqueryconfirm/jquery-confirm.min.js' %}"></script>
+{% endblock extra %}
 {% block title %}附近充电站{% endblock %}
 {% block content %}
-    {% if order %}
+{#    {% if order %}#}
     <div class="block-header" style="display: flex; justify-content: space-between; align-items: center;">
         <div>充电中:</div>
         <div style="overflow: hidden; text-overflow: ellipsis;">{{order.out_trade_no}}</div>
         <a class="coupon-item__action1" href="{% url 'order-recharge-status' %}?out_trade_no={{ order.out_trade_no }}">查看</a>
     </div>
-    {% endif %}
+    <script>
+     $.confirm({
+        title: '充电提示：',
+        content: '您有一个正在充电的订单，是否查看？',
+        type: 'green',
+        theme: 'material',
+        buttons: {
+            ok: {
+                text: "确定",
+                btnClass: 'btn-blue',
+                keys: ['enter'],
+                action: function(){
+                     window.location.href = "{% url 'order-recharge-status' %}?out_trade_no={{ order.out_trade_no }}"
+                }
+            },
+            cancel: {
+                text: "取消",
+                action: function(){
+                     console.log('the user clicked cancel');
+                }
+            },
+        }
+    });
+    </script>
+
+{#    {% endif %}#}
     <div class="page">
          <div>
              <form action="#" id="form1">
@@ -50,6 +79,8 @@ $(function () {
                 station_list(keyword);
             }
      });
+
+
 });
  wx.ready(function () {
     wx.getLocation({
@@ -156,5 +187,6 @@ function geocoder(latitude,longitude) {
          return (distance/1000).toFixed(2) + 'km'
      }
  }
+
 </script>
 {% endblock bottomjs %}

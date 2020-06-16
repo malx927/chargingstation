@@ -16,11 +16,11 @@ logger = logging.getLogger("django")
 
 class StationListView(View):
     """充电站列表"""
-    @method_decorator(weixin_decorator)
+    # @method_decorator(weixin_decorator)
     def get(self, request, *arg, **kwargs):
-        sign = getJsApiSign(request)
+        # sign = getJsApiSign(request)
         context = {
-            "sign": sign,
+            # "sign": sign,
         }
         openid = request.session.get("openid", None)
         user = UserInfo.objects.filter(openid=openid).first()
