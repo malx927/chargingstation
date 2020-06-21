@@ -12,7 +12,7 @@ from .models import Order, OrderRecord, OrderChargDetail
 class OrderAdmin(object):
     list_display = [
         'out_trade_no', 'name', 'charg_mode', 'charg_pile', 'gun_num', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
-        'consum_money', 'cash_fee', 'status', 'report_result', 'report_time'
+        'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'status', 'report_result', 'report_time'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_pile', 'charg_mode', 'charg_status', 'begin_time', 'status', 'report_result']
@@ -23,7 +23,7 @@ class OrderAdmin(object):
     show_all_rel_details = False
     readonly_fields = ["balance", "main_openid"]
     relfield_style = 'fk_ajax'
-    aggregate_fields = {"total_readings": "sum", 'cash_fee': "sum"}
+    aggregate_fields = {"total_readings": "sum", 'consum_money': "sum", 'cash_fee': "sum",  'power_fee': "sum", "service_fee": "sum"}
 
     form_layout = (
         Main(
