@@ -65,8 +65,8 @@ def send_charging_start_message_to_user(order):
         },
         "remark": {
            "value": "感谢您的使用。点击查看订单详情",
-           "color": color,
-       }
+           "color": "#f56c6c",
+        }
     }
     client = wxClient()
     client.message.send_template(user_id=order.openid, template_id=template, url=url, data=data)
@@ -116,8 +116,8 @@ def send_charging_end_message_to_user(order):
         },
         "remark": {
            "value": "感谢您的使用。点击查看订单详情",
-           "color": color
-       }
+           "color": "#f56c6c",
+        }
     }
     client = wxClient()
     client.message.send_template(user_id=order.openid, template_id=template, url=url, data=data)
