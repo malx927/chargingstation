@@ -76,7 +76,10 @@ class SellerAdmin(object):
             Row('bank_name', 'account_name'),
             Row('account_number', 'tax_number'),
         ),
-        Fieldset('其他信息', 'parent',),
+        Fieldset(
+            '其他信息',
+            Row('parent', 'status'),
+        )
 
     )
 
