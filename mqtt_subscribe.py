@@ -539,10 +539,15 @@ def pile_card_charging_request_hander(topic, byte_msg):
 
     cur_time = datetime.datetime.now().date()
     # 判断卡号是否有效
-    card = ChargingCard.objects.filter(status=1, card_num=card_num, cipher=password).first()
+    card = ChargingCard.objects.select_related("seller").filter(status=1, card_num=card_num, cipher=password).first()
     if not card:
         logging.info("此卡{}不存在或者处于禁用状态".format(card_num))
         return
+
+    if card.seller and card.seller.status == 1:
+        logging.info("此运营商已被停运")
+        return
+
     # 判断此卡是否有时间限制
     if card.is_valid_date == 1:
         if card.start_date is None or card.end_date is None:

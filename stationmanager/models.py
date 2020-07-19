@@ -31,7 +31,7 @@ class Seller(models.Model):
     telephone = models.CharField(verbose_name='联系电话', max_length=32)
     short_name = models.CharField(verbose_name='简称', max_length=32, blank=True, default='')
     parent = models.ForeignKey('self', verbose_name='上级运营商', blank=True, null=True, on_delete=models.SET_NULL)
-    # user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='添加用户', blank=True, null=True)
+    status = models.IntegerField(verbose_name='状态', choices=((0, '有效'), (1, '禁用')), default=0)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
 
     class Meta:
