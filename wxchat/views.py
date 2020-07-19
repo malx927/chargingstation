@@ -29,6 +29,7 @@ from chargingstation import settings
 from wxchat.decorators import weixin_decorator
 from wxchat.forms import RegisterForm, SubAccountForm
 from stationmanager.utils import create_qrcode
+from wxchat.utils import get_user_charging_order
 from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection, \
     SubAccount
 
@@ -509,6 +510,11 @@ class ScanQRCodeView(View):
         context = {
             "sign": signPackage
         }
+
+        openid = request.session.get("openid", None)
+        order = get_user_charging_order(openid)
+        if order:
+            context["order"] = order
         return render(request, template_name="weixin/charging_qrcode.html", context=context)
 
 

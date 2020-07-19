@@ -5,6 +5,8 @@
 {% endblock js %}
 {% block extra %}
     <link rel="stylesheet"  href="{% static 'weixin/css/member.css' %}" media="screen">
+    <link rel="stylesheet"  href="{% static 'jqueryconfirm/jquery-confirm.min.css' %}">
+    <script src="{% static 'jqueryconfirm/jquery-confirm.min.js' %}"></script>
     <style>
     .usercenter{
         width: 100%;
@@ -70,7 +72,7 @@
           <div>0</div><div>卡</div>
         </div>
         <div class="member-center__stats-item">
-          <div>{{ user.id }}</div><div>ID码</div>
+          <div>{{ user.id | add: 1000 }}</div><div>ID码</div>
         </div>
         {% endif %}
       </div>
@@ -179,5 +181,30 @@
   })
 
 </script>
-
+{% if order %}
+    <script>
+     $.confirm({
+        title: '充电提示：',
+        content: '您有一个正在充电的订单，是否查看？',
+        type: 'green',
+        theme: 'material',
+        buttons: {
+            ok: {
+                text: "确定",
+                btnClass: 'btn-blue',
+                keys: ['enter'],
+                action: function(){
+                     window.location.href = "{% url 'order-recharge-status' %}?out_trade_no={{ order.out_trade_no }}"
+                }
+            },
+            cancel: {
+                text: "取消",
+                action: function(){
+                     console.log('the user clicked cancel');
+                }
+            },
+        }
+    });
+    </script>
+{% endif %}
 {% endblock bottomjs %}

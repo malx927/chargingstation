@@ -4,6 +4,8 @@
 {% endblock js %}
 {% block extra %}
      <link rel="stylesheet"  href="{% static 'weixin/css/coll.css' %}" media="screen">
+    <link rel="stylesheet"  href="{% static 'jqueryconfirm/jquery-confirm.min.css' %}">
+    <script src="{% static 'jqueryconfirm/jquery-confirm.min.js' %}"></script>
 {% endblock extra%}
 {% block title %}扫码充电{% endblock %}
 {% block body_class %} id="cate14" {% endblock %}
@@ -41,6 +43,32 @@
         });
     });
 </script>
+{% if order %}
+    <script>
+     $.confirm({
+        title: '充电提示：',
+        content: '您有一个正在充电的订单，是否查看？',
+        type: 'green',
+        theme: 'material',
+        buttons: {
+            ok: {
+                text: "确定",
+                btnClass: 'btn-blue',
+                keys: ['enter'],
+                action: function(){
+                     window.location.href = "{% url 'order-recharge-status' %}?out_trade_no={{ order.out_trade_no }}"
+                }
+            },
+            cancel: {
+                text: "取消",
+                action: function(){
+                     console.log('the user clicked cancel');
+                }
+            },
+        }
+    });
+    </script>
+{% endif order %}
 {% endblock bottomjs %}
 
 

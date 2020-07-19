@@ -3,12 +3,25 @@ import datetime
 
 from django.urls import reverse
 
+from chargingorder.models import Order
 from chargingstation import settings
 from wxchat.models import UserInfo
 from wxchat.views import wxClient
 
 
+def get_user_charging_order(openid):
+    """用户正在充电的订单"""
+    user = UserInfo.objects.filter(openid=openid).first()
+    if user:
+        order = Order.objects.filter(out_trade_no=user.out_trade_no, charg_status_id__gt=0,
+                                     charg_status_id__lt=7).first()
+        return order
+    
+    return None
+
+
 def get_user_balance(openid):
+    """账号余额"""
     try:
         user = UserInfo.objects.get(openid=openid)
         sub_account = user.is_sub_user()

@@ -8,6 +8,7 @@ import logging
 from chargingorder.models import Order
 from wxchat.decorators import weixin_decorator
 from wxchat.models import UserInfo
+from wxchat.utils import get_user_charging_order
 from wxchat.views import getJsApiSign
 from .models import ChargingPile, Station, ChargingPrice, FaultChargingGun
 
@@ -23,11 +24,9 @@ class StationListView(View):
             "sign": sign,
         }
         openid = request.session.get("openid", None)
-        user = UserInfo.objects.filter(openid=openid).first()
-        if user:
-            order = Order.objects.filter(out_trade_no=user.out_trade_no, charg_status_id__gt=0, charg_status_id__lt=7).first()
-            if order:
-                context["order"] = order
+        order = get_user_charging_order(openid)
+        if order:
+            context["order"] = order
 
         return render(request, template_name='weixin/station_index.html', context=context)
 
