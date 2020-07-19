@@ -29,7 +29,6 @@ from chargingstation import settings
 from wxchat.decorators import weixin_decorator
 from wxchat.forms import RegisterForm, SubAccountForm
 from stationmanager.utils import create_qrcode
-from wxchat.utils import get_user_charging_order
 from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection, \
     SubAccount
 
@@ -40,6 +39,17 @@ session_interface = RedisStorage(
     redis_client,
     prefix="wechatpy"
 )
+
+
+def get_user_charging_order(openid):
+    """用户正在充电的订单"""
+    user = UserInfo.objects.filter(openid=openid).first()
+    if user:
+        order = Order.objects.filter(out_trade_no=user.out_trade_no, charg_status_id__gt=0,
+                                     charg_status_id__lt=7).first()
+        return order
+
+    return None
 
 
 def wxClient():

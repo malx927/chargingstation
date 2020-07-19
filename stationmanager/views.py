@@ -5,11 +5,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 import logging
 
-from chargingorder.models import Order
 from wxchat.decorators import weixin_decorator
-from wxchat.models import UserInfo
-from wxchat.utils import get_user_charging_order
-from wxchat.views import getJsApiSign
+from wxchat.views import getJsApiSign, get_user_charging_order
 from .models import ChargingPile, Station, ChargingPrice, FaultChargingGun
 
 logger = logging.getLogger("django")
