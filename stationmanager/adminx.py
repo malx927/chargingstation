@@ -57,8 +57,9 @@ class SellerAdmin(object):
     """
     运营商信息
     """
-    list_display = ['name', 'telephone', 'address', 'org_code', 'parent']
+    list_display = ['id', 'name', 'telephone', 'address', 'org_code', 'parent']
     search_fields = ['name', 'telephone', 'address', 'org_code']
+    list_display_links = ('name',)
     list_filter = ['parent']
     model_icon = 'fa fa-sitemap'
     list_export = ('xls', 'xml', 'json')
@@ -118,7 +119,8 @@ class StationImageInline(object):
 
 
 class StationAdmin(object):
-    list_display = ['name', 'seller', 'province_city_district', 'address',  'telephone',  'station_status', 'station_type']
+    list_display = ['id', 'name', 'seller', 'province_city_district', 'address',  'telephone',  'station_status', 'station_type']
+    list_display_links = ('name',)
     search_fields = ['name',  'address', 'seller.name', 'telephone', 'telephone1']
     list_filter = ['seller', 'dicount']
     model_icon = 'fa fa-sitemap'
@@ -266,6 +268,7 @@ class ChargingPileAdmin(object):
     """
     list_display = ['name', 'pile_sn', 'pile_type', 'station', 'pile_mode', 'business_mode',
                     'get_work_status']
+    list_display_links = ('name',)
     search_fields = ['pile_sn', 'name', 'pile_type', 'station']
     exclude = ["qrcode", 'group']
     list_filter = ['pile_type', 'station', 'pile_mode', 'business_mode']
