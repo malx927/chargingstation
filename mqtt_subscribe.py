@@ -868,6 +868,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
         logging.warning("protocol data length is not enough")
         return
     data_nums = get_data_nums(byte_msg)
+    logging.info(byte_msg)
     # 读取电桩编码(sn)
     pile_sn = get_pile_sn(byte_msg)
     # 枪口号
@@ -1008,6 +1009,7 @@ def pile_report_car_info_handler(topic, byte_msg):
     # 枪口号
     gun_num = byte_msg[38]
     # 订单
+    logging.info(byte_msg)
     out_trade_no = byte_msg[39:71].decode('utf-8').strip('\000')
     # 充电国标协议 0交流单相，1交流三相，2普天协议，3国标2011，4国标2015
     protocol = byte_msg[71]
