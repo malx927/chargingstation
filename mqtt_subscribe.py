@@ -1191,12 +1191,14 @@ def pile_charging_status_handler(topic, byte_msg):
         +输出电流值（2字节）+当前电表读数（4字节）+保留（11字节）
     """
     logging.info("Enter pile_charging_status_handler")
+    logging.info(byte_msg)
     data_nums = get_data_nums(byte_msg)
     # 读取电桩编码(sn)
     pile_sn = get_pile_sn(byte_msg)
     # 枪口号
     gun_num = byte_msg[38]
     # 订单
+
     out_trade_no = byte_msg[39:71].decode('utf-8').strip('\000')
     logging.info('电桩编码Sn:{},枪口:{}, 订单:{}'.format(pile_sn, gun_num, out_trade_no))
     # 截止时间
