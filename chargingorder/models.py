@@ -21,13 +21,13 @@ class Order(models.Model):
     out_trade_no = models.CharField(verbose_name='订单编号', max_length=32)  # 电桩编号 + YYYYMMDD + random
     openid = models.CharField(verbose_name='用户ID(openid)', max_length=64, blank=True, null=True,)
     name = models.CharField(verbose_name='姓名(或昵称)', max_length=64, blank=True, null=True,)
-    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', blank=True, null=True, on_delete=models.SET_NULL)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True,)
     protocol = models.IntegerField(verbose_name='充电国标协议', choices=INTER_PROTOCAL, blank=True, null=True)
     start_model = models.IntegerField(verbose_name='启动方式', choices=STARTUP_MODEL, default=0)
     charg_mode = models.IntegerField(verbose_name='充电类型', choices=USER_CHARGING_MODE, blank=True, default=0)
     charg_type = models.IntegerField(verbose_name='设备充电模式', choices=PILE_CHARGING_MODE, blank=True, default=0)
-    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', blank=True, null=True)
+    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', blank=True, null=True, db_constraint=False)
     begin_soc = models.DecimalField(verbose_name='初始SOC', blank=True, default=0, max_digits=6, decimal_places=2)
     end_soc = models.DecimalField(verbose_name='结束SOC', blank=True, default=0, max_digits=6, decimal_places=2)
     begin_time = models.DateTimeField(verbose_name='开始时间', blank=True, null=True)
@@ -129,7 +129,7 @@ class OrderRecord(models.Model):
     充值记录表
     """
     serial_num = models.CharField(verbose_name='流水号', max_length=24, blank=True, null=True,) #YYYYMMDDHHMiSS
-    order = models.ForeignKey(Order, verbose_name='订单', related_name='records', blank=True, null=True, on_delete=models.SET_NULL)
+    order = models.ForeignKey(Order, verbose_name='订单', related_name='records', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     pile_sn = models.CharField(verbose_name="电桩编码SN", max_length=32, blank=True, null=True)
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True,)
     out_trade_no = models.CharField(verbose_name='订单号', max_length=32, blank=True, null=True)

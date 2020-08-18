@@ -55,7 +55,7 @@ class UserInfo(models.Model):
     nickname = models.CharField(verbose_name='昵称', max_length=64, help_text="微信昵称")
     openid = models.CharField(verbose_name='微信ID', max_length=120, blank=True, null=True)
     user_type = models.IntegerField(verbose_name='用户类型', choices=USER_TYPE_CHOICE, default=0)
-    seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.SET_NULL)
+    seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     id_card = models.CharField(verbose_name='身份证号', max_length=20, blank=True, default='')
     telephone = models.CharField(verbose_name='手机号码', max_length=18, blank=True, default='')
     # ic_card = models.CharField(verbose_name='IC卡号', max_length=24, blank=True, default='')
@@ -286,7 +286,7 @@ class RechargeList(models.Model):
 class UserCollection(models.Model):
     """用户收藏"""
     openid = models.CharField(verbose_name="微信标识", max_length=32, )
-    station = models.ForeignKey(Station, verbose_name="充电站", on_delete=models.CASCADE)
+    station = models.ForeignKey(Station, verbose_name="充电站", on_delete=models.CASCADE, db_constraint=False)
     create_at = models.DateTimeField(verbose_name="收藏时间", auto_now_add=True)
 
     def __str__(self):
@@ -299,8 +299,8 @@ class UserCollection(models.Model):
 
 class SubAccount(models.Model):
     """附属账号"""
-    sub_user = models.ForeignKey(UserInfo, verbose_name="附属账号", on_delete=models.CASCADE, null=True)
-    main_user = models.ForeignKey(UserInfo, verbose_name="主账号", related_name="main_users", on_delete=models.CASCADE, null=True)
+    sub_user = models.ForeignKey(UserInfo, verbose_name="附属账号", on_delete=models.CASCADE, null=True, db_constraint=False)
+    main_user = models.ForeignKey(UserInfo, verbose_name="主账号", related_name="main_users", on_delete=models.CASCADE, null=True, db_constraint=False)
     # recharge_amount = models.DecimalField(verbose_name='充值金额', max_digits=7, decimal_places=2, default=0)
     # balance = models.DecimalField(verbose_name='账户余额', max_digits=7, decimal_places=2, default=0)
     update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
@@ -319,9 +319,9 @@ class SubAccount(models.Model):
 
 class SubAccountConsume(models.Model):
     """附属账号充值记录"""
-    account = models.ForeignKey(SubAccount, verbose_name="附属账号", on_delete=models.CASCADE, null=True)
+    account = models.ForeignKey(SubAccount, verbose_name="附属账号", on_delete=models.CASCADE, null=True, db_constraint=False)
     out_trade_no = models.CharField(verbose_name="订单号", max_length=32, null=True, blank=True)
-    charg_pile = models.ForeignKey(ChargingPile, verbose_name="充电桩", on_delete=models.CASCADE, null=True)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name="充电桩", on_delete=models.CASCADE, null=True, db_constraint=False)
     gun_num = models.IntegerField(verbose_name="枪口", blank=True, null=True)
     consum_money = models.DecimalField(verbose_name='消费余额(元)', max_digits=7, decimal_places=2, default=0)
     create_time = models.DateTimeField(verbose_name="添加时间", default=datetime.datetime.now)

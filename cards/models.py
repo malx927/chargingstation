@@ -41,8 +41,8 @@ class ChargingCard(models.Model):
     cipher = models.CharField(verbose_name="卡密钥", max_length=128, default='123456')
     name = models.CharField(verbose_name='用户名', max_length=32, blank=True, null=True)
     telephone = models.CharField(verbose_name="电话号码", max_length=18)
-    seller = models.ForeignKey(Seller, verbose_name="运营商", on_delete=models.SET_NULL, blank=True, null=True)
-    station = models.ManyToManyField(Station, verbose_name='充电站', blank=True)
+    seller = models.ForeignKey(Seller, verbose_name="运营商", on_delete=models.SET_NULL, blank=True, null=True, db_constraint=False)
+    station = models.ManyToManyField(Station, verbose_name='充电站', blank=True, db_constraint=False)
     sec_num = models.CharField(verbose_name="备用卡号", max_length=128, blank=True, null=True)
     money = models.DecimalField(verbose_name="余额", default=0, max_digits=10, decimal_places=2)
     status = models.IntegerField(verbose_name="状态", choices=STATUS, default=1)
@@ -88,9 +88,9 @@ class ChargingCard(models.Model):
 class CardRecharge(models.Model):
     """充值记录表"""
     card = models.CharField(verbose_name="储蓄卡", max_length=128)
-    seller = models.ForeignKey(Seller, verbose_name="运营商", on_delete=models.SET_NULL, blank=True, null=True)
+    seller = models.ForeignKey(Seller, verbose_name="运营商", on_delete=models.SET_NULL, blank=True, null=True, db_constraint=False)
     money = models.IntegerField(verbose_name="充值金额(元)", default=0)
-    op_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作人', blank=True, null=True)
+    op_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作人', blank=True, null=True, db_constraint=False)
     add_time = models.DateTimeField(verbose_name="充值时间", auto_now_add=True)
 
     def __str__(self):

@@ -117,6 +117,39 @@ class ChargingCardAdmin(object):
             return queryset.filter(seller=self.request.user.seller)
         else:
             return queryset
+    # xadmin filter.py RelatedFieldListFilter
+    # 增加条件过滤
+    # if hasattr(model_admin, '{field}_choices'.format(field=field.name)):
+    #     self.lookup_choices = getattr(model_admin, '{field}_choices'.format(field=field.name))(field, request,
+    #                                                                                            params, model,
+    #                                                                                            model_admin,
+    #                                                                                            field_path)
+    # else:
+    #     self.lookup_choices = field.get_choices(include_blank=False)
+
+    def seller_choices(self, field, request, params, model, model_admin, field_path):
+        # print(field, params, model, model_admin, field_path)
+        if self.request.user.station:
+            seller_lst = Seller.objects.filter(id=self.request.user.station.seller.id).values("id", "name")
+        elif self.request.user.seller:
+            seller_lst = Seller.objects.filter(id=self.request.user.seller.id).values("id", "name")
+        else:
+            return field.get_choices(include_blank=False)
+        print(seller_lst)
+        # 返回格式 [('pk','标题'),]
+        return list(((seller.get('id'), seller.get('name')) for seller in seller_lst))
+
+    def station_choices(self, field, request, params, model, model_admin, field_path):
+        # print(field, params, model, model_admin, field_path)
+        if self.request.user.station:
+            stations = Station.objects.filter(id=self.request.user.station.id).values("id", "name")
+        elif self.request.user.seller:
+            stations = Station.objects.filter(seller_id=self.request.user.seller.id).values("id", "name")
+        else:
+            return field.get_choices(include_blank=False)
+        print(stations)
+
+        return list(((station.get('id'), station.get('name')) for station in stations))
 
 
 xadmin.site.register(ChargingCard, ChargingCardAdmin)
@@ -127,7 +160,7 @@ class CardRechargeAdmin(object):
     list_display = ['seller', 'card', 'money', 'op_user', 'add_time']
     search_fields = ['card']
     list_filter = ['seller']
-    readonly_fields = ['card', 'money', 'op_user', 'seller']
+    # readonly_fields = ['card', 'money', 'op_user', 'seller']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
@@ -135,16 +168,16 @@ class CardRechargeAdmin(object):
     def has_add_permission(self):
         if self.request.user.is_superuser or self.request.user.is_oper_mgr:
             return False
-        return True
+        return False
 
     def has_change_permission(self, obj=None):
         if self.request.user.is_superuser or self.request.user.is_oper_mgr:
-            return True
+            return False
         return False
 
     def has_delete_permission(self, obj=None):
         if self.request.user.is_superuser or self.request.user.is_oper_mgr:
-            return True
+            return False
         return False
 
     def save_models(self):
@@ -160,6 +193,17 @@ class CardRechargeAdmin(object):
             return queryset.filter(seller=self.request.user.seller)
         else:
             return queryset
+
+    def seller_choices(self, field, request, params, model, model_admin, field_path):
+        if self.request.user.station:
+            seller_lst = Seller.objects.filter(id=self.request.user.station.seller.id).values("id", "name")
+        elif self.request.user.seller:
+            seller_lst = Seller.objects.filter(id=self.request.user.seller.id).values("id", "name")
+        else:
+            return field.get_choices(include_blank=False)
+        print(seller_lst)
+        # 返回格式 [('pk','标题'),]
+        return list(((seller.get('id'), seller.get('name')) for seller in seller_lst))
 
 
 xadmin.site.register(CardRecharge, CardRechargeAdmin)

@@ -60,7 +60,6 @@ class SellerAdmin(object):
     list_display = ['id', 'name', 'telephone', 'address', 'org_code', 'parent']
     search_fields = ['name', 'telephone', 'address', 'org_code']
     list_display_links = ('name',)
-    list_filter = ['parent']
     model_icon = 'fa fa-sitemap'
     list_export = ('xls', 'xml', 'json')
     save_on_top = False
@@ -200,6 +199,16 @@ class StationAdmin(object):
             return queryset.filter(seller=self.request.user.seller)
         else:
             return queryset
+
+    def seller_choices(self, field, request, params, model, model_admin, field_path):
+        if self.request.user.station:
+            seller_lst = Seller.objects.filter(id=self.request.user.station.seller.id).values("id", "name")
+        elif self.request.user.seller:
+            seller_lst = Seller.objects.filter(id=self.request.user.seller.id).values("id", "name")
+        else:
+            return field.get_choices(include_blank=False)
+
+        return list(((seller.get('id'), seller.get('name')) for seller in seller_lst))
 
     def formfield_for_dbfield(self, db_field,  **kwargs):
         # print(self.new_obj)
@@ -378,6 +387,16 @@ class ChargingPileAdmin(object):
         instance.qrcode = '{0}{1}'.format(upload_path, image_url)
         instance.save()
 
+    def station_choices(self, field, request, params, model, model_admin, field_path):
+        if self.request.user.station:
+            stations = Station.objects.filter(id=self.request.user.station.id).values("id", "name")
+        elif self.request.user.seller:
+            stations = Station.objects.filter(seller_id=self.request.user.seller.id).values("id", "name")
+        else:
+            return field.get_choices(include_blank=False)
+
+        return list(((station.get('id'), station.get('name')) for station in stations))
+
 
 xadmin.site.register(ChargingPile, ChargingPileAdmin)
 
@@ -386,7 +405,7 @@ class ChargingGunAdmin(object):
     list_display = ['charg_pile', 'charging_pile_sn', 'gun_num', 'work_status', 'charg_status', 'cc_status', 'cp_status', 'gun_temp_status', 'elec_lock_status', 'relay_status',]
     search_fields = ['gun_num', 'charg_pile__pile_sn']
     list_display_links = ['gun_num', 'charg_pile']
-    list_filter = ['charg_pile', 'work_status', 'cc_status', 'cp_status']
+    list_filter = ['charg_pile', 'work_status']
     model_icon = 'fa fa-sitemap'
     show_all_rel_details = False
     # save_as = True
@@ -462,6 +481,15 @@ class ChargingGunAdmin(object):
         image.save(os.path.join(dirs, image_url), quality=100)
         obj.qrcode = '{0}{1}'.format(upload_path, image_url)
         return super(ChargingGunAdmin, self).save_models()
+
+    def charg_pile_choices(self, field, request, params, model, model_admin, field_path):
+        if self.request.user.station:
+            piles = ChargingPile.objects.filter(station_id=self.request.user.station.id).values("id", "name")
+        elif self.request.user.seller:
+            piles = ChargingPile.objects.filter(station__seller_id=self.request.user.seller.id).values("id", "name")
+        else:
+            return field.get_choices(include_blank=False)
+        return list(((pile.get('id'), pile.get('name')) for pile in piles))
 
 
 xadmin.site.register(ChargingGun, ChargingGunAdmin)

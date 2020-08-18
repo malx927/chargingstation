@@ -70,7 +70,7 @@ class UserRefundDetail(models.Model):
         (1, '成功')
     )
     out_refund_no = models.CharField(verbose_name='退款单号', max_length=64)
-    user_refund = models.ForeignKey(UserRefund, verbose_name='申请单号', blank=True, null=True, on_delete=models.SET_NULL)
+    user_refund = models.ForeignKey(UserRefund, verbose_name='申请单号', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     openid = models.CharField(verbose_name='微信ID', max_length=120, blank=True, null=True)
     out_trade_no = models.CharField(verbose_name='原订单编号', max_length=128)
     transaction_id = models.CharField(verbose_name='原微信订单号', max_length=128, null=True, blank=True)
