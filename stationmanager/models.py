@@ -145,7 +145,7 @@ class Station(models.Model):
 
 class StationImage(models.Model):
     """电站图片"""
-    station = models.ForeignKey(Station, verbose_name='所属充电站')
+    station = models.ForeignKey(Station, verbose_name='所属充电站', on_delete=models.CASCADE, db_constraint=False)
     image = models.ImageField(verbose_name='电站图片', upload_to='stations/', blank=True, null=True)
     create_at = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
 
@@ -192,8 +192,8 @@ class ChargingPile(models.Model):
     is_subsidy = models.IntegerField(verbose_name='运营补贴', default=0, choices=((0, '否'), (1, '运营补贴')))
     sub_status = models.IntegerField(verbose_name='订阅状态', default=0, choices=((0, '离线'), (1, '订阅')))
     sub_time = models.DateTimeField(verbose_name='出厂时间', blank=True, null=True)
-    group = models.ForeignKey(Group, verbose_name='单位', blank=True, null=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='添加用户', blank=True, null=True, db_constraint=False)
+    group = models.ForeignKey(Group, verbose_name='单位', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='添加用户', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 
     def __str__(self):
@@ -226,10 +226,10 @@ class ChargingGun(models.Model):
     充电桩枪信息表
     """
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, choices=GUN_NUM)
-    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE, db_constraint=False)
     gun_type = models.IntegerField(verbose_name='枪口类型', choices=CONNECTOR_TYPE, default=4)
     work_status = models.IntegerField(verbose_name='工作状态', default=9, blank=True, choices=GUN_WORKING_STATUS)
-    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True)
+    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True, on_delete=models.SET_NULL, db_constraint=False)
     voltage_upper_limits = models.IntegerField(verbose_name='额定电压上限', default=0)
     voltage_lower_limits = models.IntegerField(verbose_name='额定电压下限', default=0)
     current = models.IntegerField(verbose_name='额定电流', default=0)
@@ -265,7 +265,7 @@ class ChargingGun(models.Model):
 
 
 class ChargingPileStatus(models.Model):
-    pile = models.ForeignKey(ChargingPile, verbose_name="充电桩")
+    pile = models.ForeignKey(ChargingPile, verbose_name="充电桩", on_delete=models.CASCADE, db_constraint=False)
     cabinet_temp1_status = models.IntegerField(verbose_name='柜内温度PT-1状态', default=0, choices=CABINET_TEMPERATURE_STATUS)
     cabinet_temp2_status = models.IntegerField(verbose_name='柜内温度PT-2状态', default=0, choices=CABINET_TEMPERATURE_STATUS)
     cabinet_temp1 = models.DecimalField(verbose_name='柜内温度PT-1', blank=True, null=True, max_digits=5, decimal_places=2)
@@ -290,9 +290,9 @@ class FaultChargingGun(models.Model):
     故障充电桩枪信息表
     """
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, choices=GUN_NUM)
-    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE, db_constraint=False)
     work_status = models.IntegerField(verbose_name='工作状态', default=9, blank=True, choices=GUN_WORKING_STATUS)
-    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True)
+    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True, on_delete=models.SET_NULL, db_constraint=False)
     fault_time = models.DateTimeField(verbose_name="故障时间", blank=True, null=True)
     repair_time = models.DateTimeField(verbose_name="修复时间", blank=True, null=True)
     repair_persons = models.CharField(verbose_name="修复人", blank=True, null=True, max_length=64)
@@ -312,7 +312,7 @@ class ChargingPrice(models.Model):
         (0, '--无--'),
         (1, '默认价格策略'),
     )
-    station = models.ForeignKey(Station, verbose_name='充电站', null=True, on_delete=models.SET_NULL)
+    station = models.ForeignKey(Station, verbose_name='充电站', null=True, on_delete=models.SET_NULL, db_constraint=False)
     type = models.IntegerField(verbose_name='收费类型', choices=CHARGING_PRICE_TYPE)
     parking_fee = models.DecimalField(verbose_name='停车费(元/小时)', max_digits=5, decimal_places=2, default=0)
     default_flag = models.IntegerField(verbose_name='默认价格策略', default=0, choices=FLAGS, help_text='每个电站设置一个默认策略')
@@ -337,7 +337,7 @@ class ChargingPriceDetail(models.Model):
     """
     收费价格表（明细表）
     """
-    charg_price = models.ForeignKey(ChargingPrice, verbose_name='价格类型', related_name="prices")
+    charg_price = models.ForeignKey(ChargingPrice, verbose_name='价格类型', related_name="prices", on_delete=models.CASCADE, db_constraint=False)
     begin_time = models.TimeField(verbose_name='开始时间')
     end_time = models.TimeField(verbose_name='截止时间')
     price = models.DecimalField(verbose_name='电价(元/度)', max_digits=6, decimal_places=2, default=0, blank=True)
@@ -357,7 +357,7 @@ class PowerModuleStatus(models.Model):
     电源模块状态
     """
     name = models.IntegerField(verbose_name='模块序号')
-    pile = models.ForeignKey(ChargingPile, verbose_name='电桩名称',  on_delete=models.CASCADE)
+    pile = models.ForeignKey(ChargingPile, verbose_name='电桩名称',  on_delete=models.CASCADE, db_constraint=False)
     pile_sn = models.CharField(verbose_name='电桩编号', max_length=32, blank=True, null=True)
     status = models.IntegerField(verbose_name='状态', blank=True, null=True, choices=POWER_MODULE_STATUS)
     update_time = models.DateTimeField(verbose_name='更新时间',default=datetime.now)

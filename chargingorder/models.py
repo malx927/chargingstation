@@ -27,7 +27,7 @@ class Order(models.Model):
     start_model = models.IntegerField(verbose_name='启动方式', choices=STARTUP_MODEL, default=0)
     charg_mode = models.IntegerField(verbose_name='充电类型', choices=USER_CHARGING_MODE, blank=True, default=0)
     charg_type = models.IntegerField(verbose_name='设备充电模式', choices=PILE_CHARGING_MODE, blank=True, default=0)
-    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', blank=True, null=True, db_constraint=False)
+    charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     begin_soc = models.DecimalField(verbose_name='初始SOC', blank=True, default=0, max_digits=6, decimal_places=2)
     end_soc = models.DecimalField(verbose_name='结束SOC', blank=True, default=0, max_digits=6, decimal_places=2)
     begin_time = models.DateTimeField(verbose_name='开始时间', blank=True, null=True)

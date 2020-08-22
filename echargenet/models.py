@@ -37,7 +37,7 @@ class StationInfo(models.Model):
     充电站信息
     """
     StationID = models.CharField(verbose_name='充电站ID', max_length=20,  primary_key=True)
-    OperatorID = models.ForeignKey(OperatorInfo, verbose_name='运营商ID', null=True, on_delete=models.SET_NULL)
+    OperatorID = models.ForeignKey(OperatorInfo, verbose_name='运营商ID', null=True, on_delete=models.SET_NULL, db_constraint=False)
     EquipmentOwnerID = models.CharField(verbose_name='设备所属方ID', max_length=9)
     StationName = models.CharField(verbose_name='充电站名称', max_length=50)
     CountryCode = models.CharField(verbose_name='国家代码', max_length=2, default='CN')
@@ -83,7 +83,7 @@ class EquipmentInfo(models.Model):
         (5, '其他'),
     )
     EquipmentID = models.CharField(verbose_name='设备编码', max_length=23,  primary_key=True)
-    StationID = models.ForeignKey(StationInfo, verbose_name='充电站', related_name="EquipmentInfos")
+    StationID = models.ForeignKey(StationInfo, verbose_name='充电站', related_name="EquipmentInfos", null=True, on_delete=models.SET_NULL, db_constraint=False)
     ManufacturerID = models.CharField(verbose_name='生产商组织机构代码', max_length=9, blank=True, default="")
     ManufacturerName = models.CharField(verbose_name='设备生产商名称', max_length=30,  blank=True, default="")
     EquipmentModel = models.CharField(verbose_name='设备型号', max_length=20, blank=True, default="")
@@ -132,7 +132,7 @@ class ConnectorInfo(models.Model):
     )
     ID = models.IntegerField(verbose_name='ID', primary_key=True)
     ConnectorID = models.CharField(verbose_name='充电设备接口编码', max_length=26)
-    EquipmentID = models.ForeignKey(EquipmentInfo, verbose_name='充电设备', related_name="ConnectorInfos")
+    EquipmentID = models.ForeignKey(EquipmentInfo, verbose_name='充电设备', related_name="ConnectorInfos", db_constraint=False, on_delete=models.CASCADE)
     ConnectorName = models.CharField(verbose_name='充电设备接口名称', max_length=30, blank=True, null=True)
     ConnectorType = models.IntegerField(verbose_name='接口类型', choices=CONNECTOR_TYPE)
     VoltageUpperLimits = models.IntegerField(verbose_name='额定电压上限')
@@ -173,7 +173,7 @@ class CheckChargeOrder(models.Model):
 
 class DisputeOrder(models.Model):
     """单项订单"""
-    order = models.ForeignKey(CheckChargeOrder, verbose_name='争议订单')
+    order = models.ForeignKey(CheckChargeOrder, verbose_name='争议订单', on_delete=models.CASCADE, db_constraint=False)
     StartChargeSeq = models.CharField(verbose_name='充电订单号', max_length=27)
     TotalPower = models.DecimalField(verbose_name='累计充电量(度)', max_digits=9, decimal_places=2, blank=True, null=True)
     TotalMoney = models.DecimalField(verbose_name='累计总金额(元)', max_digits=9, decimal_places=2, blank=True, null=True)
