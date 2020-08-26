@@ -47,9 +47,13 @@ class DashBoardPlugin(BaseAdminPlugin):
             stations = stations.filter(seller=self.request.user.seller)
 
         today_results = orders.values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
-            .annotate(total_readings=Sum("total_readings", output_field=FloatField()), counts=Count("id"),
-                      total_fees=Sum("consum_money", output_field=FloatField()),
-                      times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60))).order_by("station_id")
+            .annotate(
+                total_readings=Sum("total_readings", output_field=FloatField()),
+                counts=Count("id"),
+                total_fees=Sum("consum_money", output_field=FloatField()),
+                service_fees=Sum("service_fee"),
+                times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60))
+            ).order_by("station_id")
 
         stations = stations.values("id", "name")
 
@@ -59,12 +63,14 @@ class DashBoardPlugin(BaseAdminPlugin):
             station["counts"] = 0
             station["total_fees"] = 0
             station["times"] = 0
+            station["service_fees"] = 0
             for result in today_results:
                 if result["station_id"] == station["id"]:
                     station["total_readings"] = result.get("total_readings", 0)
                     station["counts"] = result.get("counts", 0)
                     station["total_fees"] = result.get("total_fees", 0)
                     station["times"] = result.get("times", 0)
+                    station["service_fees"] = result.get("service_fees", 0)
 
         # print(stations_list)
         context.update({'stations_list': stations_list})

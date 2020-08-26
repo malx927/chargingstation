@@ -5,6 +5,7 @@
                 <div>今日充电总量:<span class="pull-right"><em id="today_readings">0.00</em> KWH</span></div>
               <div>今日充电次数:<span class="pull-right"><em id="today_counts">0.00</em> 次</span></div>
               <div>今日充电收入:<span class="pull-right"><em id="today_total_fees">0.00</em> 元</span></div>
+              <div>今日服务费:<span class="pull-right"><em id="today_service_fees">0.00</em> 元</span></div>
               <div>今日充电时长:<span class="pull-right"><em id="today_times">0.00</em> 小时</span></div>
             </div>
           </div>
@@ -15,6 +16,7 @@
           <div>昨日充电总量:<span class="pull-right"><em id="yesterday_readings">0.00</em> KWH</span></div>
           <div>昨日充电次数:<span class="pull-right"><em id="yesterday_counts">0.00</em> 次</span></div>
           <div>昨日充电收入:<span class="pull-right"><em id="yesterday_total_fees">0.00</em> 元</span></div>
+          <div>昨日服务费:<span class="pull-right"><em id="yesterday_service_fees">0.00</em> 元</span></div>
           <div>昨日充电时长:<span class="pull-right"><em id="yesterday_times">0.00</em> 小时</span></div>
         </div>
       </div>
@@ -25,6 +27,7 @@
           <div>本月充电总量:<span class="pull-right"><em id="month_readings">0.00</em> KWH</span></div>
           <div>本月充电次数:<span class="pull-right"><em id="month_counts">0.00</em> 次</span></div>
           <div>本月充电收入:<span class="pull-right"><em id="month_total_fees">0.00</em> 元</span></div>
+          <div>本月服务费:<span class="pull-right"><em id="month_service_fees">0.00</em> 元</span></div>
           <div>本月充电时长:<span class="pull-right"><em id="month_times">0.00</em> 小时</span></div>
         </div>
       </div>
@@ -35,6 +38,7 @@
           <div>今年充电总量:<span class="pull-right"><em id="year_readings">0.00</em> KWH</span></div>
           <div>今年充电次数:<span class="pull-right"><em id="year_counts">0.00</em> 次</span></div>
           <div>今年充电收入:<span class="pull-right"><em id="year_total_fees">0.00</em> 元</span></div>
+          <div>今年服务费:<span class="pull-right"><em id="year_service_fees">0.00</em> 元</span></div>
           <div>今年充电时长:<span class="pull-right"><em id="year_times">0.00</em> 小时</span></div>
         </div>
       </div>
@@ -52,7 +56,7 @@
         <table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(分钟)</th><th>充电收入(元)</th>
+              <th>序号</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(分钟)</th><th>充电收入(元)</th><th>服务费(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -64,6 +68,7 @@
               <td>{{ result.counts }}</td>
               <td>{{ result.times|floatformat:2 }}</td>
               <td>{{ result.total_fees|floatformat:2 }}</td>
+              <td>{{ result.service_fees|floatformat:2 }}</td>
           </tr>
           {% endfor %}
           </tbody>
@@ -168,7 +173,7 @@
 	<table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>运营商</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+              <th>序号</th><th>运营商</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th><th>服务费(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -180,6 +185,7 @@
               <td>${ seller.counts }</td>
               <td>${ seller.times.toFixed(2) }</td>
               <td>${ seller.total_fees.toFixed(2) }</td>
+              <td>${ seller.service_fees.toFixed(2) }</td>
           </tr>
 		  `).join('')}
           </tbody>
@@ -189,7 +195,7 @@
 	<table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>运营商</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+              <th>序号</th><th>运营商</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th><th>服务费(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -202,6 +208,7 @@
               <td>${ station.counts }</td>
               <td>${ station.times.toFixed(2) }</td>
               <td>${ station.total_fees.toFixed(2) }</td>
+              <td>${ station.service_fees.toFixed(2) }</td>
           </tr>
 		  `).join('')}
           </tbody>
@@ -211,7 +218,7 @@
 	<table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>运营商</th><th>充电站</th><th>充电桩</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+              <th>序号</th><th>运营商</th><th>充电站</th><th>充电桩</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th><th>服务费(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -225,6 +232,7 @@
               <td>${ pile.counts }</td>
               <td>${ pile.times.toFixed(2) }</td>
               <td>${ pile.total_fees.toFixed(2) }</td>
+              <td>${ pile.service_fees.toFixed(2) }</td>
           </tr>
 		  `).join('')}
           </tbody>
@@ -291,6 +299,7 @@
                 $("#today_readings").text(data.readings.toFixed(2))
                 $("#today_counts").text(data.counts)
                 $("#today_total_fees").text(data.total_fees.toFixed(2))
+                $("#today_service_fees").text(data.service_fees.toFixed(2))
                 $("#today_times").text(data.times.toFixed(2))
               },
               error: function(error){
@@ -312,6 +321,7 @@
                 $("#yesterday_readings").text(data.readings.toFixed(2))
                 $("#yesterday_counts").text(data.counts)
                 $("#yesterday_total_fees").text(data.total_fees.toFixed(2))
+                $("#yesterday_service_fees").text(data.service_fees.toFixed(2))
                 $("#yesterday_times").text(data.times.toFixed(2))
               },
               error: function(error){
@@ -329,6 +339,7 @@
                 $("#month_readings").text(data.readings.toFixed(2))
                 $("#month_counts").text(data.counts)
                 $("#month_total_fees").text(data.total_fees.toFixed(2))
+                $("#month_service_fees").text(data.service_fees.toFixed(2))
                 $("#month_times").text(data.times.toFixed(2))
               },
               error: function(error){
@@ -346,6 +357,7 @@
                 $("#year_readings").text(data.readings.toFixed(2))
                 $("#year_counts").text(data.counts)
                 $("#year_total_fees").text(data.total_fees.toFixed(2))
+                $("#year_service_fees").text(data.service_fees.toFixed(2))
                 $("#year_times").text(data.times.toFixed(2))
               },
               error: function(error){

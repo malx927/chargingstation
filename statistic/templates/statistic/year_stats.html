@@ -103,7 +103,7 @@
 	<table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>运营商</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+              <th>序号</th><th>运营商</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th><th>服务费(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -115,12 +115,13 @@
               <td>${ seller.counts }</td>
               <td>${ seller.times.toFixed(2) }</td>
               <td>${ seller.total_fees.toFixed(2) }</td>
+              <td>${ seller.service_fees.toFixed(2) }</td>
           </tr>
 		  `).join('')}
           </tbody>
             <tfoot>
                 <tr>
-                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td>
+                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td><td>${ data.service_fees.toFixed(2) }</td>
                 </tr>
             </tfoot>
         </table>
@@ -129,7 +130,7 @@ var station_template = data => `
 	<table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+              <th>序号</th><th>充电站</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th><th>服务费(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -141,12 +142,13 @@ var station_template = data => `
               <td>${ station.counts }</td>
               <td>${ station.times.toFixed(2) }</td>
               <td>${ station.total_fees.toFixed(2) }</td>
+              <td>${ station.service_fees.toFixed(2) }</td>
           </tr>
 		  `).join('')}
           </tbody>
            <tfoot>
                 <tr>
-                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td>
+                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td><td>${ data.service_fees.toFixed(2) }</td>
                 </tr>
            </tfoot>
         </table>
@@ -155,7 +157,7 @@ var station_template = data => `
 	<table class="table table-hover table-striped">
           <thead>
             <tr>
-              <th>序号</th><th>充电桩</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th>
+              <th>序号</th><th>充电桩</th><th>充电总量(KWH)</th><th>充电次数(次)</th><th>充电时长(小时)</th><th>充电收入(元)</th><th>服务费(元)</th>
             </tr>
           </thead>
           <tbody>
@@ -167,12 +169,13 @@ var station_template = data => `
               <td>${ pile.counts }</td>
               <td>${ pile.times.toFixed(2) }</td>
               <td>${ pile.total_fees.toFixed(2) }</td>
+              <td>${ pile.service_fees.toFixed(2) }</td>
           </tr>
 		  `).join('')}
           </tbody>
           <tfoot>
                 <tr>
-                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td>
+                  <td></td><td> 合计 </td><td>${ data.readings.toFixed(2) }</td><td>${ data.counts }</td><td>${ data.times.toFixed(2) }</td><td>${ data.total_fees.toFixed(2) }</td><td>${ data.service_fees.toFixed(2) }</td>
                 </tr>
            </tfoot>
         </table>
