@@ -69,17 +69,17 @@ class ChargingCardAdmin(object):
         return media
 
     def has_add_permission(self):
-        if self.request.user.is_superuser or self.request.user.is_oper_mgr:
+        if self.request.user.is_oper_mgr:
             return False
         return True
 
     def has_change_permission(self, obj=None):
-        if self.request.user.is_superuser or self.request.user.is_oper_mgr:
+        if self.request.user.is_oper_mgr:
             return False
         return True
 
     def has_delete_permission(self, obj=None):
-        if self.request.user.is_superuser or self.request.user.is_oper_mgr:
+        if self.request.user.is_oper_mgr:
             return False
         return True
 
