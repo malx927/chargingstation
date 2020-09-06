@@ -127,7 +127,7 @@ def charging_status_overtime():
         if datetime.datetime.now() > over_time:  # 15s 充电状态超时
             log.info('charging_status_overtime 超时:电桩SN:{} 枪口:{}订单:{}'.format(record.pile_sn, record.gun_num, record.out_trade_no))
             try:
-                fault_code = FaultCode.objects.get(id=71)
+                fault_code = FaultCode.objects.get(id=92)
                 ChargingGun.objects.filter(charg_pile__pile_sn=record.pile_sn, gun_num=record.gun_num) \
                     .update(work_status=2, charg_status=fault_code)  # 2故障状态 71充电阶段超时
                 order = Order.objects.get(out_trade_no=record.out_trade_no)
@@ -144,7 +144,7 @@ def charging_status_overtime():
                     "consum_money": int(order.consum_money.quantize(decimal.Decimal("0.01")) * 100),
                     "total_reading": int(order.get_total_reading() * 100),
                     "stop_code": 0,  # 0 为后台主动停止
-                    "fault_code": 71,  # 后台主动停止－通讯超时
+                    "fault_code": 92,  # 后台主动停止－通讯超时
                     "start_model": order.start_model,
                 }
                 server_send_stop_charging_cmd(**stop_cmd)  # 发送停止命令

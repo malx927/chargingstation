@@ -1341,7 +1341,7 @@ def save_pile_charg_status_to_db(**data):
     else:
         balanc = order.get_balance()
         if balanc < 0:
-            balanc = 0
+            balanc = decimal.Decimal(0)
         balance = int(balanc.quantize(decimal.Decimal("0.01")) * 100)
 
     reply_charging_data = {
@@ -1396,18 +1396,28 @@ def save_pile_charg_status_to_db(**data):
     else:
         try:
             charg_user = UserInfo.objects.get(openid=order.openid)
+            # 判断订单余额和账号余额是否同步,不同步更新订单余额
             sub_account = charg_user.is_sub_user()
             if sub_account:
-                if sub_account.main_user.account_balance() - order.consum_money <= 10:  # 附属用户
+                user_balance = sub_account.main_user.account_balance()
+                if order.balance < user_balance:
+                    order.balance = user_balance
+                    order.save(update_fields=["balance"])
+                if user_balance - order.consum_money <= 10:  # 附属用户
                     # 发送停充指令
                     stop_data["fault_code"] = 93  # 后台主动停止－帐号无费用
                     logging.info(stop_data)
                     server_send_stop_charging_cmd(**stop_data)
-            elif charg_user.account_balance() - order.consum_money <= 0.2:
-                # 发送停充指令
-                stop_data["fault_code"] = 93    # 后台主动停止－帐号无费用
-                logging.info(stop_data)
-                server_send_stop_charging_cmd(**stop_data)
+            else:
+                user_balance = charg_user.account_balance()
+                if order.balance < user_balance:
+                    order.balance = user_balance
+                    order.save(update_fields=["balance"])
+                if user_balance - order.consum_money <= 0.2:
+                    # 发送停充指令
+                    stop_data["fault_code"] = 93    # 后台主动停止－帐号无费用
+                    logging.info(stop_data)
+                    server_send_stop_charging_cmd(**stop_data)
         except UserInfo.DoesNotExist as ex:
             logging.warning(ex)
             # 发送停充指令
