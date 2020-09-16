@@ -159,7 +159,7 @@ def charging_today_data():
     """当天充电次数、充电电量、充电金额、充电电力"""
     cur_date = datetime.datetime.now().date()
     # yester_date = (datetime.datetime.now() + datetime.timedelta(days=-1)).date()
-    today_totals = Order.objects.filter(begin_time__date=cur_date)\
+    today_totals = Order.objects.filter(charg_pile__isnull=False, begin_time__date=cur_date)\
         .aggregate(today_total_counts=Count("id"), today_total_readings=Sum("total_readings", output_field=FloatField()), today_total_money=Sum("consum_money", output_field=FloatField()))
     log.info(today_totals)
 

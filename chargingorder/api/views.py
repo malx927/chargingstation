@@ -29,11 +29,11 @@ class OrderDayStats(APIView):
         }
 
         if self.request.user.is_superuser:
-            queryset = Order.objects.all()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
         elif self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
             queryset = Order.objects.none()
 
@@ -83,11 +83,11 @@ class OrderMonthStats(APIView):
     def get(self, request, *args, **kwargs):
         month = request.GET.get("month", None)
         if self.request.user.is_superuser:
-            queryset = Order.objects.all()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
         elif self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
             queryset = Order.objects.none()
 
@@ -124,11 +124,11 @@ class OrderYearStats(APIView):
     def get(self, request, *args, **kwargs):
         year = request.GET.get("year", None)
         if self.request.user.is_superuser:
-            queryset = Order.objects.all()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
         elif self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
             queryset = Order.objects.none()
 
@@ -171,11 +171,11 @@ class OrderCategoryStats(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.all()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         if begin_time and end_time:
             b_date = datetime.datetime.strptime(begin_time, "%Y-%m-%d")
@@ -228,11 +228,11 @@ class OrderDayAnalysis(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.all()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         if s_date:
             d_date = datetime.datetime.strptime(s_date, "%Y-%m-%d")
@@ -309,11 +309,11 @@ class OrderMonthAnalysis(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.all()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         if s_month:
             d_date = datetime.datetime.strptime(s_month, "%Y-%m")
@@ -390,11 +390,11 @@ class OrderYearAnalysis(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.all()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         if s_year:
             d_date = datetime.datetime.strptime(s_year, "%Y")

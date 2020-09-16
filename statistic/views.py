@@ -3,19 +3,17 @@ import logging
 import time
 import json
 
-from django.db.models import Sum, Count, F, Case, When, IntegerField, FloatField
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from chargingorder.models import Order, OrderChargDetail
-from django.db import connection
+
 from django_redis import get_redis_connection
 # 累计充电次数
 # 累计充电电量
 # 实时充电总功率
 # 充电桩总数
-from stationmanager.models import ChargingPile
-from statistic.tasks import charging_yesterday_data, charging_device_stats, charging_accumulative_total_stats, \
-    current_month_year_accumlative_stats, real_time_power_stats, charging_today_data
+
+from statistic.tasks import charging_device_stats, charging_accumulative_total_stats, \
+    current_month_year_accumlative_stats, real_time_power_stats
 
 logger = logging.getLogger("django")
 
@@ -54,7 +52,6 @@ class BigScreenRealtimePowerAPIView(APIView):
         conn = get_redis_connection("default")
         results_stats = conn.get("yd_real_time_power_stats")
         if results_stats is None:
-            print("---------------")
             real_time_power_stats()
             time.sleep(0.5)
             results_stats = conn.get("yd_real_time_power_stats")
@@ -73,7 +70,6 @@ class BigScreenDeviceStatsAPIView(APIView):
         results_stats = conn.get("yd_device_category_stats")
         if results_stats is None:
             charging_device_stats()
-            print("++++++++++++++++")
             time.sleep(0.5)
             results_stats = conn.get("yd_device_category_stats")
 

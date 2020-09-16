@@ -129,7 +129,7 @@ def charging_status_overtime():
             try:
                 fault_code = FaultCode.objects.get(id=92)
                 ChargingGun.objects.filter(charg_pile__pile_sn=record.pile_sn, gun_num=record.gun_num) \
-                    .update(work_status=2, charg_status=fault_code)  # 2故障状态 71充电阶段超时
+                    .update(work_status=2, charg_status=fault_code)  # 2故障状态
                 order = Order.objects.get(out_trade_no=record.out_trade_no)
                 if order.status == 2:
                     user_update_pile_gun(order.openid, order.start_model, None, None)
