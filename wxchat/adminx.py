@@ -5,7 +5,7 @@ from django.urls import reverse
 from xadmin import views
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText
 from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord, RechargeList, \
-    UserCollection, SubAccount, SubAccountConsume, UserAcountHistory
+    UserCollection, SubAccount, SubAccountConsume, UserAcountHistory, RechargeDesc
 
 
 class GroupClientsAdmin(object):
@@ -189,12 +189,22 @@ xadmin.site.register(RechargeRecord, RechargeRecordAdmin)
 
 class RechargeListAdmin(object):
     """用户充值设置"""
-    list_display = ('money', 'create_at')
+    list_display = ('money', 'gift_amount', 'create_at')
     list_per_page = 50
     model_icon = 'fa fa-weixin'
 
 
 xadmin.site.register(RechargeList, RechargeListAdmin)
+
+
+class RechargeDescAdmin(object):
+    """充值优惠说明"""
+    list_display = ('desc', 'create_at')
+    list_per_page = 50
+    model_icon = 'fa fa-weixin'
+
+
+xadmin.site.register(RechargeDesc, RechargeDescAdmin)
 
 
 class UserCollectionAdmin(object):

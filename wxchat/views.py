@@ -30,7 +30,7 @@ from wxchat.decorators import weixin_decorator
 from wxchat.forms import RegisterForm, SubAccountForm
 from stationmanager.utils import create_qrcode
 from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection, \
-    SubAccount
+    SubAccount, RechargeDesc
 
 logger = logging.getLogger("django")
 
@@ -255,12 +255,15 @@ class OrderPayView(View):
         openid = request.session.get("openid", None)
         url = request.GET.get("url", None)
         lists = RechargeList.objects.all()
+        desc = RechargeDesc.objects.first()
+
         signPackage = getJsApiSign(self.request)
         context = {
             "openid": openid,
             "url": url,
             "sign": signPackage,
             "lists": lists,
+            "desc": desc,
         }
         # return render(request, template_name="wxchat/wxchat_pay.html", context=context)
         return render(request, template_name="wxchat/recharge_list.html", context=context)
@@ -389,6 +392,10 @@ def pay_notify(request):
 
                 cash_fee = res_data['cash_fee'] / 100
 
+                rec_item = RechargeList.objects.filter(money=cash_fee).first()
+                # 赠送金额
+                gift_amount = rec_item.gift_money if rec_item is not None else 0
+
                 coupon_fee_0 = res_data.get('coupon_fee_0', 0) / 100
                 coupon_fee_1 = res_data.get('coupon_fee_1', 0) / 100
 
@@ -398,6 +405,7 @@ def pay_notify(request):
                     "total_fee": res_data['total_fee'] / 100,
                     "transaction_id": res_data['transaction_id'],
                     "cash_fee": cash_fee + coupon_fee_0 + coupon_fee_1,
+                    "gift_amount": gift_amount,
                     "status": 1,
                     "pay_time": pay_time,
                     "recharge_type": 2,     # 微信支付
@@ -408,7 +416,7 @@ def pay_notify(request):
                 try:
                     user = UserInfo.objects.get(openid=openid)
                     if user.out_trade_no != out_trade_no:
-                        user.total_money += decimal.Decimal(cash_fee)
+                        user.total_money += decimal.Decimal(cash_fee + gift_amount)
                         user.out_trade_no = out_trade_no
                         user.last_charg_time = datetime.now()
                         user.save(update_fields=["total_money", "out_trade_no", "last_charg_time"])

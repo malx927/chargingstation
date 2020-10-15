@@ -145,6 +145,7 @@ class RechargeRecord(models.Model):
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32, null=True, blank=True)
     total_fee = models.DecimalField(verbose_name='应收款', max_digits=7, decimal_places=2, blank=True, null=True)
     cash_fee = models.DecimalField(verbose_name='实收款', max_digits=7, decimal_places=2, blank=True, null=True)
+    gift_amount = models.IntegerField(verbose_name="赠送金额(元)", default=0)
     pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
     refund_fee = models.DecimalField(verbose_name="退款金额", max_digits=7, decimal_places=2, default=0)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True, auto_now=False)
@@ -272,6 +273,7 @@ class Menu(models.Model):
 
 class RechargeList(models.Model):
     money = models.IntegerField(verbose_name="充值金额(元)", default=0)
+    gift_amount = models.IntegerField(verbose_name="赠送金额(元)", default=0)
     create_at = models.DateTimeField(verbose_name='创建时间', auto_now=True)
 
     def __str__(self):
@@ -281,6 +283,19 @@ class RechargeList(models.Model):
         verbose_name = '充值金额设置'
         verbose_name_plural = verbose_name
         ordering = ["money"]
+
+
+class RechargeDesc(models.Model):
+    desc = models.CharField(verbose_name="充值优惠说明", max_length=1000)
+    create_at = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+
+    def __str__(self):
+        return self.desc
+
+    class Meta:
+        verbose_name = '充值优惠活动'
+        verbose_name_plural = verbose_name
+        ordering = ["-create_at"]
 
 
 class UserCollection(models.Model):
