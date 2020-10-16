@@ -95,7 +95,7 @@
           <i class="material-icons cyan circle">shopping_basket</i>
           <h6 class="collection-header m-0">充值金额列表</h6>
             {% if desc %}
-            <p>{{ desc.desc|default: '' }}</p>
+            <p>{{ desc.desc}}</p>
             {% endif %}
            <input id="openid" type="hidden" value="{{ request.session.openid }}">
         </div>
