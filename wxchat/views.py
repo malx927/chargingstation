@@ -394,7 +394,7 @@ def pay_notify(request):
 
                 rec_item = RechargeList.objects.filter(money=cash_fee).first()
                 # 赠送金额
-                gift_amount = rec_item.gift_money if rec_item is not None else 0
+                gift_amount = rec_item.gift_amount if rec_item is not None else 0
 
                 coupon_fee_0 = res_data.get('coupon_fee_0', 0) / 100
                 coupon_fee_1 = res_data.get('coupon_fee_1', 0) / 100
@@ -420,7 +420,7 @@ def pay_notify(request):
                         user.binding_amount += decimal.Decimal(gift_amount)
                         user.out_trade_no = out_trade_no
                         user.last_charg_time = datetime.now()
-                        user.save(update_fields=["total_money", "out_trade_no", "last_charg_time"])
+                        user.save(update_fields=["total_money", "out_trade_no", "binding_amount", "last_charg_time"])
                         # 订单同步余额
                         if user.out_trade_no:
                             balance = user.account_balance()
