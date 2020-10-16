@@ -11,7 +11,7 @@ from .models import Order, OrderRecord, OrderChargDetail
 # 订单admin
 class OrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'charg_pile', 'gun_num', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
+        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
         'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'status', 'report_result', 'report_time'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
@@ -106,6 +106,12 @@ class OrderAdmin(object):
         ),
 
     )
+
+    def station(self, obj):
+        return obj.charg_pile.station.name
+    station.short_description = '充电站'
+    station.allow_tags = True
+    station.is_column = True
 
     def queryset(self):
         queryset = super(OrderAdmin, self).queryset()

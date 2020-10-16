@@ -416,7 +416,8 @@ def pay_notify(request):
                 try:
                     user = UserInfo.objects.get(openid=openid)
                     if user.out_trade_no != out_trade_no:
-                        user.total_money += decimal.Decimal(cash_fee + gift_amount)
+                        user.total_money += decimal.Decimal(cash_fee)
+                        user.binding_amount += decimal.Decimal(gift_amount)
                         user.out_trade_no = out_trade_no
                         user.last_charg_time = datetime.now()
                         user.save(update_fields=["total_money", "out_trade_no", "last_charg_time"])
