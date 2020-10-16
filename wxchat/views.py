@@ -305,8 +305,8 @@ class OrderPayView(View):
 
         try:
             wxPay = WeixinPay()
-            # if openid == 'o6Lcy5jOuH-efHvQJPyGFIw7PbGA':
-            #     total_fee = 1
+            if openid == 'o6Lcy5jOuH-efHvQJPyGFIw7PbGA':
+                total_fee = 1
             data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, attach=attach, notify_url=settings.NOTIFY_URL, user_id=openid)
             prepay_id = data.get('prepay_id', None)
             save_data = dict(data)
