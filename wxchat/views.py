@@ -256,7 +256,7 @@ class OrderPayView(View):
         url = request.GET.get("url", None)
         lists = RechargeList.objects.all()
         desc = RechargeDesc.objects.first()
-
+        print(desc)
         signPackage = getJsApiSign(self.request)
         context = {
             "openid": openid,
