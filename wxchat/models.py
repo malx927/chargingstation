@@ -63,7 +63,7 @@ class UserInfo(models.Model):
     total_money = models.DecimalField(verbose_name='充值总额(元)', default=0, blank=True, max_digits=8, decimal_places=2, help_text='<font color=red>用户清零请将充值总额和消费总额设置为零</font>')
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2, help_text='<font color=red>用户清零请将充值总额和消费总额设置为零</font>')
     binding_amount = models.DecimalField(verbose_name='赠送金额(元)', default=0, blank=True, max_digits=6, decimal_places=2)
-    # account_balances = models.DecimalField(verbose_name='账户余额', default=0, blank=True, max_digits=8, decimal_places=2)
+    consume_amount = models.DecimalField(verbose_name='赠金消费额(元)', default=0, blank=True, max_digits=6, decimal_places=2)
     subscribe = models.NullBooleanField(verbose_name='是否订阅', default=0)
     sex = models.IntegerField(verbose_name='性别', choices=SEX_CHOICE)  # 值为1时是男性，值为2时是女性，值为0时是未知
     province = models.CharField(verbose_name='省份', max_length=64, blank=True, null=True)
@@ -85,9 +85,6 @@ class UserInfo(models.Model):
     out_trade_no = models.CharField(verbose_name='最近一次订单编号', max_length=32, blank=True, null=True)
     visit_city = models.CharField(verbose_name="最后访问地点", max_length=120, blank=True, null=True)
     visit_time = models.DateTimeField(verbose_name="最后访问时间", blank=True, null=True)
-
-    # 反复一分钟之内充电,停止充电(短时间内做充停操作)
-    # 充电开启后,不是桩的原因停止充电, 三分钟或是五分钟之内不允许停止充电
 
     def __str__(self):
         return self.name if self.name else self.nickname
@@ -297,6 +294,29 @@ class RechargeDesc(models.Model):
         verbose_name = '充值优惠活动说明'
         verbose_name_plural = verbose_name
         ordering = ["-create_at"]
+
+
+class GiftMoneyRecord(models.Model):
+    """
+    用户赠送金额记录表
+    """
+    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32)
+    name = models.CharField(verbose_name='用户名', max_length=24, blank=True, default='')
+    openid = models.CharField(verbose_name='微信号(openid)', max_length=32)
+    transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32, null=True, blank=True)
+    gift_amount = models.DecimalField(verbose_name='赠送金额(元)', default=0, blank=True, max_digits=7, decimal_places=2)
+    consume_amount = models.DecimalField(verbose_name='消费额(元)', default=0, blank=True, max_digits=7, decimal_places=2)
+    gift_time = models.DateTimeField(verbose_name='赠送时间', blank=True, null=True)
+    status = models.BooleanField(verbose_name='是否有效', default=False)
+    update_time = models.DateTimeField(verbose_name='修改时间', auto_now=True)
+    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '用户赠送金额记录'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.out_trade_no
 
 
 class UserCollection(models.Model):

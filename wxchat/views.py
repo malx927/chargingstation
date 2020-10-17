@@ -30,7 +30,7 @@ from wxchat.decorators import weixin_decorator
 from wxchat.forms import RegisterForm, SubAccountForm
 from stationmanager.utils import create_qrcode
 from .models import UserInfo, RechargeRecord, WxUnifiedOrderResult, WxPayResult, RechargeList, UserCollection, \
-    SubAccount, RechargeDesc
+    SubAccount, RechargeDesc, GiftMoneyRecord
 
 logger = logging.getLogger("django")
 
@@ -255,7 +255,7 @@ class OrderPayView(View):
         openid = request.session.get("openid", None)
         url = request.GET.get("url", None)
         lists = RechargeList.objects.all()
-        desc = RechargeDesc.objects.first()
+        desc = RechargeDesc.objects.filter(is_used=True).first()
         print(desc)
         signPackage = getJsApiSign(self.request)
         context = {
@@ -392,9 +392,13 @@ def pay_notify(request):
 
                 cash_fee = res_data['cash_fee'] / 100
 
-                rec_item = RechargeList.objects.filter(money=cash_fee).first()
-                # 赠送金额
-                gift_amount = rec_item.gift_amount if rec_item is not None else 0
+                counts = RechargeDesc.objects.filter(is_used=True).count()
+                if counts > 0:
+                    rec_item = RechargeList.objects.filter(money=cash_fee).first()
+                    # 赠送金额
+                    gift_amount = rec_item.gift_amount if rec_item is not None else 0
+                else:
+                    gift_amount = 0
 
                 coupon_fee_0 = res_data.get('coupon_fee_0', 0) / 100
                 coupon_fee_1 = res_data.get('coupon_fee_1', 0) / 100
@@ -412,6 +416,16 @@ def pay_notify(request):
                 }
                 logger.info(data)
                 RechargeRecord.objects.update_or_create(defaults=data, out_trade_no=out_trade_no)
+                if counts > 0:
+                    gift_data = {
+                        "openid": openid,
+                        "name": name,
+                        "transaction_id": res_data['transaction_id'],
+                        "gift_amount": gift_amount,
+                        "status": True,
+                        "gift_time": pay_time,
+                    }
+                    GiftMoneyRecord.objects.update_or_create(defaults=gift_data, out_trade_no=out_trade_no)
 
                 try:
                     user = UserInfo.objects.get(openid=openid)
