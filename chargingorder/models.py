@@ -82,6 +82,11 @@ class Order(models.Model):
             return 0
     total_minutes.short_description = '充电时长(min)'
 
+    # 站场
+    # def station(self):
+    #     return self.charg_pile.station.name
+    # station.short_description = '充电站'
+
     def total_seconds(self):
         if self.end_time and self.begin_time:
             seconds = (self.end_time - self.begin_time).total_seconds()
