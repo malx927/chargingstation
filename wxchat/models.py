@@ -62,7 +62,7 @@ class UserInfo(models.Model):
     # ic_pwd = models.CharField(verbose_name='IC卡秘钥', max_length=20, blank=True, default='')
     total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2, help_text='<font color=red>用户清零请将充值总额和消费总额设置为零</font>')
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2, help_text='<font color=red>用户清零请将充值总额和消费总额设置为零</font>')
-    binding_amount = models.DecimalField(verbose_name='绑定金额', default=0, blank=True, max_digits=6, decimal_places=2)
+    binding_amount = models.DecimalField(verbose_name='赠送金额', default=0, blank=True, max_digits=6, decimal_places=2)
     # account_balances = models.DecimalField(verbose_name='账户余额', default=0, blank=True, max_digits=8, decimal_places=2)
     subscribe = models.NullBooleanField(verbose_name='是否订阅', default=0)
     sex = models.IntegerField(verbose_name='性别', choices=SEX_CHOICE)  # 值为1时是男性，值为2时是女性，值为0时是未知
@@ -287,6 +287,7 @@ class RechargeList(models.Model):
 
 class RechargeDesc(models.Model):
     desc = models.CharField(verbose_name="充值优惠说明", max_length=1000)
+    is_used = models.BooleanField(verbose_name="有效", default=False)
     create_at = models.DateTimeField(verbose_name='创建时间', auto_now=True)
 
     def __str__(self):
