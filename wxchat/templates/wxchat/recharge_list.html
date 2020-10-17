@@ -101,7 +101,12 @@
         </div>
         <div class="collection-item">
             {% for list in lists %}
-                <a data-item="{{ list.money }}" class="btn money_btn  waves-effect waves-light gradient-45deg-light-blue-cyan" href="javascript:void(0);">{{ list.money }}元</a>
+                <a data-item="{{ list.money }}" class="btn money_btn  waves-effect waves-light gradient-45deg-light-blue-cyan" href="javascript:void(0);">
+                    <div>{{ list.money }}元</div>
+                    {% if list.gift_amount > 0 %}
+				    <div class="red-text">送{{ list.gift_amount }}元</div>
+                    {% endif %}
+                </a>
             {% endfor %}
         </div>
       </div>
