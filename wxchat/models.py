@@ -94,9 +94,12 @@ class UserInfo(models.Model):
         verbose_name_plural = verbose_name
 
     def account_balance(self):
-        return self.total_money - self.consume_money + self.binding_amount
+        return self.total_money - self.consume_money + self.binding_amount - self.consume_amount
 
     account_balance.short_description = '账户余额'
+
+    def recharge_balance(self):
+        return self.total_money - self.consume_money
 
     def is_sub_user(self):
         sub_account = self.subaccount_set.first()
@@ -239,11 +242,12 @@ class UserAcountHistory(models.Model):
     openid = models.CharField(verbose_name='微信ID', max_length=120, blank=True, null=True)
     total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2)
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
-    binding_amount = models.DecimalField(verbose_name='绑定金额', default=0, blank=True, max_digits=6, decimal_places=2)
+    binding_amount = models.DecimalField(verbose_name='赠送金额', default=0, blank=True, max_digits=6, decimal_places=2)
+    consume_amount = models.DecimalField(verbose_name='赠金消费', default=0, blank=True, max_digits=6, decimal_places=2)
     create_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
 
     def account_balance(self):
-        return self.total_money - self.consume_money + self.binding_amount
+        return self.total_money - self.consume_money + self.binding_amount - self.consume_amount
 
     account_balance.short_description = '账户余额'
 
@@ -314,6 +318,29 @@ class GiftMoneyRecord(models.Model):
     class Meta:
         verbose_name = '用户赠送金额记录'
         verbose_name_plural = verbose_name
+        # ordering = ["add_time"]
+
+    def __str__(self):
+        return self.out_trade_no
+
+    def remain_money(self):
+        return self.gift_amount - self.consume_amount
+
+
+class GiftConsumeRecord(models.Model):
+    """
+    用户赠金使用情况
+    """
+    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32)
+    name = models.CharField(verbose_name='用户名', max_length=24, blank=True, default='')
+    openid = models.CharField(verbose_name='微信号(openid)', max_length=32)
+    consume_amount = models.DecimalField(verbose_name='消费额(元)', default=0, blank=True, max_digits=7, decimal_places=2)
+    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = '用户赠金使用情况'
+        verbose_name_plural = verbose_name
+        ordering = ["-add_time"]
 
     def __str__(self):
         return self.out_trade_no

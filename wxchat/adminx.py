@@ -5,7 +5,7 @@ from django.urls import reverse
 from xadmin import views
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText
 from .models import UserInfo, WxPayResult, WxUnifiedOrderResult, GroupClients, Menu, RechargeRecord, RechargeList, \
-    UserCollection, SubAccount, SubAccountConsume, UserAcountHistory, RechargeDesc, GiftMoneyRecord
+    UserCollection, SubAccount, SubAccountConsume, UserAcountHistory, RechargeDesc, GiftMoneyRecord, GiftConsumeRecord
 
 
 class GroupClientsAdmin(object):
@@ -88,6 +88,7 @@ class UserInfoAdmin(object):
             AppendedText('total_money', '元'),
             AppendedText('consume_money', '元'),
             AppendedText('binding_amount', '元'),
+            AppendedText('consume_amount', '元'),
         )
     )
 
@@ -216,6 +217,17 @@ class GiftMoneyRecordAdmin(object):
 
 
 xadmin.site.register(GiftMoneyRecord, GiftMoneyRecordAdmin)
+
+
+class GiftConsumeRecordAdmin(object):
+    """赠送金额记录表"""
+    list_display = ('out_trade_no', 'name', 'openid', 'consume_amount', 'add_time')
+    list_per_page = 50
+    search_fields = ['out_trade_no', 'name', 'openid']
+    model_icon = 'fa fa-weixin'
+
+
+xadmin.site.register(GiftConsumeRecord, GiftConsumeRecordAdmin)
 
 
 class UserCollectionAdmin(object):

@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
 import datetime
-from wxchat.models import UserInfo, RechargeRecord
+from wxchat.models import UserInfo, RechargeRecord, GiftMoneyRecord, UserAcountHistory
 from wxchat.views import order_refund
 from .models import UserRefund, UserRefundDetail, WxRefundRecord, InvoiceTitle
 
@@ -222,13 +222,29 @@ class UserUnfreezeView(View):
         print(openid)
         try:
             user = UserInfo.objects.get(openid=openid)
+            # 保存清零前金额
+            his_data = {
+                "name": user.name if user.name is not None else user.nickname,
+                "openid": user.openid,
+                "total_money": user.total_money,
+                "consume_money": user.consume_money,
+                "binding_amount": user.binding_amount,
+                "consume_amount": user.consume_amount,
+            }
+            logger.info(his_data)
+            UserAcountHistory.objects.create(**his_data)
+
             user.is_freeze = 0
             user.total_money = 0
             user.consume_money = 0
             user.binding_amount = 0
+            user.consume_amount = 0
             user.freeze_time = None
             user.freeze_reason = None
-            user.save(update_fields=["is_freeze", "freeze_time", "freeze_reason", "total_money", "consume_money", "binding_amount"])
+            user.save(update_fields=["is_freeze", "freeze_time", "freeze_reason", "total_money", "consume_money", "binding_amount", "consume_amount"])
+            # 修改赠送金额状态设置为无效
+            GiftMoneyRecord.objects.filter(openid=openid).update(status=False)
+
             msg = {
                 "status_code": 201,
                 "message": "解冻成功"

@@ -11,7 +11,7 @@ from cards.models import ChargingCard
 from chargingorder.models import ChargingCmdRecord, GroupName
 from chargingstation import settings
 from django.db.models import F
-from wxchat.models import UserInfo, UserAcountHistory, SubAccountConsume
+from wxchat.models import UserInfo, UserAcountHistory, SubAccountConsume, GiftMoneyRecord, GiftConsumeRecord
 from wxchat.utils import send_charging_end_message_to_user
 
 channel_layer = get_channel_layer()
@@ -229,8 +229,13 @@ def user_account_deduct_money(order):
         else:
             try:
                 user = UserInfo.objects.get(openid=openid)
+                sub_account = None
+                if order.main_openid:
+                    sub_account = user
+                    user = UserInfo.objects.get(openid=order.main_openid)
+
                 subscribe = user.subscribe
-                sub_account = user.is_sub_user()
+
                 if sub_account:  # 附属账户
                     order_data = {
                         "account": sub_account,
@@ -241,21 +246,22 @@ def user_account_deduct_money(order):
                     }
                     logging.info(order_data)
                     SubAccountConsume.objects.create(**order_data)
-                    UserInfo.objects.filter(openid=sub_account.main_user.openid).update(
-                        consume_money=F('consume_money') + consum_money)
+                    # UserInfo.objects.filter(openid=sub_account.main_user.openid).update(
+                    #     consume_money=F('consume_money') + consum_money)
+                    account_balance_calc(user, consum_money, order.out_trade_no)
                 else:
                     his_data = {
                         "name": user.name if user.name is not None else user.nickname,
                         "openid": user.openid,
                         "total_money": user.total_money,
                         "consume_money": user.consume_money,
-                        "binding_amount": user.binding_amount
+                        "binding_amount": user.binding_amount,
+                        "consume_amount": user.consume_amount
                     }
                     UserAcountHistory.objects.create(**his_data)
-                    UserInfo.objects.filter(openid=openid).update(consume_money=F('consume_money') + consum_money)
-
-                if order.main_openid:
-                    user = UserInfo.objects.get(openid=order.main_openid)
+                    # 扣款(余额扣款，不足则扣赠送金额)
+                    # UserInfo.objects.filter(openid=openid).update(consume_money=F('consume_money') + consum_money)
+                    account_balance_calc(user, consum_money, order.out_trade_no)
 
                 order.pay_time = datetime.datetime.now()
                 order.cash_fee = consum_money
@@ -266,6 +272,39 @@ def user_account_deduct_money(order):
             except UserInfo.DoesNotExist as ex:
                 logging.warning(ex)
     logging.info("---------------Leave user_account_deduct_money--------------------")
+
+
+def account_balance_calc(user, consum_money, out_trade_no):
+    if user.recharge_balance() > consum_money:
+        user.consume_money += consum_money
+        user.save(update_fields=["consume_money"])
+        # UserInfo.objects.filter(openid=openid).update(consume_money=F('consume_money') + consum_money)
+    else:
+        diff_val = consum_money - user.recharge_balance()
+        user.consume_money += user.recharge_balance()  # 扣除充值金额
+        user.consume_amount += diff_val  # 扣除赠送金额
+        user.save(update_fields=["consume_money", "consume_amount"])
+
+        recs = {
+            "out_trade_no": out_trade_no,
+            "name": user.name if user.name else user.nickname,
+            "openid": user.openid,
+            "consume_amount": diff_val,
+        }
+        logging.info(recs)
+        GiftConsumeRecord.objects.create(**recs)
+        # recs = GiftMoneyRecord.objects.filter(openid=user.openid, status=True)
+        # for r in recs:
+        #     rm = r.remain_money()
+        #     if rm > diff_val:
+        #         r.consume_amount += diff_val
+        #         r.save(update_fields=["consume_amount"])
+        #         break
+        #     else:
+        #         r.consume_amount += rm
+        #         diff_val -= rm
+        #         r.status = False
+        #         r.save(update_fields=["consume_amount", "status"])
 
 
 def user_update_pile_gun(openid, start_model, pile_sn, gun_num):
