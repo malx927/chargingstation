@@ -405,7 +405,8 @@ class UserBalanceResetRecord(models.Model):
     telephone = models.CharField(verbose_name='手机号码', max_length=18, blank=True, default='')
     total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2)
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
-    binding_amount = models.DecimalField(verbose_name='绑定金额', default=0, blank=True, max_digits=6, decimal_places=2)
+    binding_amount = models.DecimalField(verbose_name='赠送金额', default=0, blank=True, max_digits=6, decimal_places=2)
+    consume_amount = models.DecimalField(verbose_name='赠金消费(元)', default=0, blank=True, max_digits=7, decimal_places=2)
     op_name = models.CharField(verbose_name='操作人', max_length=24, blank=True, null=True)
     oper_time = models.DateTimeField(verbose_name='操作时间', auto_now_add=True)
 

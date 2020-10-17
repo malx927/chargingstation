@@ -82,6 +82,7 @@ class BalanceResetAPIView(APIView):
                     'total_money': user.total_money,
                     'consume_money': user.consume_money,
                     'binding_amount': user.binding_amount,
+                    'consume_amount': user.consume_amount,
                     'op_name': op_name,
                 }
                 UserBalanceResetRecord.objects.create(**data)
@@ -89,7 +90,8 @@ class BalanceResetAPIView(APIView):
                 user.total_money = 0
                 user.consume_money = 0
                 user.binding_amount = 0
-                user.save(update_fields=['total_money', 'consume_money', 'binding_amount'])
+                user.consume_amount = 0
+                user.save(update_fields=['total_money', 'consume_money', 'binding_amount', 'consume_amount'])
                 msg["status"] = 200
             except UserInfo.DoesNotExist as ex:
                 msg["status"] = 200
