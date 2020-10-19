@@ -417,7 +417,7 @@ def pay_notify(request):
                 logger.info(data)
                 RechargeRecord.objects.update_or_create(defaults=data, out_trade_no=out_trade_no)
                 # 记录赠送金额
-                if counts > 0:
+                if counts > 0 and gift_amount > 0:
                     gift_data = {
                         "openid": openid,
                         "name": name,
