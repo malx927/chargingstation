@@ -200,7 +200,7 @@ xadmin.site.register(RechargeList, RechargeListAdmin)
 
 class RechargeDescAdmin(object):
     """充值优惠说明"""
-    list_display = ('desc', 'create_at')
+    list_display = ('desc', 'is_used', 'create_at')
     list_per_page = 50
     model_icon = 'fa fa-weixin'
 
