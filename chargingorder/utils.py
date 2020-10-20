@@ -275,13 +275,17 @@ def user_account_deduct_money(order):
 
 
 def account_balance_calc(user, consum_money, out_trade_no):
-    if user.recharge_balance() > consum_money:
+    if user.recharge_balance() >= consum_money:
         user.consume_money += consum_money
         user.save(update_fields=["consume_money"])
         # UserInfo.objects.filter(openid=openid).update(consume_money=F('consume_money') + consum_money)
     else:
-        diff_val = consum_money - user.recharge_balance()
-        user.consume_money += user.recharge_balance()  # 扣除充值金额
+        if user.recharge_balance() < 0:
+            diff_val = consum_money
+        else:
+            diff_val = consum_money - user.recharge_balance()
+
+        user.consume_money += user.recharge_balance() if user.recharge_balance() > 0 else 0  # 扣除充值金额
         user.consume_amount += diff_val  # 扣除赠送金额
         user.save(update_fields=["consume_money", "consume_amount"])
 

@@ -1141,7 +1141,7 @@ def server_reply_charging_info_handler(*args, **kwargs):
     服务器->充电桩，服务器主动向充电桩发送帐单信息，收到06命令的回复（48字节）。
     2020-04- 17 增加余额数据
     """
-    logging.info(kwargs)
+    # logging.info(kwargs)
     pile_sn = kwargs.get("pile_sn")
     if pile_sn is None:
         logging.warning("电桩SN不能为空")

@@ -151,7 +151,7 @@ def update_connector_info(sender, instance, created, **kwargs):
             connector_type = 3
         elif instance.work_status == 2:
             connector_type = 255
-        print("update_connector_info")
+
         defaults = {
             "ConnectorID": ConnectorID,
             "ConnectorType": instance.gun_type,
