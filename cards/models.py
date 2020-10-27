@@ -44,7 +44,7 @@ class ChargingCard(models.Model):
     card_num = models.CharField(verbose_name="卡号", max_length=128, unique=True)
     cipher = models.CharField(verbose_name="卡密钥", max_length=128, default='123456')
     name = models.CharField(verbose_name='用户名', max_length=32, blank=True, null=True)
-    face_num = models.CharField(verbose_name="卡面卡号", max_length=12)
+    face_num = models.CharField(verbose_name="卡面卡号", max_length=12, unique=True)
     telephone = models.CharField(verbose_name="电话号码", max_length=18)
     seller = models.ForeignKey(Seller, verbose_name="运营商", on_delete=models.SET_NULL, blank=True, null=True, db_constraint=False)
     station = models.ManyToManyField(Station, verbose_name='充电站', blank=True, db_constraint=False)
