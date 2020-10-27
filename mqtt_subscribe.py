@@ -578,7 +578,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
             return
 
     # 判断是否正在充电如果正在充电判断充电时间操作3s后，进行停充
-    order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=str(gun_num), openid=card_num, status__lt=2).first()
+    order = Order.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=str(gun_num), openid=card.face_num, status__lt=2).first()
     if order and oper_type == 2:
         cur_dtime = datetime.datetime.now()
         diff_seconds = (cur_dtime - order.begin_time).seconds
@@ -598,7 +598,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
 
     if oper_type == 1 and card.money > settings.ACCOUNT_BALANCE:
         # 创建订单(充满为止), 发送充电命令
-        openid = card.card_num
+        openid = card.face_num
         out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(10000, 100000))
 
         start_model = 1  # 储值卡启动
