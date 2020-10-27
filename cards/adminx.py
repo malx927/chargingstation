@@ -19,8 +19,8 @@ from xadmin.layout import Fieldset, Row, AppendedText, Main, Side
 
 class ChargingCardAdmin(object):
     """储值卡"""
-    list_display = ['card_num', 'seller', 'station', 'telephone', 'money', 'status', 'add_time', 'startup']
-    search_fields = ['card_num', 'telephone', 'name']
+    list_display = ['card_num', 'face_num', 'name', 'seller', 'station', 'telephone', 'money', 'status', 'add_time', 'startup']
+    search_fields = ['face_num', 'card_num', 'telephone', 'name']
     list_filter = ['status', 'seller', 'station']
     list_per_page = 50
     exclude = ['sec_num', 'cipher', 'pile_sn', 'gun_num']
@@ -52,7 +52,7 @@ class ChargingCardAdmin(object):
 
     def get_list_display(self):
         if self.request.user.is_oper_mgr or self.request.user.is_superuser:
-            self.list_display =  ['card_num', 'seller', 'station', 'telephone', 'money', 'status', 'add_time']
+            self.list_display =  ['card_num', 'face_num', 'name', 'seller', 'station', 'telephone', 'money', 'status', 'add_time']
         return super().get_list_display()
 
     # def get_readonly_fields(self):
