@@ -216,7 +216,7 @@ def user_account_deduct_money(order):
         logging.info("启动方式：{},{}".format(order.start_model, consum_money))
         if order.start_model == 1:      # 储值卡启动
             try:
-                card = ChargingCard.objects.get(card_num=openid)
+                card = ChargingCard.objects.get(face_num=openid)
                 card.money = card.money - consum_money
                 card.save(update_fields=['money'])
                 logging.info("card.money：{}".format(card.money))
