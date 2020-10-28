@@ -157,8 +157,8 @@ xadmin.site.register(ChargingCard, ChargingCardAdmin)
 
 class CardRechargeAdmin(object):
     """储值卡充值"""
-    list_display = ['seller', 'card', 'money', 'op_user', 'add_time']
-    search_fields = ['card']
+    list_display = ['seller', 'card', 'face_num', 'name', 'money', 'op_user', 'add_time']
+    search_fields = ['card', 'face_num', 'name']
     list_filter = ['seller']
     # readonly_fields = ['card', 'money', 'op_user', 'seller']
     list_per_page = 50

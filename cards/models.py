@@ -93,6 +93,8 @@ class ChargingCard(models.Model):
 class CardRecharge(models.Model):
     """充值记录表"""
     card = models.CharField(verbose_name="储蓄卡", max_length=128)
+    face_num = models.CharField(verbose_name="卡面卡号", max_length=12)
+    name = models.CharField(verbose_name='用户名', max_length=32, blank=True, null=True)
     seller = models.ForeignKey(Seller, verbose_name="运营商", on_delete=models.SET_NULL, blank=True, null=True, db_constraint=False)
     money = models.IntegerField(verbose_name="充值金额(元)", default=0)
     op_user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='操作人', blank=True, null=True, db_constraint=False)
