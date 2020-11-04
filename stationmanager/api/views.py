@@ -79,7 +79,7 @@ class StationStatsView(APIView):
 class StationListAPIView(ListAPIView):
     """电站列表"""
     permission_classes = [AllowAny]
-    queryset = Station.objects.filter(is_show=1)
+    queryset = Station.objects.all()
     serializer_class = StationSerializer
     pagination_class = None
 
@@ -89,6 +89,6 @@ class StationListAPIView(ListAPIView):
             city_name = "北京"
         stations = Station.objects.filter(Q(name__icontains=city_name) | Q(address__icontains=city_name)
                                             | Q(province__name__icontains=city_name) | Q(city__name__contains=city_name)
-                                            | Q(district__name__icontains=city_name))
+                                            | Q(district__name__icontains=city_name), is_show=1)
         return stations
 
