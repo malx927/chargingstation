@@ -169,11 +169,10 @@ class OrderRecordAdmin(object):
     service_money.allow_tags = True
     service_money.is_column = True
 
-    list_display = ['out_trade_no', 'pile_sn', 'gun_num', 'charg_time', 'meter_quantity', 'price', 'power_money', 'service_price', 'service_money',
-                    'accumulated_readings', 'accumulated_amount', 'accumulated_service_amount']
+    list_display = ['out_trade_no', 'pile_sn', 'gun_num', 'charg_time', 'meter_quantity', 'price', 'service_price', 'accumulated_readings', 'accumulated_amount', 'accumulated_service_amount']
     search_fields = ['order__out_trade_no']
     exclude = ["price_begin_time", "price_end_time"]
-    readonly_fields = ['charg_time', 'meter_quantity', 'power_money', 'service_money', 'accumulated_service_amount', 'accumulated_readings', 'accumulated_amount']
+    readonly_fields = ['charg_time', 'meter_quantity', 'accumulated_service_amount', 'accumulated_readings', 'accumulated_amount']
     list_filter = ['begin_time', 'order']
     date_hierarchy = 'begin_time'
     list_per_page = 30
@@ -191,9 +190,7 @@ class OrderRecordAdmin(object):
                 Row('begin_time', AppendedText('begin_reading', '度'),),
                 Row('end_time', AppendedText('end_reading', '度'),),
                 Row(AppendedText('price', '元/度'), AppendedText('service_price', '元/度')),
-                Row('meter_quantity', 'power_money', 'service_money'),
-                Row('accumulated_readings', 'accumulated_amount', 'accumulated_service_amount'),
-
+                Row('meter_quantity', 'accumulated_readings', 'accumulated_amount', 'accumulated_service_amount'),
             ),
 
     )
