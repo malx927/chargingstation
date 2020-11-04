@@ -136,6 +136,7 @@ class StationAdmin(object):
                 Row('equip_owner_id', 'station_status'),
                 Row('station_type', 'construction'),
                 Row('telephone', 'telephone1'),
+                Row('is_show', None),
             ),
             Fieldset(
                 '费用收取设置',
