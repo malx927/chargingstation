@@ -109,7 +109,8 @@ class Order(models.Model):
     get_total_reading.short_description = '充电总量'
 
     def get_record(self):
-        return self.records.all().first()
+        return OrderRecord.objects.filter(out_trade_no=self.out_trade_no).first()
+        # return self.records.all().first()
 
     def get_balance(self):
         return self.balance - self.consum_money

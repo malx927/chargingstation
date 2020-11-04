@@ -182,7 +182,7 @@ class OrderRecordAdmin(object):
             Fieldset(
                 '订单信息',
                 Row('out_trade_no', 'pile_sn'),
-                Row( 'serial_num', None),
+                Row('serial_num', None),
                 Row('gun_num', "current_soc"),
             ),
             Fieldset(
@@ -197,6 +197,7 @@ class OrderRecordAdmin(object):
 
     def queryset(self):
         queryset = super(OrderRecordAdmin, self).queryset()
+        # charg_pile = ChargingPile.objects.filter(pile_sn=)
         if self.request.user.station:
             return queryset.filter(order__charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
