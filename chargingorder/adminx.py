@@ -171,9 +171,8 @@ class OrderRecordAdmin(object):
 
     list_display = ['out_trade_no', 'pile_sn', 'gun_num', 'charg_time', 'meter_quantity', 'price', 'service_price', 'accumulated_readings', 'accumulated_amount', 'accumulated_service_amount']
     search_fields = ['out_trade_no']
-    exclude = ["price_begin_time", "price_end_time"]
+    exclude = ["price_begin_time", "price_end_time", "order"]
     readonly_fields = ['charg_time', 'meter_quantity', 'accumulated_service_amount', 'accumulated_readings', 'accumulated_amount']
-    exclude = ["order"]
     list_filter = ['begin_time', 'order']
     date_hierarchy = 'begin_time'
     list_per_page = 30
