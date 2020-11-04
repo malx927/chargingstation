@@ -173,7 +173,6 @@ class OrderRecordAdmin(object):
     search_fields = ['out_trade_no']
     exclude = ["price_begin_time", "price_end_time", "order"]
     readonly_fields = ['charg_time', 'meter_quantity', 'accumulated_service_amount', 'accumulated_readings', 'accumulated_amount']
-    list_filter = ['begin_time', 'order']
     date_hierarchy = 'begin_time'
     list_per_page = 30
     model_icon = 'fa fa-file-text'
@@ -197,23 +196,22 @@ class OrderRecordAdmin(object):
 
     def queryset(self):
         queryset = super(OrderRecordAdmin, self).queryset()
-        # charg_pile = ChargingPile.objects.filter(pile_sn=)
         if self.request.user.station:
-            return queryset.filter(order__charg_pile__station=self.request.user.station)
+            return queryset.filter(station_id=self.request.user.station_id)
         elif self.request.user.seller:
-            return queryset.filter(order__charg_pile__station__seller=self.request.user.seller)
+            return queryset.filter(seller_id=self.request.user.seller_id)
         else:
             return queryset
 
-    def formfield_for_dbfield(self, db_field,  **kwargs):
-        if db_field.name == 'order':
-            if self.request.user.is_superuser:
-                pass
-            elif self.request.user.station:
-                kwargs['queryset'] = Order.objects.filter(charg_pile__station=self.request.user.station)
-            elif self.request.user.seller:
-                kwargs['queryset'] = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
-        return super(OrderRecordAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
+    # def formfield_for_dbfield(self, db_field,  **kwargs):
+    #     if db_field.name == 'order':
+    #         if self.request.user.is_superuser:
+    #             pass
+    #         elif self.request.user.station:
+    #             kwargs['queryset'] = Order.objects.filter(charg_pile__station=self.request.user.station)
+    #         elif self.request.user.seller:
+    #             kwargs['queryset'] = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+    #     return super(OrderRecordAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
 
 
 xadmin.site.register(OrderRecord, OrderRecordAdmin)

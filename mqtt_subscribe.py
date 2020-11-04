@@ -1499,6 +1499,8 @@ def calculate_order(**kwargs):
         logging.info("the first record:{}".format(ex))
         first_data = dict()
         first_data["order"] = order
+        first_data["station_id"] = charg_pile.station_id
+        first_data["seller_id"] = charg_pile.station.seller_id
         first_data["serial_num"] = kwargs["serial_num"]
         first_data["pile_sn"] = pile_sn
         first_data["gun_num"] = gun_num
