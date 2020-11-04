@@ -170,7 +170,7 @@ class OrderRecordAdmin(object):
     service_money.is_column = True
 
     list_display = ['out_trade_no', 'pile_sn', 'gun_num', 'charg_time', 'meter_quantity', 'price', 'service_price', 'accumulated_readings', 'accumulated_amount', 'accumulated_service_amount']
-    search_fields = ['order__out_trade_no']
+    search_fields = ['out_trade_no']
     exclude = ["price_begin_time", "price_end_time"]
     readonly_fields = ['charg_time', 'meter_quantity', 'accumulated_service_amount', 'accumulated_readings', 'accumulated_amount']
     list_filter = ['begin_time', 'order']
@@ -182,7 +182,7 @@ class OrderRecordAdmin(object):
             Fieldset(
                 '订单信息',
                 Row('out_trade_no', 'pile_sn'),
-                Row('order', 'serial_num'),
+                Row( 'serial_num', None),
                 Row('gun_num', "current_soc"),
             ),
             Fieldset(
@@ -190,7 +190,7 @@ class OrderRecordAdmin(object):
                 Row('begin_time', AppendedText('begin_reading', '度'),),
                 Row('end_time', AppendedText('end_reading', '度'),),
                 Row(AppendedText('price', '元/度'), AppendedText('service_price', '元/度')),
-                Row('meter_quantity', 'accumulated_readings', 'accumulated_amount', 'accumulated_service_amount'),
+                Row('charg_time', 'meter_quantity', 'accumulated_readings', 'accumulated_amount', 'accumulated_service_amount'),
             ),
 
     )
