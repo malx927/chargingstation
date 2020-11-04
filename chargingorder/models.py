@@ -18,7 +18,7 @@ class Order(models.Model):
         (0, '上报'),
         (None,  '空'),
     )
-    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32)  # 电桩编号 + YYYYMMDD + random
+    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32, db_index=True)  # 电桩编号 + YYYYMMDD + random
     openid = models.CharField(verbose_name='用户ID(openid)', max_length=64, blank=True, null=True,)
     name = models.CharField(verbose_name='姓名(或昵称)', max_length=64, blank=True, null=True,)
     charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
@@ -137,7 +137,7 @@ class OrderRecord(models.Model):
     order = models.ForeignKey(Order, verbose_name='订单', related_name='records', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     pile_sn = models.CharField(verbose_name="电桩编码SN", max_length=32, blank=True, null=True)
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True,)
-    out_trade_no = models.CharField(verbose_name='订单号', max_length=32, blank=True, null=True)
+    out_trade_no = models.CharField(verbose_name='订单号', max_length=32, blank=True, null=True, db_index=True)
     begin_time = models.DateTimeField(verbose_name='起始时间', blank=True, null=True)
     end_time = models.DateTimeField(verbose_name='截止时间', blank=True, null=True)
     current_soc = models.IntegerField(verbose_name="当前SOC", blank=True, default=0)
