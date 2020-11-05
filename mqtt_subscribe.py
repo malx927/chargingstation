@@ -1493,6 +1493,12 @@ def calculate_order(**kwargs):
             currRec.accumulated_readings = 0
         currRec.accumulated_amount = currRec.accumulated_readings * currRec.price
         currRec.accumulated_service_amount = currRec.accumulated_readings * currRec.service_price
+        if currRec.station_id is None:
+            currRec.station_id = charg_pile.station_id
+
+        if currRec.seller_id is None:
+            currRec.seller_id = charg_pile.station.seller_id
+
         logging.info(currRec)
         currRec.save()
     except OrderRecord.DoesNotExist as ex:
