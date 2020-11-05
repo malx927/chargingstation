@@ -136,6 +136,8 @@ class OrderRecord(models.Model):
     """
     serial_num = models.CharField(verbose_name='流水号', max_length=24, blank=True, null=True,) #YYYYMMDDHHMiSS
     order = models.ForeignKey(Order, verbose_name='订单', related_name='records', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
+    station_id = models.IntegerField(verbose_name='电桩ID', blank=True, null=True)
+    seller_id = models.IntegerField(verbose_name='运营商ID', blank=True, null=True)
     pile_sn = models.CharField(verbose_name="电桩编码SN", max_length=32, blank=True, null=True)
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True,)
     out_trade_no = models.CharField(verbose_name='订单号', max_length=32, blank=True, null=True, db_index=True)
