@@ -1253,8 +1253,8 @@ def pile_charging_status_handler(topic, byte_msg):
         "current_soc": current_soc,
         "voltage": int(voltage * settings.FACTOR_VOLTAGE),
         "current": int(current * settings.FACTOR_CURRENT),
-        "output_voltage": int(output_voltage * settings.FACTOR_VOLTAGE),
-        "output_current": int(output_current * settings.FACTOR_CURRENT),
+        "output_voltage": output_voltage * settings.FACTOR_VOLTAGE,
+        "output_current": output_current * settings.FACTOR_CURRENT,
     }
     logging.info(data)
 
@@ -1266,8 +1266,8 @@ def pile_charging_status_handler(topic, byte_msg):
         "current_soc": current_soc,
         "voltage": int(voltage * settings.FACTOR_VOLTAGE),
         "current": int(current * settings.FACTOR_CURRENT),
-        "output_voltage": int(output_voltage * settings.FACTOR_VOLTAGE),
-        "output_current": int(output_current * settings.FACTOR_CURRENT),
+        "output_voltage": output_voltage * settings.FACTOR_VOLTAGE,
+        "output_current": output_current * settings.FACTOR_CURRENT,
         "gun_temp": int(gun_temp * settings.FACTOR_TEMPERATURE),
         "gun_temp1": int(gun_temp1 * settings.FACTOR_TEMPERATURE),
         "cab_temp": int(cab_temp * settings.FACTOR_TEMPERATURE),

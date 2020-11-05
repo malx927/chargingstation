@@ -62,8 +62,8 @@ class Order(models.Model):
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     report_result = models.IntegerField(verbose_name='上报确认', blank=True, null=True, choices=RESULT)
     report_time = models.DateTimeField(verbose_name='上报确认时间', blank=True, null=True)
-    output_voltage = models.IntegerField(verbose_name='输出电压(V)', blank=True, default=0)
-    output_current = models.IntegerField(verbose_name='输出电流(A)', blank=True, default=0)
+    output_voltage = models.FloatField(verbose_name='输出电压(V)', blank=True, default=0)
+    output_current = models.FloatField(verbose_name='输出电流(A)', blank=True, default=0)
 
     def __str__(self):
         return self.out_trade_no
@@ -189,8 +189,8 @@ class OrderChargDetail(models.Model):
     current_soc = models.IntegerField(verbose_name="当前SOC", blank=True, default=0)
     voltage = models.IntegerField(verbose_name='所需电压值', blank=True, default=0)
     current = models.IntegerField(verbose_name='所需电流值', blank=True, default=0)
-    output_voltage = models.IntegerField(verbose_name='实际输出电压值', blank=True, default=0)
-    output_current = models.IntegerField(verbose_name='实际输出电流', blank=True, default=0)
+    output_voltage = models.FloatField(verbose_name='实际输出电压值', blank=True, default=0)
+    output_current = models.FloatField(verbose_name='实际输出电流', blank=True, default=0)
     gun_temp = models.DecimalField(verbose_name='枪头温度1', blank=True, null=True, max_digits=6, decimal_places=2)
     gun_temp1 = models.DecimalField(verbose_name='枪头温度2', blank=True, null=True, max_digits=6, decimal_places=2)
     cab_temp = models.DecimalField(verbose_name='柜内温度1', blank=True, null=True, max_digits=6, decimal_places=2)
