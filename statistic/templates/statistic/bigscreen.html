@@ -194,7 +194,7 @@
               timeout: 5000,
               success: function(data){
                 {#console.log(JSON.stringify(data));#}
-                $("#id_realtime_power").text(data.realtime_power.toFixed(2).toFixed(2));
+                $("#id_realtime_power").text(data.realtime_power);
 
                 $('.counter').countUp();
                 $("#id_realtime_power").removeClass("counter");
@@ -501,7 +501,7 @@
               timeout: 5000,
               success: function(data){
                 {#console.log(JSON.stringify(data));#}
-                $("#id_total_power").text(data.total_power.toFixed(2));
+                $("#id_total_power").text(data.total_power);
                 var option = {
                         title: {
                             text: '今日充电电力曲线(KW)',
