@@ -193,7 +193,7 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                {#console.log(JSON.stringify(data));#}
+                console.log(JSON.stringify(data));
                 $("#id_realtime_power").text(data.realtime_power);
 
                 $('.counter').countUp();
@@ -500,7 +500,7 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                {#console.log(JSON.stringify(data));#}
+                console.log(JSON.stringify(data));
                 $("#id_total_power").text(data.total_power);
                 var option = {
                         title: {
@@ -603,7 +603,6 @@
                 {#console.log(JSON.stringify(data));#}
                 $("#id_device_stats").find("li").remove();
                 $.each(data, function (index, item) {
-                    console.log(JSON.stringify(item));
 
                     $("#id_device_stats").append(`<li>
                                                      <span>${item.station__name}</span><span>${item.dc_device}</span><span>${item.ac_device}</span>
@@ -627,7 +626,6 @@
                 {#console.log(JSON.stringify(data));#}
                 $("#id_money_stats").find("li").remove();
                 $.each(data, function (index, item) {
-                    console.log(JSON.stringify(item));
 
                     $("#id_money_stats").append(`<li>
                                                      <span>${item.station_name}</span><span>${item.month_money.toFixed(2)}</span><span>${item.year_money.toFixed(2)}</span>
