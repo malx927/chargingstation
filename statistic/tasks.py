@@ -149,9 +149,9 @@ def real_time_power_stats():
         aggregate(realtime_power=Sum(F("output_voltage") * F("output_current"), output_field=FloatField()) / 1000)
 
     conn = get_redis_connection("default")
-    realtime_power = results.get("realtime_power", 0) if results.get("realtime_power", 0) is not None else 0
+    realtime_power = results.get("realtime_power", 0) if results.get("realtime_power", None) is not None else 0
 
-    conn.set("yd_real_time_power_stats", realtime_power)
+    conn.set("yd_real_time_power_stats", round(realtime_power, 2))
 
 
 @shared_task
@@ -182,7 +182,7 @@ def charging_today_data():
     conn.set("yd_today_total_counts", today_total_counts)
     conn.set("yd_today_total_readings", today_total_readings)
     conn.set("yd_today_total_money", today_total_money)
-    conn.set("yd_today_total_power", today_total_power)
+    conn.set("yd_today_total_power", round(today_total_power, 2))
 
     conn.delete("yd_today_hour_count")
     conn.delete("yd_today_hour_readings")
