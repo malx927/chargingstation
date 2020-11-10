@@ -162,4 +162,4 @@ def charging_status_overtime():
 @shared_task
 def order_charging_detail_remove():
     # 清理15天前的数据
-    OrderChargDetail.objects.filter(update_time__lte=datetime.datetime.now() - datetime.timedelta(days=15)).delete()
+    OrderChargDetail.objects.filter(update_time__lte=datetime.datetime.now() - datetime.timedelta(days=25)).delete()

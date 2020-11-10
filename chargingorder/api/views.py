@@ -459,3 +459,4 @@ class OrderYearAnalysis(APIView):
             totals["results"] = results
 
         return Response(totals)
+

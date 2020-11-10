@@ -12,7 +12,7 @@ from .models import Order, OrderRecord, OrderChargDetail
 class OrderAdmin(object):
     list_display = [
         'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
-        'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'status', 'report_result'
+        'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'status', 'report_result', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_pile', 'charg_mode', 'charg_status', 'begin_time', 'status', 'report_result']
@@ -24,6 +24,7 @@ class OrderAdmin(object):
     readonly_fields = ["balance", "main_openid"]
     relfield_style = 'fk_ajax'
     aggregate_fields = {"total_readings": "sum", 'consum_money': "sum", 'cash_fee': "sum",  'power_fee': "sum", "service_fee": "sum"}
+    object_list_template = "chargingorder/order_model_list.html"
 
     form_layout = (
         Main(
@@ -107,6 +108,16 @@ class OrderAdmin(object):
 
     )
 
+    def curve(self, obj):
+        curve_url = ""
+        refund_btn = "<a class='btn btn-xs btn-primary' data-toggle='modal' data-target='#myModal' " \
+                     "data-uri='{}'>监控曲线</a>".format(curve_url)
+        return refund_btn
+
+    curve.short_description = "充电监控"
+    curve.allow_tags = True
+    curve.is_column = True
+
     def station(self, obj):
         return obj.charg_pile.station.name
     station.short_description = '充电站'
@@ -131,6 +142,13 @@ class OrderAdmin(object):
             elif self.request.user.seller:
                 kwargs['queryset'] = ChargingPile.objects.filter(station__seller=self.request.user.seller)
         return super(OrderAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
+
+    def get_media(self):
+        media = super(OrderAdmin, self).get_media()
+        # path = self.request.get_full_path()
+        # if "add" in path or 'update' in path:
+        media.add_js([self.static('stationmanager/js/xadmin.areacode.js')])
+        return media
 
 
 xadmin.site.register(Order, OrderAdmin)

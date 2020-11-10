@@ -42,7 +42,7 @@ class Order(models.Model):
     charg_reading_val = models.IntegerField(verbose_name='按电量充电', blank=True, default=0)   # 按电量充电取此值判断
     # 微信支付
     total_fee = models.DecimalField(verbose_name='充值金额(元)',  max_digits=10, decimal_places=2, blank=True, default=0)
-    cash_fee = models.DecimalField(verbose_name='实际支付金额(元)',  max_digits=10, decimal_places=2, blank=True, default=0)
+    cash_fee = models.DecimalField(verbose_name='实付金额(元)',  max_digits=10, decimal_places=2, blank=True, default=0)
     pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
     transaction_id = models.CharField(verbose_name='微信订单号', max_length=32, null=True, blank=True)
     consum_money = models.DecimalField(verbose_name='消费总金额',  max_digits=10, decimal_places=2, blank=True, default=0)
