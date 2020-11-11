@@ -1,7 +1,7 @@
 #-*-coding:utf-8-*-
 import datetime
 
-from django.db.models import Sum, Count, Q, F, DecimalField, FloatField, IntegerField
+from django.db.models import Sum, Count, Q, F, DecimalField, FloatField, IntegerField, Avg
 from django.db import connection
 from rest_framework import status
 from rest_framework.generics import ListAPIView
@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
-from chargingorder.models import Order
+from chargingorder.models import Order, OrderChargDetail
 from stationmanager.models import ChargingPile, Station, Seller
 
 __author__ = 'malixin'
@@ -460,3 +460,25 @@ class OrderYearAnalysis(APIView):
 
         return Response(totals)
 
+
+class OrderDetailAPIView(APIView):
+    """充电监控"""
+    def get(self, request, *args, **kwargs):
+        out_trade_no = kwargs.get("out_trade_no", None)
+        order = Order.objects.filter(out_trade_no=out_trade_no).first()
+
+        totals = {}
+        results = OrderChargDetail.objects.filter(out_trade_no=out_trade_no)\
+            .extra(select={'curr_time': "DATE_FORMAT(`current_time`, '%%y-%%m-%%d %%H:%%i')"})\
+            .values("curr_time")\
+            .annotate(voltage=Avg("voltage"), current=Avg("current"), output_voltage=Avg("output_voltage"), output_current=Avg("output_current"))\
+            .order_by("curr_time")
+
+        totals["out_trade_no"] = out_trade_no
+        totals["begin_time"] = order.begin_time.strftime("%Y-%m-%d %H:%M:%S")
+        totals["end_time"] = order.end_time.strftime("%Y-%m-%d %H:%M:%S")
+        totals["total_readings"] = order.total_readings
+        totals["consum_money"] = order.consum_money
+        totals["results"] = results
+
+        return Response(totals)

@@ -7,6 +7,11 @@
 <style type="text/css">
   .btn-toolbar{margin-top: 0;}
   #content-block.full-content{margin-left: 0;}
+@media (min-width: 992px) {
+  .modal-lg {
+    min-width: 1000px;
+  }
+}
 </style>
 {% endblock %}
 {% block bodyclass %}change-list{% endblock %}
@@ -153,4 +158,189 @@
   <ul class="pagination">
     {% view_block 'pagination' %}
   </ul>
+{#   对话框 #}
+    <script type="text/javascript" src="{% static 'statistic/js/echarts.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'statistic/js/china.js' %}"></script>
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="myModal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">充电监控曲线</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>订单号</th>
+                          <th>开始时间</th>
+                          <th>结束时间</th>
+                          <th>充电量(KWH)</th>
+                          <th>消费金额(元)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td id="id_out_trade_no"></td>
+                          <td id="id_begin_time"></td>
+                          <td id="id_end_time"></td>
+                          <td id="id_total_readings"></td>
+                          <td id="id_consum_money"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div id="id_curve" style="width: 960px; height: 450px;"></div>
+                </div>
+                <div class="modal-footer">
+{#                    <button type="submit" class="btn btn-primary" data-dismiss="modal" id="save-edit-btn">退款</button>#}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(function () {
+        $('#myModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var uri = button.attr('data-uri');
+            console.log(uri);
+            const id_curve = echarts.init(document.getElementById('id_curve'));
+            $.ajax({
+                type: 'GET',
+                url: uri,
+                dataType: 'json',
+                timeout: 5000,
+                success: function(data){
+                    console.log(data);
+                    $("#id_out_trade_no").text(data.out_trade_no);
+                    $("#id_begin_time").text(data.begin_time);
+                    $("#id_end_time").text(data.end_time);
+                    $("#id_total_readings").text(data.total_readings);
+                    $("#id_consum_money").text(data.consum_money);
+                    const curr_time = data.results.map( item => {
+                        return item.curr_time;
+                    });
+                    const voltage = data.results.map( item => {
+                        return item.voltage.toFixed(2);
+                    });
+                    const current = data.results.map( item => {
+                        return item.current.toFixed(2);
+                    });
+                    const output_voltage = data.results.map( item => {
+                        return item.output_voltage.toFixed(2);
+                    });
+                    const output_current = data.results.map( item => {
+                        return item.output_current.toFixed(2);
+                    });
+
+                    const option = {
+                        title: {
+                            text: '订单充电监控曲线',
+                            textStyle: {
+                              color: '#000',
+                              fontSize: 16,
+                            }
+                        },
+                        tooltip:{
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'cross',
+                                label: {
+                                    backgroundColor: '#6a7985'
+                                }
+                            }
+                        },
+                        grid: {
+                            left: '2%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        legend: {
+                            data:['所需电压', '所需电流', '输出电压', '输出电流'],
+                            {#x: 'right',#}
+                            textStyle:{
+                                color: '#000',
+                            },
+
+                        },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap : false,
+                            axisLabel:{
+                                color: '#000',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#000',
+                                },
+                            },
+                            data: curr_time,
+                        },
+                        yAxis: {
+                            type: 'value',
+                            axisLabel:{
+                                interval:1,
+                                color: '#000',
+                            },
+                            axisLine:{
+                                lineStyle:{
+                                    color: '#000',
+                                },
+                            },
+                        },
+                        {#"#9E87FF", '#73DDFF', '#fe9a8b', '#F56948', '#9E87FF'#}
+                        series: [
+                            {
+                                name: '所需电压',
+                                type: 'line',
+                                smooth: true,
+                                itemStyle:{
+                                  color: '#d384ff',
+                                },
+                                data: voltage,
+                            },
+                            {
+                                name: '所需电流',
+                                type: 'line',
+                                smooth: true,
+                                 itemStyle:{
+                                  color: '#71b1fe',
+                                },
+                                data: current,
+                            },
+                            {
+                                name: '输出电压',
+                                type: 'line',
+                                smooth: true,
+                                 itemStyle:{
+                                  color: '#F56948',
+                                },
+                                data: output_voltage,
+                            },
+                            {
+                                name: '输出电流',
+                                type: 'line',
+                                smooth: true,
+                                 itemStyle:{
+                                  color: '#73DD39',
+                                },
+                                data: output_current,
+                            },
+                        ]
+                    };
+                    id_curve.setOption(option);
+                },
+                complete: function(){
+                },
+                error: function(error){
+
+                }
+            });
+        });
+
+    });
+
+    </script>
 {% endblock %}

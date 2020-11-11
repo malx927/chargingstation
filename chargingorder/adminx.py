@@ -2,6 +2,7 @@
 import decimal
 import logging
 from django.contrib import admin
+from django.urls import reverse
 from stationmanager.models import Station, ChargingPile
 import xadmin
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText, Col, TabHolder, Tab
@@ -109,7 +110,7 @@ class OrderAdmin(object):
     )
 
     def curve(self, obj):
-        curve_url = ""
+        curve_url = reverse("order-detail-list", kwargs={"out_trade_no": obj.out_trade_no})
         refund_btn = "<a class='btn btn-xs btn-primary' data-toggle='modal' data-target='#myModal' " \
                      "data-uri='{}'>监控曲线</a>".format(curve_url)
         return refund_btn
