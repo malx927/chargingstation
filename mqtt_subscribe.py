@@ -1248,7 +1248,7 @@ def pile_charging_status_handler(topic, byte_msg):
         "pile_sn": pile_sn,
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
-        "end_time": charg_time,
+        "end_time": datetime.datetime.now(),
         "end_reading": curr_readings,
         "current_soc": current_soc,
         "voltage": int(voltage * settings.FACTOR_VOLTAGE),
