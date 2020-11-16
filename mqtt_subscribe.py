@@ -550,7 +550,7 @@ def pile_card_charging_request_hander(topic, byte_msg):
 
     pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
     # 判断电站是否支持刷卡
-    if pile and pile.charg_mode != 2:
+    if pile and pile.charg_mode == 1:
         logging.info("此充电桩不支持刷卡!")
         return
 
