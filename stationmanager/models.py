@@ -175,6 +175,7 @@ class ChargingPile(models.Model):
     symbol_4g = models.NullBooleanField(verbose_name='4G使用标志', blank=True, null=True)
     symbol_eth = models.NullBooleanField(verbose_name='ETH使用标志', blank=True, null=True)
     restart_nums = models.IntegerField(verbose_name='4G重启次数', blank=True, default=0)
+    charg_mode = models.IntegerField(verbose_name='充电方式', default=0, choices=CHARG_MODE_CONTROL)
     gun_max_voltage = models.IntegerField(verbose_name='单枪最大输出电压', blank=True, null=True)
     gun_min_voltage = models.IntegerField(verbose_name='单枪最小输出电压', blank=True, null=True)
     gun_max_current = models.IntegerField(verbose_name='单枪最大输出电流', blank=True, null=True)

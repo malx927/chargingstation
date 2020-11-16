@@ -548,16 +548,12 @@ def pile_card_charging_request_hander(topic, byte_msg):
         logging.info("此运营商已被停运")
         return
 
-    # 判断此卡是否有时间限制
-    if card.is_valid_date == 1:
-        if card.start_date is None or card.end_date is None:
-            logging.warning("有效截止时间不能为空")
-            return
-        elif cur_time > card.end_date:
-            logging.warning("此卡{}已经过期".format(card_num))
-            return
-
     pile = ChargingPile.objects.select_related("station").filter(pile_sn=pile_sn).first()
+    # 判断电站是否支持刷卡
+    if pile and pile.charg_mode != 2:
+        logging.info("此充电桩不支持刷卡!")
+        return
+
     if card.seller and card.seller_id != pile.station.seller_id:
         logging.info("此卡不属于此运营商,无法充电")
         return
@@ -571,6 +567,15 @@ def pile_card_charging_request_hander(topic, byte_msg):
     if not pile_gun:
         logging.info("{}-{} 不存在".format(pile_sn, gun_num))
         return
+
+    # 判断此卡是否有时间限制
+    if card.is_valid_date == 1:
+        if card.start_date is None or card.end_date is None:
+            logging.warning("有效截止时间不能为空")
+            return
+        elif cur_time > card.end_date:
+            logging.warning("此卡{}已经过期".format(card_num))
+            return
 
     if card.pile_sn and card.gun_num:
         if card.pile_sn != pile_sn or card.gun_num != str(gun_num):

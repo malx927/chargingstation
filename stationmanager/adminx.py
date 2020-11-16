@@ -294,6 +294,7 @@ class ChargingPileAdmin(object):
         "subscribe_status": "radio-inline",
         "occupy_status": "radio-inline",
         'sub_status': "radio-inline",
+        'charg_mode': "radio-inline",
     }
 
     form_layout = (
@@ -308,7 +309,8 @@ class ChargingPileAdmin(object):
                         Row('station', 'pile_mode'),
                         Row('business_mode', 'fireware'),
                         Row('symbol_4g', 'symbol_eth'),
-                        Row('sub_time'),
+                        'charg_mode',
+                        'sub_time',
                         Row('is_subsidy', 'faults'),
                     ),
                     Inline(ChargingGun),

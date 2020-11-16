@@ -74,6 +74,16 @@ class RechargeView(View):
         2、确定是否频繁做充电和停充操作，
         3、发出退款请求后要冻结账号，不允许充电，退款后解除冻结后可充电
         """
+        pile_sn = kwargs.get('pile_sn', None)
+        gun_num = kwargs.get('gun_num', None)
+
+        pile = ChargingPile.objects.filter(pile_sn=pile_sn).first()
+        if pile and pile.charg_mode == 2:
+            context = {
+                "errmsg": "此桩不支持微信支付"
+            }
+            return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+
         openid = request.session.get("openid", None)
         try:
             user_info = UserInfo.objects.get(openid=openid)
@@ -105,8 +115,6 @@ class RechargeView(View):
             logger.info(redirect_url)
             return HttpResponseRedirect(redirect_url)
 
-        pile_sn = kwargs.get('pile_sn', None)
-        gun_num = kwargs.get('gun_num', None)
         logger.info("pile_sn:{}, gun_num:{}, user_pile_sn:{}, gun_num:{}".format(pile_sn, gun_num, user_info.pile_sn, user_info.gun_num))
         pile_gun = ChargingGun.objects.filter(charg_pile__pile_sn=pile_sn, gun_num=gun_num).first()
         if pile_gun:
