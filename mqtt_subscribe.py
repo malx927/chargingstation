@@ -911,7 +911,7 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
         logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
 
-        logging.info("1.1-{}--{}".format(work_status, gun.charg_status_id, type(gun.charg_status_id), charg_status,
+        logging.info("1.1-{}--{}--{}--{}--{}".format(work_status, gun.charg_status_id, type(gun.charg_status_id), charg_status,
                                          type(charg_status)))
         # if work_status is None and gun.charg_status_id == charg_status:     # 充电回复,更新充电状态
         #     logging.info("gun.charg_status_id == charg_status")
@@ -930,7 +930,7 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
         if work_status is not None:
 
             if gun.work_status != work_status and work_status in [0, 2, 9]:    # 非充电状态清除用户与电桩关联数据
-                logging.info("清除用户电桩数据关联....")
+                logging.info("清除用户电桩数据关联....{}-{}".format(gun.work_status, work_status))
                 UserInfo.objects.filter(pile_sn=pile_sn, gun_num=gun_num).update(pile_sn=None, gun_num=None)
             gun.work_status = work_status
 
