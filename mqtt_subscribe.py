@@ -910,14 +910,23 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
         logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
+
+        if work_status is None and gun.charg_status_id == charg_status:     # 充电回复,更新充电状态
+            return gun
+
+        if gun.charg_status_id == charg_status and gun.work_status == work_status:  # 充电状态上报
+            return gun
+
         if charg_status is not None:
-            fault_code = FaultCode.objects.get(id=charg_status)
-            logging.info("2、{}--{}".format(fault_code, charg_status))
-            gun.charg_status = fault_code
+            # fault_code = FaultCode.objects.get(id=charg_status)
+            gun.charg_status_id = charg_status
         if work_status is not None:
             gun.work_status = work_status
-            logging.info("3、{}--{}".format(gun, charg_status))
-        logging.info("4、{}--{}".format(charg_status, work_status))
+            if work_status in [0, 2, 9]:    # 非充电状态清除用户与电桩关联数据
+                logging.info("清除用户电桩数据关联....")
+                UserInfo.objects.filter(pile_sn=pile_sn, gun_num=gun_num).update(pile_sn=None, gun_num=None)
+
+        logging.info("---------- end update_charging_gun_status ---------------")
         gun.save()
     except ChargingGun.DoesNotExist as ex:
         logging.warning(ex)
@@ -948,9 +957,9 @@ def update_gun_order_status(**data):
     gun = update_charging_gun_status(pile_sn, gun_num, charg_status)
     # 更新订单状态和初始表值
     try:
-        fault_code = FaultCode.objects.get(pk=charg_status)
+        # fault_code = FaultCode.objects.get(pk=charg_status)
         order = Order.objects.get(out_trade_no=out_trade_no)
-        order.charg_status = fault_code
+        order.charg_status_id = charg_status
         order.begin_reading = begin_reading
         order.end_reading = begin_reading
         order.begin_time = begin_time
