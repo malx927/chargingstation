@@ -928,10 +928,11 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
             # fault_code = FaultCode.objects.get(id=charg_status)
             gun.charg_status_id = charg_status
         if work_status is not None:
-            gun.work_status = work_status
-            if work_status in [0, 2, 9]:    # 非充电状态清除用户与电桩关联数据
+
+            if gun.work_status != work_status and work_status in [0, 2, 9]:    # 非充电状态清除用户与电桩关联数据
                 logging.info("清除用户电桩数据关联....")
                 UserInfo.objects.filter(pile_sn=pile_sn, gun_num=gun_num).update(pile_sn=None, gun_num=None)
+            gun.work_status = work_status
 
         logging.info("---------- end update_charging_gun_status ---------------")
         gun.save()
