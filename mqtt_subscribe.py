@@ -913,16 +913,16 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
 
         logging.info("1.1-{}--{}".format(work_status, gun.charg_status_id, type(gun.charg_status_id), charg_status,
                                          type(charg_status)))
-        if work_status is None and gun.charg_status_id == charg_status:     # 充电回复,更新充电状态
-            logging.info("gun.charg_status_id == charg_status")
-            return gun
-
-        logging.info("1.1-{}--{}".format(work_status, type(work_status), gun.work_status, type(gun.work_status),
-                                         gun.charg_status_id, type(gun.charg_status_id), charg_status,
-                                         type(charg_status)))
-        if gun.charg_status_id == charg_status and gun.work_status == work_status:  # 充电状态上报
-            logging.info("gun.charg_status_id == charg_status and gun.work_status == work_status")
-            return gun
+        # if work_status is None and gun.charg_status_id == charg_status:     # 充电回复,更新充电状态
+        #     logging.info("gun.charg_status_id == charg_status")
+        #     return gun
+        #
+        # logging.info("1.1-{}--{}".format(work_status, type(work_status), gun.work_status, type(gun.work_status),
+        #                                  gun.charg_status_id, type(gun.charg_status_id), charg_status,
+        #                                  type(charg_status)))
+        # if gun.charg_status_id == charg_status and gun.work_status == work_status:  # 充电状态上报
+        #     logging.info("gun.charg_status_id == charg_status and gun.work_status == work_status")
+        #     return gun
 
         if charg_status is not None:
             # fault_code = FaultCode.objects.get(id=charg_status)
