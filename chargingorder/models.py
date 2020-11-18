@@ -128,7 +128,7 @@ class Order(models.Model):
 
     def car_type(self):
         user = UserInfo.objects.filter(openid=self.openid).first()
-        if user:
+        if user and user.car_type:
             return user.car_type
         return ""
 
