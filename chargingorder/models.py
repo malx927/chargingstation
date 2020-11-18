@@ -48,6 +48,7 @@ class Order(models.Model):
     transaction_id = models.CharField(verbose_name='微信订单号', max_length=32, null=True, blank=True)
     consum_money = models.DecimalField(verbose_name='消费总金额',  max_digits=10, decimal_places=2, blank=True, default=0)
     # 车辆信息
+    car_type = models.CharField(verbose_name="车型", max_length=32, blank=True, null=True)
     vin_code = models.CharField(verbose_name='车辆VIN码', max_length=32, blank=True, null=True,)
     max_current = models.IntegerField(verbose_name='车辆最高充电电流', blank=True, null=True)
     max_voltage = models.IntegerField(verbose_name='车辆最高充电电压',  blank=True, null=True)
@@ -126,13 +127,13 @@ class Order(models.Model):
     def get_absolute_url(self):
         return reverse("user-order-detail", kwargs={"pk": self.id})
 
-    def car_type(self):
-        user = UserInfo.objects.filter(openid=self.openid).first()
-        if user and user.car_type:
-            return user.car_type
-        return ""
-
-    car_type.short_description = '车型'
+    # def car_type(self):
+    #     user = UserInfo.objects.filter(openid=self.openid).first()
+    #     if user and user.car_type:
+    #         return user.car_type
+    #     return ""
+    #
+    # car_type.short_description = '车型'
 
 
 # @receiver(post_save, sender=Order)

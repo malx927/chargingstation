@@ -494,6 +494,7 @@ class RegisterView(View):
             UserInfo.objects.filter(openid=openid).update(name=user_name, telephone=telephone, car_number=car_number, car_type=car_type)
             request.session["created"] = False
             request.session["username"] = user_name
+            request.session["car_type"] = car_type
         else:
             errors = form.errors
             print(errors, 'errors')

@@ -96,7 +96,7 @@ class RechargeView(View):
             redirect_url = "{0}?url={1}".format(reverse("wxchat-register"), request.get_full_path())
             return HttpResponseRedirect(redirect_url)
 
-        name = request.session.get("name", None)
+        name = request.session.get("username", None)
         # 检查账号余额
         if openid is None:
             context = {
@@ -235,10 +235,18 @@ class RechargeView(View):
     def get_request_params(self, request, *args, **kwargs):
         gun_num = request.POST.get('gun_num', '0')  # 枪口号
         openid = request.session.get("openid", None)  # 用户id(微信公众号openid)
-        name = request.session.get("name", None)
+        name = request.session.get("username", None)
         charg_mode = request.POST.get('charg_mode', "0")
         if name is None or len(name) == 0:
             name = request.session.get("nickname", '')  # 用户名称
+
+        car_type = request.session.get("car_type", None)
+        if car_type is None:
+            user = UserInfo.objects.filter(openid=openid).first()
+            if user and user.car_type:
+                car_type = user.car_type
+            else:
+                car_type = ""
 
         out_trade_no = '{0}{1}{2}'.format(settings.OPERATORID, datetime.now().strftime('%Y%m%d%H%M%S'),
                                              random.randint(10000, 100000))
@@ -255,6 +263,7 @@ class RechargeView(View):
             "charg_pile": gun.charg_pile,
             "gun": gun,
             "balance": balance,
+            "car_type": car_type,
         }
         sub_account = SubAccount.objects.filter(sub_user__openid=openid).first()
         if sub_account:

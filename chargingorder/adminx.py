@@ -15,7 +15,7 @@ class OrderAdmin(object):
         'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
         'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'status', 'report_result', 'curve'
     ]
-    search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
+    search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid', 'car_type']
     list_filter = ['charg_pile', 'charg_mode', 'charg_status', 'begin_time', 'status', 'report_result']
     exclude = ['charg_type']
     date_hierarchy = 'begin_time'
@@ -90,6 +90,7 @@ class OrderAdmin(object):
         Side(
             Fieldset(
                 '车辆信息',
+                'car_type',
                 'vin_code',
                 AppendedText('max_current', '安'),
                 AppendedText('max_voltage', '伏'),

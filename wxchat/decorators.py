@@ -37,6 +37,7 @@ def weixin_decorator(func):
                     request.session["created"] = created
                     if not created:
                         request.session["username"] = obj.name
+                        request.session["car_type"] = obj.car_type
                     return func(request, *args, **kwargs)
         else:
             return func(request, *args, **kwargs)
