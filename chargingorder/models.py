@@ -126,13 +126,13 @@ class Order(models.Model):
     def get_absolute_url(self):
         return reverse("user-order-detail", kwargs={"pk": self.id})
 
-    def card_type(self):
+    def car_type(self):
         user = UserInfo.objects.filter(openid=self.openid).first()
         if user:
-            return user.card_type
+            return user.car_type
         return ""
 
-    card_type.short_description = '车型'
+    car_type.short_description = '车型'
 
 
 # @receiver(post_save, sender=Order)
