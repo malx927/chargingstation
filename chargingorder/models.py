@@ -8,6 +8,7 @@ from django.urls import reverse
 from stationmanager.models import ChargingPile
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from wxchat.models import UserInfo
 
 
 class Order(models.Model):
@@ -124,6 +125,15 @@ class Order(models.Model):
 
     def get_absolute_url(self):
         return reverse("user-order-detail", kwargs={"pk": self.id})
+
+    def card_type(self):
+        user = UserInfo.objects.filter(openid=self.openid).first()
+        if user:
+            return user.card_type
+        return ""
+
+    card_type.short_description = '车型'
+
 
 # @receiver(post_save, sender=Order)
 # def send_cmd(sender, instance, created, **kwargs):
