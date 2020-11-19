@@ -116,7 +116,7 @@ def on_message(client, userdata, msg):
 
 def server_publish(pile_sn, data):
     topic = '/{0}/{1}'.format(pile_sn, SUB_TOPIC)
-    logging.info('{}:{}'.format(topic, data))
+    # logging.info('{}:{}'.format(topic, data))
     client.publish(topic, data)
 
 
@@ -705,7 +705,7 @@ def pile_status_handler_v12(topic, byte_msg):
         "return_code": "success",
         "cmd": "01",  # 电桩状态
     }
-    logging.info("{}----{}".format(gun1, gun2))
+    # logging.info("{}----{}".format(gun1, gun2))
     if gun1:
         send_data["work_status"] = gun1.get_work_status_display()
         send_data["charg_status"] = gun1.charg_status.name
@@ -723,7 +723,7 @@ def pile_status_handler_v12(topic, byte_msg):
     except ChargingPile.DoesNotExist as ex:
         logging.warning("Illegal Pile:{}".format(ex))
         return
-    logging.info("{}----{}".format(gun1, gun2))
+    # logging.info("{}----{}".format(gun1, gun2))
     pile_type = charg_pile.pile_type.id
 
     fireware = charg_pile.fireware
@@ -769,7 +769,7 @@ def server_reply_version_info(*arg, **kwargs):
 
     ac_dc_ver = kwargs.get("ac_dc_version", '0')
     ac_dc_version = get_byte_version(ac_dc_ver)
-    logging.info("版本信息：{},{},{},{}".format(dc_version, ac_version, power_distrib_version, ac_dc_version))
+    # logging.info("版本信息：{},{},{},{}".format(dc_version, ac_version, power_distrib_version, ac_dc_version))
     b_blank = bytes(12)
     b_data = b''.join([b_command, b_current_time, dc_version, ac_version, power_distrib_version, ac_dc_version, b_blank])
 
@@ -911,8 +911,6 @@ def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
         logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
 
-        logging.info("1.1-{}--{}--{}--{}--{}".format(work_status, gun.charg_status_id, type(gun.charg_status_id), charg_status,
-                                         type(charg_status)))
         # if work_status is None and gun.charg_status_id == charg_status:     # 充电回复,更新充电状态
         #     logging.info("gun.charg_status_id == charg_status")
         #     return gun
