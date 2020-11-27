@@ -10,6 +10,10 @@
         color: rgb(255, 68, 68);
         font-size: 18px;
     }
+    .pile{
+        width:31%;
+        height:18px;
+    }
     </style>
 {% endblock extra%}
 {% block title %}充电站详情{% endblock %}
@@ -97,9 +101,38 @@
 					<div class="van-cell__title"><span>故障中（{{ station.get_gun_totals_by_status.fault }}）</span></div>
 				</div>
 			</div>
-{#             {% for p in station.get_station_price.prices.all %}#}
-{#                <p>{{ p.begin_time }},{{ p.end_time }},{{ p.price }}</p>#}
-{#             {% endfor %}#}
+        {% if station.get_inline_piles %}
+          <div class="goods-header" style="margin-top:10px;">
+            <div class="goods-title" style="padding-right: 44px; position: relative;">
+                <div class="goods-title__main">
+                    <span style="font-size:14px">在线电桩</span>
+                </div>
+            </div>
+            <div class="goods-price" >
+                <div class="goods-price__current" >
+                    {% for item in station.get_inline_piles %}
+                    <i class="goods-price__current-price-text pile" >{{item.charg_pile__pile_sn}}</i>
+                    {% endfor %}
+                </div>
+            </div>
+          </div>
+        {% endif %}
+         {% if station.get_offline_piles %}
+          <div class="goods-header">
+            <div class="goods-title" style="padding-right: 44px; position: relative;">
+                <div class="goods-title__main">
+                    <span style="font-size:14px">离线电桩</span>
+                </div>
+            </div>
+            <div class="goods-price" >
+                <div class="goods-price__current" >
+                    {% for item in station.get_offline_piles %}
+                    <i class="goods-price__current-price-text pile" >{{item.charg_pile__pile_sn}}</i>
+                    {% endfor %}
+                </div>
+            </div>
+          </div>
+         {% endif %}
             <div class="member-center__order" style="margin-top:10px;">
                 <div class="van-cell van-cell--clickable">
                     <div class="van-cell__value"><span>联系电话：{{ station.telephone }}</span></div>

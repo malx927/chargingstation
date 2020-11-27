@@ -105,7 +105,6 @@ class Station(models.Model):
     def get_gun_totals(self):
         counts = ChargingGun.objects.filter(charg_pile__station=self).count()
         free_counts = ChargingGun.objects.filter(charg_pile__station=self, work_status=0).count()
-        print(counts, free_counts)
         return '{}/{}'.format(free_counts, counts)
 
     def get_gun_totals_by_type(self):
@@ -142,6 +141,15 @@ class Station(models.Model):
 
     def get_absolute_url(self):
         return reverse('station-detail', kwargs={'stationid': self.id})
+
+    def get_inline_piles(self):
+        piles = ChargingGun.objects.filter(charg_pile__station_id=self.id, work_status__lt=9).values("charg_pile__pile_sn").distinct()
+        return piles
+
+    def get_offline_piles(self):
+        piles = ChargingGun.objects.filter(charg_pile__station_id=self.id, work_status=9).values(
+            "charg_pile__pile_sn").distinct()
+        return piles
 
 
 class StationImage(models.Model):
