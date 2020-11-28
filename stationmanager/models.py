@@ -123,16 +123,19 @@ class Station(models.Model):
             "charging": 0,
             "fault": 0,
             "offline": 0,
+            "seat": 0,
         }
         for d in data:
-            if d["work_status"] == 0:
+            if d["work_status"] == 0:       # 空闲
                 ret_data["free"] = d["counts"]
-            elif d["work_status"] == 1 or d["work_status"] == 3:
+            elif d["work_status"] == 1:     # 充电中
                 ret_data["charging"] += d["counts"]
-            elif d["work_status"] == 2:
+            elif d["work_status"] == 2:     # 故障
                 ret_data["fault"] = d["counts"]
-            elif d["work_status"] == 9:
+            elif d["work_status"] == 9:     # 离线
                 ret_data["offline"] = d["counts"]
+            elif d["work_status"] == 3:     # 占位
+                ret_data["seat"] = d["counts"]
         return ret_data
 
     def get_station_price(self):
@@ -154,13 +157,19 @@ class Station(models.Model):
     # 故障
     def get_fault_guns(self):
         guns = ChargingGun.objects.filter(charg_pile__station_id=self.id, work_status=2).values(
-            "charg_pile__pile_sn", 'gun_num').distinct()
+            "charg_pile__pile_sn", 'gun_num')
         return guns
     
     # 充电中
     def get_charging_guns(self):
         guns = ChargingGun.objects.filter(charg_pile__station_id=self.id, work_status=1).values(
-            "charg_pile__pile_sn", 'gun_num').distinct()
+            "charg_pile__pile_sn", 'gun_num')
+        return guns
+
+    # 占位
+    def get_seat_guns(self):
+        guns = ChargingGun.objects.filter(charg_pile__station_id=self.id, work_status=3).values(
+            "charg_pile__pile_sn", 'gun_num')
         return guns
 
 
