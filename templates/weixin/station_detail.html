@@ -136,6 +136,38 @@
             </div>
           </div>
          {% endif %}
+         {% if station.get_charging_guns %}
+          <div class="goods-header">
+            <div class="goods-title" style="padding-right: 44px; position: relative;">
+                <div class="goods-title__main">
+                    <span style="font-size:14px">充电枪充电中</span>
+                </div>
+            </div>
+            <div class="goods-price" >
+                <div class="goods-price__current" >
+                    {% for item in station.get_charging_guns %}
+                    <i class="goods-price__current-price-text pile" >{{item.charg_pile__pile_sn}}-{{ item.gun_num }}</i>
+                    {% endfor %}
+                </div>
+            </div>
+          </div>
+         {% endif %}
+         {% if station.get_fault_guns %}
+          <div class="goods-header">
+            <div class="goods-title" style="padding-right: 44px; position: relative;">
+                <div class="goods-title__main">
+                    <span style="font-size:14px">充电枪故障中</span>
+                </div>
+            </div>
+            <div class="goods-price" >
+                <div class="goods-price__current" >
+                    {% for item in station.get_fault_guns %}
+                    <i class="goods-price__current-price-text pile" >{{item.charg_pile__pile_sn}}-{{ item.gun_num }}</i>
+                    {% endfor %}
+                </div>
+            </div>
+          </div>
+         {% endif %}
             <div class="member-center__order" style="margin-top:10px;">
                 <div class="van-cell van-cell--clickable">
                     <div class="van-cell__value"><span>联系电话：{{ station.telephone }}</span></div>

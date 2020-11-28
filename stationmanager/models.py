@@ -151,6 +151,18 @@ class Station(models.Model):
             "charg_pile__pile_sn").distinct()
         return piles
 
+    # 故障
+    def get_fault_guns(self):
+        guns = ChargingGun.objects.filter(charg_pile__station_id=self.id, work_status=2).values(
+            "charg_pile__pile_sn", 'gun_num').distinct()
+        return guns
+    
+    # 充电中
+    def get_charging_guns(self):
+        guns = ChargingGun.objects.filter(charg_pile__station_id=self.id, work_status=1).values(
+            "charg_pile__pile_sn", 'gun_num').distinct()
+        return guns
+
 
 class StationImage(models.Model):
     """电站图片"""
