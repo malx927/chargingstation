@@ -24,7 +24,7 @@ class InvoiceTitle(models.Model):
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
     is_write = models.IntegerField(verbose_name='开票确认', default=0, choices=INVOICE_WRITE)
     update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
-    add_time = models.DateTimeField(verbose_name="添加时间", auto_now_add=True)
+    add_time = models.DateTimeField(verbose_name="申请时间", auto_now_add=True)
 
     class Meta:
         verbose_name = '发票抬头管理'
