@@ -79,6 +79,7 @@ class UserRefundDetailAdmin(object):
     search_fields = ['openid', 'user_refund__name', 'user_refund__nickname', 'out_trade_no', 'out_refund_no', 'refund_id', 'transaction_id']
     list_filter = ['status']
     model_icon = 'fa fa-random'
+    show_all_rel_details = False
 
     def has_add_permission(self):
         return False
