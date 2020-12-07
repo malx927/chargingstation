@@ -170,7 +170,7 @@ class RechargeRecordAdmin(object):
     用户充值记录表
     """
     list_display = ('out_trade_no', 'name', 'recharge_type', 'pay_time', 'total_fee', 'cash_fee', 'status')
-    search_fields = ['out_trade_no', 'name']
+    search_fields = ['out_trade_no', 'name', 'openid']
     list_per_page = 50
     model_icon = 'fa fa-weixin'
 
