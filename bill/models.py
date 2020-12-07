@@ -51,7 +51,7 @@ class UserRefund(models.Model):
     actual_fee = models.DecimalField(verbose_name='实退金额(元)', max_digits=7, decimal_places=2, default=0)
     status = models.IntegerField(verbose_name='退款状态', choices=REFUND_STATUS, default=0)
     update_time = models.DateTimeField(verbose_name='退款时间', blank=True, null=True)
-    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
+    add_time = models.DateTimeField(verbose_name='申请时间', auto_now_add=True)
 
     class Meta:
         verbose_name = '用户退款申请'
