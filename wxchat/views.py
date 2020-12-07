@@ -253,6 +253,13 @@ class OrderPayView(View):
     """
     def get(self, request, *args, **kwargs):
         openid = request.session.get("openid", None)
+        user = UserInfo.objects.filter(openid=openid).first()
+        if user and user.is_freeze == 1:
+            context = {
+                "errmsg": "您的账号已被冻结，暂时无法充值"
+            }
+            return render(request, template_name="chargingorder/charging_pile_status.html", context=context)
+
         url = request.GET.get("url", None)
         lists = RechargeList.objects.all()
         desc = RechargeDesc.objects.filter(is_used=True).first()
