@@ -13,7 +13,7 @@ from .models import Order, OrderRecord, OrderChargDetail
 class OrderAdmin(object):
     list_display = [
         'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
-        'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'status', 'report_result', 'curve'
+        'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'charg_status', 'status', 'report_result', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid', 'car_type']
     list_filter = ['charg_pile', 'charg_mode', 'charg_status', 'begin_time', 'status', 'report_result']
