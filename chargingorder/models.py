@@ -73,7 +73,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = '充电订单'
         verbose_name_plural = verbose_name
-        ordering = ["charg_status", "-create_time"]
+        ordering = ["-create_time"]
 
     # 充电时间
     def total_minutes(self):
