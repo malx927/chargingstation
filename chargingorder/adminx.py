@@ -23,6 +23,7 @@ class ChargingOrderAdmin(object):
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
     relfield_style = 'fk_ajax'
+    refresh_times = [3, 5]  # 计时刷新
     # aggregate_fields = {"total_readings": "sum", 'cash_fee': "sum"}
     object_list_template = "chargingorder/order_model_list.html"
 
