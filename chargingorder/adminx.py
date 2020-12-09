@@ -13,8 +13,8 @@ CHARG_STATUS = 6    # 充电中编码
 
 class ChargingOrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'charg_pile', 'gun_num', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
-        'consum_money', 'cash_fee', 'charg_status', 'status'
+        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes',
+        'total_readings', 'begin_time', 'power_fee', 'service_fee', 'charg_status', 'status', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_status', 'begin_time', 'status']
@@ -136,6 +136,16 @@ class ChargingOrderAdmin(object):
 
     def has_delete_permission(self, obj=None):
         return False
+
+    def curve(self, obj):
+        curve_url = reverse("order-detail-list", kwargs={"out_trade_no": obj.out_trade_no})
+        refund_btn = "<a class='btn btn-xs btn-primary' data-toggle='modal' data-target='#myModal' " \
+                     "data-uri='{}'>监控曲线</a>".format(curve_url)
+        return refund_btn
+
+    curve.short_description = "充电监控"
+    curve.allow_tags = True
+    curve.is_column = True
 
 
 xadmin.site.register(ChargingOrder, ChargingOrderAdmin)
