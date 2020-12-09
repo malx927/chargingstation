@@ -13,8 +13,8 @@ CHARG_STATUS = 6    # 充电中编码
 
 class ChargingOrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes',
-        'total_readings', 'begin_time', 'power_fee', 'service_fee', 'charg_status', 'status', 'curve'
+        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time',
+        'consum_money', 'power_fee', 'service_fee', 'charg_status', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_status', 'begin_time', 'status']
@@ -23,7 +23,8 @@ class ChargingOrderAdmin(object):
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
     relfield_style = 'fk_ajax'
-    aggregate_fields = {"total_readings": "sum", 'cash_fee': "sum"}
+    # aggregate_fields = {"total_readings": "sum", 'cash_fee': "sum"}
+    object_list_template = "chargingorder/order_model_list.html"
 
     form_layout = (
         Main(
@@ -136,6 +137,12 @@ class ChargingOrderAdmin(object):
 
     def has_delete_permission(self, obj=None):
         return False
+
+    def station(self, obj):
+        return obj.charg_pile.station.name
+    station.short_description = '充电站'
+    station.allow_tags = True
+    station.is_column = True
 
     def curve(self, obj):
         curve_url = reverse("order-detail-list", kwargs={"out_trade_no": obj.out_trade_no})
