@@ -141,6 +141,14 @@ class Order(models.Model):
 #     print(created, instance, 'order signal')
 
 
+class ChargingOrder(Order):
+    """充电中的订单"""
+    class Meta:
+        proxy = True
+        verbose_name = '充电中订单'
+        verbose_name_plural = verbose_name
+
+
 class OrderRecord(models.Model):
     """
     充值记录表
