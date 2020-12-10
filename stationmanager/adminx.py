@@ -499,7 +499,7 @@ xadmin.site.register(ChargingGun, ChargingGunAdmin)
 
 
 class FaultChargingGunAdmin(object):
-    list_display = ['charg_pile', 'gun_num', 'work_status', 'charg_status', 'fault_time', 'repair_time', 'repair_flag']
+    list_display = ['charg_pile', 'gun_num', 'work_status', 'charg_status', 'status', 'fault_time']
     search_fields = ['gun_num', 'charg_pile__pile_sn']
     list_display_links = ['gun_num', 'charg_pile']
     list_filter = ['charg_pile', 'work_status', 'charg_status']
@@ -519,9 +519,7 @@ class FaultChargingGunAdmin(object):
         Fieldset('',
             Row('charg_pile', 'gun_num'),
             Row('work_status', 'charg_status'),
-            Row('fault_time', 'repair_time'),
-            Row('repair_persons'),
-            Row('repair_flag'),
+            Row('fault_time', 'status'),
         ),
     )
 

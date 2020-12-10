@@ -169,7 +169,6 @@ ELEC_LEAK_STATUS = (
 )
 
 
-
 # 14 枪运行状态编码(D7-D5)
 GUN_WORKING_STATUS = (
     (0, '空闲'),

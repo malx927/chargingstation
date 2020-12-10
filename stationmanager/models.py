@@ -320,14 +320,18 @@ class FaultChargingGun(models.Model):
     """
     故障充电桩枪信息表
     """
+    STATUS = (
+        (0, '修复'),
+        (1, '故障'),
+    )
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, choices=GUN_NUM)
     charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', on_delete=models.CASCADE, db_constraint=False)
     work_status = models.IntegerField(verbose_name='工作状态', default=9, blank=True, choices=GUN_WORKING_STATUS)
     charg_status = models.ForeignKey(FaultCode, verbose_name='充电状态', null=True, blank=True, on_delete=models.SET_NULL, db_constraint=False)
-    fault_time = models.DateTimeField(verbose_name="故障时间", blank=True, null=True)
-    repair_time = models.DateTimeField(verbose_name="修复时间", blank=True, null=True)
-    repair_persons = models.CharField(verbose_name="修复人", blank=True, null=True, max_length=64)
-    repair_flag = models.BooleanField(verbose_name="修复标志", default=False)
+    fault_time = models.DateTimeField(verbose_name="发生时间", blank=True, null=True)
+    status = models.IntegerField(verbose_name='状态', blank=True, null=True, choices=STATUS)
+    update_time = models.DateTimeField(verbose_name='修改时间', auto_now=True)
+    add_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
     class Meta:
         verbose_name = '故障枪口信息'

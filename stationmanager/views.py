@@ -67,7 +67,8 @@ class StationPricesDetailView(View):
 
 class FaultChargingGunListView(View):
     def get(self, request, *args, **kwargs):
-        fault_counts = FaultChargingGun.objects.filter(repair_flag=False).count()
+        # fault_counts = FaultChargingGun.objects.filter(repair_flag=False).count()
+        fault_counts = 0
         data = {
             "fault_counts": fault_counts
         }

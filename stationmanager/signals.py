@@ -5,7 +5,6 @@ import logging
 from django.db.models.signals import post_init, post_save, post_delete
 from django.dispatch import receiver
 
-from chargingstation import settings
 from .models import Seller, Station, ChargingPile, ChargingGun, FaultChargingGun
 from echargenet.models import OperatorInfo, StationInfo, EquipmentInfo, ConnectorInfo
 from statistic import tasks
@@ -105,7 +104,7 @@ def update_equipment_info(sender, instance, created, **kwargs):
             EquipmentInfo.objects.update_or_create(EquipmentID=str(EquipmentID), defaults=defaults)
         except StationInfo.DoesNotExist as ex:
             pass
-        print("mmmmmmmmmmmmmmmmmmmmmm:", created)
+
         if created:
             tasks.charging_device_stats.delay()
 
@@ -113,7 +112,6 @@ def update_equipment_info(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=ChargingPile)
 def equipment_info_delete(sender, instance, **kwargs):
     EquipmentInfo.objects.filter(EquipmentID=str(instance.id)).delete()
-    print("delete000000000000000000000000::")
     tasks.charging_device_stats.delay()
 
 
@@ -132,6 +130,18 @@ def update_connector_info(sender, instance, created, **kwargs):
             "work_status": instance.work_status,
             "charg_status": instance.charg_status,
             "fault_time": datetime.datetime.now(),
+            "status": 1         # 故障
+        }
+        FaultChargingGun.objects.create(**data)
+
+    if not created and instance.old_work_status in [2, 9] and instance.work_status not in [2, 9]:
+        data = {
+            "gun_num": instance.gun_num,
+            "charg_pile": instance.charg_pile,
+            "work_status": instance.work_status,
+            "charg_status": instance.charg_status,
+            "fault_time": datetime.datetime.now(),
+            "status": 0         # 修复
         }
         FaultChargingGun.objects.create(**data)
 
