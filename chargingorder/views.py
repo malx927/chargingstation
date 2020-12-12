@@ -89,7 +89,7 @@ class RechargeView(View):
             user_info = UserInfo.objects.get(openid=openid)
         except UserInfo.DoesNotExist as ex:
             request.session.flush()
-            return HttpResponseRedirect(request.get_full_path())
+            return HttpResponseRedirect(reverse("station-index"))
         b_created = request.session.get("created", None)
         if b_created:
             # 跳转到信息注册
@@ -134,6 +134,7 @@ class RechargeView(View):
                 context = {
                     "pile_sn": pile_gun.charg_pile.pile_sn,
                     "gun_num": pile_gun.gun_num,
+                    "balance": user_info.account_balance(),
                 }
                 return render(request, template_name='chargingorder/recharge.html', context=context)  # 进入充电界面
             elif pile_gun.work_status in [1, 3]:         # 1-充电中 3-充电结束(未拔枪)

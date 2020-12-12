@@ -94,12 +94,39 @@
             </div>
          </div>
     </div>
-
+    <div id="myModal" class="modal bottom-sheet">
+        <div class="modal-content">
+            <h5>账户余额:{{ balance }}元</h5>
+            <p>您的账户还剩下{{ balance }}元，为了不影响您继续充电，请您尽快充值</p>
+        </div>
+        <div class="modal-footer">
+            <a href="{% url 'wxchat-order-pay' %}" class="modal-action modal-close waves-effect waves-green btn ">我要去充值</a>
+            <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat ">继续充电</a>
+        </div>
+    </div>
 {% endblock container%}
 
 {% block bottomjs %}
 <script>
     $(document).ready(function(){
+        $('#myModal').modal({
+            dismissible: true, // 点击模态外面模态消失关闭
+            opacity: .5, // 相对于背景的不透明度
+            in_duration: 300, // 显示特效的时间
+            out_duration: 200, // 消失特效时间
+            starting_top: '4%', // 启动时的样式属性
+            ending_top: '10%', // 结束时的样式属性
+            ready: function(modal, trigger) { // 模态加载完成触发事件
+            },
+            complete: function() {
+
+            } // 关闭时触发的事件
+        });
+        let balance = {{ balance }};
+        if( balance <=10 ){
+            $('#myModal').modal('open');
+        }
+
         // 充满为止
         $("#full_recharge").on("click", function (event) {
             var ret = delay_time();
