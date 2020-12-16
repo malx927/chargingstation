@@ -141,14 +141,10 @@ function geocoder(latitude,longitude) {
           data: {city: city},
           timeout: 5000,
           success: function(data){
-              let stations = data.map((item) => {
-                  let end = new qq.maps.LatLng(item.latitude, item.longitude);
-                  item.distance = getDistance(start, end)
-              });
-              $.each(stations, function (index, item) {
-
+              $.each(data, function (index, item) {
+                  var end = new qq.maps.LatLng(item.latitude, item.longitude);
                   let templateStr = `<div class="store">
-                                            <div class="store__header">${item.name}<p>${item.distance}</p></div>
+                                            <div class="store__header">${item.name}<p>${getDistance(start, end)}</p></div>
                                             <div class="store__info">
                                                 <div class="store__thumb"><img src="${item.image_url}"></div>
                                                 <a href="${item.get_absolute_url}" class="store__detail">
