@@ -134,6 +134,7 @@ function geocoder(latitude,longitude) {
  function station_list(city) {
     $("#stations").empty();
     var start = new qq.maps.LatLng(latitude, longitude);
+    {#var start = new qq.maps.LatLng(39.915, 116.404);#}
      $.ajax({
           type: 'GET',
           url: "{% url 'station-list' %}",
@@ -141,10 +142,20 @@ function geocoder(latitude,longitude) {
           data: {city: city},
           timeout: 5000,
           success: function(data){
-              $.each(data, function (index, item) {
-                  var end = new qq.maps.LatLng(item.latitude, item.longitude);
+              const stations = data.map((item)=>{
+                  let end = new qq.maps.LatLng(item.latitude, item.longitude);
+                  let distance = getDistance(start, end);
+                  item["distance"] = distance;
+                  item["dist_format"] = disFormat(distance);
+                  return item;
+              });
+              stations.sort(function (a, b) {
+                  return a.distance - b.distance ;
+              });
+
+              $.each(stations, function (index, item) {
                   let templateStr = `<div class="store">
-                                            <div class="store__header">${item.name}<p>${getDistance(start, end)}</p></div>
+                                            <div class="store__header">${item.name}<p>${item.dist_format}</p></div>
                                             <div class="store__info">
                                                 <div class="store__thumb"><img src="${item.image_url}"></div>
                                                 <a href="${item.get_absolute_url}" class="store__detail">
@@ -181,6 +192,9 @@ function geocoder(latitude,longitude) {
  }
  function getDistance(start, end) {
      var distance = qq.maps.geometry.spherical.computeDistanceBetween(start, end);
+     return distance
+ }
+ function disFormat(distance) {
      if(distance<1000){
          return distance.toFixed(2) + 'm'
      }else{
