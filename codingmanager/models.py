@@ -19,8 +19,13 @@ class PileType(models.Model):
 
 # 故障原因编码
 class FaultCode(models.Model):
+    STATUS = (
+        (0, '无'),
+        (1, '故障'),
+    )
     id = models.IntegerField(verbose_name='故障编码', primary_key=True, default=0)
     name = models.CharField(verbose_name='故障原因', max_length=32)
+    fault = models.IntegerField(verbose_name="故障标识", choices=STATUS, default=0)
     remark = models.CharField(verbose_name='说明', max_length=64, blank=True, null=True)
 
     def __str__(self):
