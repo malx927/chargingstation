@@ -29,6 +29,7 @@ class InvoiceTitle(models.Model):
     class Meta:
         verbose_name = '发票抬头管理'
         verbose_name_plural = verbose_name
+        ordering = ["is_write", "-add_time"]
 
     def __str__(self):
         return self.title

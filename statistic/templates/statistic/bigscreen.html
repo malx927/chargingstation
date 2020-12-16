@@ -114,7 +114,7 @@
                     </div>
                 </div>
 
-                <div class="boxall"  style="margin-top:.3rem">
+                <div class="boxall">
                     <div class="alltitle">今日充电金额:  <span class="title" id="id_total_money">0</span>元</div>
                     <div id="id_today_money" class="boxcontent"></div>
                     <div class="boxfoot"></div>
@@ -143,7 +143,7 @@
                 </div>
             </li>
             <li>
-               <div class="boxall">
+               <div class="boxall" style="margin-top:.3rem">
                     <div class="alltitle">今日充电量:   <span class="title" id="id_total_readings">0</span>千瓦时</div>
                     <div id="id_today_readings" class="boxcontent"></div>
                     <div class="boxfoot"></div>
@@ -231,7 +231,7 @@
             today_count_stats();
             today_readings_stats();
             today_money_stats();
-            today_power_stats();
+            {#today_power_stats();#}
             station_device_stats();
             station_money_stats()
         }, 20000);
