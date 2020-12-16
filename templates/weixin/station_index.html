@@ -144,9 +144,15 @@ function geocoder(latitude,longitude) {
           success: function(data){
               const stations = data.map((item)=>{
                   let end = new qq.maps.LatLng(item.latitude, item.longitude);
-                  let distance = getDistance(start, end);
-                  item["distance"] = distance;
-                  item["dist_format"] = disFormat(distance);
+                  if(item.latitude === 0.0 || item.longitude === 0.0){
+                      item["distance"] = 99999999;
+                      item["dist_format"] = "";
+                  } else {
+                    let distance = getDistance(start, end);
+                    item["distance"] = distance;
+                    item["dist_format"] = disFormat(distance);
+                  }
+
                   return item;
               });
               stations.sort(function (a, b) {
