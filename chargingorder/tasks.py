@@ -125,7 +125,7 @@ def charging_status_overtime():
     for record in ChargingStatusRecord.objects.all():
         over_time = record.over_time
         if datetime.datetime.now() > over_time:  # 15s 充电状态超时
-            log.info('charging_status_overtime 超时:电桩SN:{} 枪口:{}订单:{}'.format(record.pile_sn, record.gun_num, record.out_trade_no))
+            log.info('charging_status_overtime timeout: pile SN:{} gun:{},order:{}'.format(record.pile_sn, record.gun_num, record.out_trade_no))
             try:
                 fault_code = FaultCode.objects.get(id=92)
                 ChargingGun.objects.filter(charg_pile__pile_sn=record.pile_sn, gun_num=record.gun_num) \
