@@ -24,6 +24,7 @@ class PileTypeAdmin(object):
 class FaultCodeAdmin(object):
     list_display = ['id', 'name', 'fault', 'remark']
     list_display_links = ['name']
+    list_filter = ['fault']
     search_fields = ['name']
     model_icon = 'fa fa-star'
 
