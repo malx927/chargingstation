@@ -22,7 +22,8 @@ class PileTypeAdmin(object):
 
 # 故障原因编码
 class FaultCodeAdmin(object):
-    list_display = ['id', 'name', 'remark']
+    list_display = ['id', 'name', 'fault', 'remark']
+    list_display_links = ['name']
     search_fields = ['name']
     model_icon = 'fa fa-star'
 

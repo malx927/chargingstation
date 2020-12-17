@@ -21,7 +21,7 @@ class PileType(models.Model):
 class FaultCode(models.Model):
     STATUS = (
         (0, '无'),
-        (1, '故障'),
+        (1, '故障统计'),
     )
     id = models.IntegerField(verbose_name='故障编码', primary_key=True, default=0)
     name = models.CharField(verbose_name='故障原因', max_length=32)
