@@ -1338,6 +1338,24 @@ def save_pile_charg_status_to_db(**data):
         logging.info(send_data)
         send_data_to_client(pile_sn, gun_num, **send_data)
         return
+    # 超过五分钟电表差值为零，电表故障
+    if order.end_time and order.begin_time:
+        total_mins = (order.end_time - order.begin_time).total_seconds() / 60
+        if total_mins >= 5 and order.end_reading - order.begin_reading == 0:
+            stop_error_data = {
+                "pile_sn": data.get("pile_sn", None),
+                "gun_num": data.get("gun_num", None),
+                "openid": order.openid,
+                "out_trade_no": out_trade_no,
+                "consum_money": 0,
+                "total_reading": 0,
+                "stop_code": 0,  # 0 主动停止，1被动响应
+                "fault_code": 33,  # 电表通讯故障
+                "start_model": order.start_model,
+            }
+            logging.warning("电表通讯故障：{},{},{}".format(out_trade_no, order.end_reading - order.begin_reading, total_mins))
+            server_send_stop_charging_cmd(**stop_error_data)
+            return
 
     if order.end_reading - order.begin_reading < 0 or order.power_fee < 0 or order.service_fee < 0:
         stop_error_data = {
@@ -1347,7 +1365,7 @@ def save_pile_charg_status_to_db(**data):
             "out_trade_no": out_trade_no,
             "consum_money": 0,
             "total_reading": 0,
-            "stop_code": 0,  # 0 主动停止，1被动响应，2消费清单已结束或不存在
+            "stop_code": 0,  # 0 主动停止，1被动响应
             "fault_code": 95,
             "start_model": order.start_model,
         }
