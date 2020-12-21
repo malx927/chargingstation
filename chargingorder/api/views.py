@@ -1,7 +1,7 @@
 #-*-coding:utf-8-*-
 import datetime
 
-from django.db.models import Sum, Count, Q, F, DecimalField, FloatField, IntegerField, Avg
+from django.db.models import Sum, Count, Q, F, DecimalField, FloatField, IntegerField, Avg, Case, When
 from django.db import connection
 from rest_framework import status
 from rest_framework.generics import ListAPIView
@@ -14,6 +14,41 @@ from chargingorder.models import Order, OrderChargDetail
 from stationmanager.models import ChargingPile, Station, Seller
 
 __author__ = 'malixin'
+
+
+class OrderTodayStatusStats(APIView):
+    """订单状态分类统计"""
+    def get(self, request, *args, **kwargs):
+
+        results = {
+            "totals": 0,
+            "charg_counts": 0,
+            "faults": 0,
+        }
+
+        if self.request.user.is_superuser:
+            queryset = Order.objects.filter(charg_pile__isnull=False)
+        elif self.request.user.station:
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+        else:
+            queryset = Order.objects.none()
+
+        cur_time = datetime.datetime.now().date()
+        queryset = queryset.filter(begin_time__date=cur_time)
+        # 总数量
+        totals = queryset.count()
+        # 充电中
+        charg_counts = queryset.filter(charg_status_id=6).count()
+        # 故障数量
+        faults = queryset.filter(charg_status__fault=1).count()
+        print(totals, charg_counts, faults)
+
+        results["totals"] = totals
+        results["charg_counts"] = charg_counts
+        results["faults"] = faults
+        return Response(results)
 
 
 class OrderDayStats(APIView):

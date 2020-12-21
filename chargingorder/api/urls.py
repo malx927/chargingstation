@@ -2,7 +2,7 @@
 from django.conf.urls import url
 
 from chargingorder.api.views import OrderDayStats, OrderMonthStats, OrderYearStats, OrderCategoryStats, \
-    OrderDayAnalysis, OrderMonthAnalysis, OrderYearAnalysis, OrderDetailAPIView
+    OrderDayAnalysis, OrderMonthAnalysis, OrderYearAnalysis, OrderDetailAPIView, OrderTodayStatusStats
 from stationmanager.api.views import ChargingPileListAPIView, AreaCodeListAPIView
 
 __author__ = 'malixin'
@@ -19,5 +19,6 @@ urlpatterns = [
     url(r'^order-month-analysis/$', OrderMonthAnalysis.as_view(), name='order-month-analysis'),
     url(r'^order-year-analysis/$', OrderYearAnalysis.as_view(), name='order-year-analysis'),
     url(r'^order-detail-list/(?P<out_trade_no>\w+)/$', OrderDetailAPIView.as_view(), name='order-detail-list'),
+    url(r'^order-status-stats/$', OrderTodayStatusStats.as_view(), name='order-status-stats'),
 ]
 
