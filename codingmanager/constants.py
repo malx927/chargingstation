@@ -256,8 +256,8 @@ GUN_CHARGING_STATUS = (
 
 ORDER_STATUS = (
     (0, '空'),
-    (1, '未结帐'),
-    (2, '结账'),
+    (1, '未支付'),
+    (2, '已支付'),
 )
 # 订单状态
 PAY_ORDER_STATUS = (

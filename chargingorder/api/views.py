@@ -19,13 +19,6 @@ __author__ = 'malixin'
 class OrderTodayStatusStats(APIView):
     """订单状态分类统计"""
     def get(self, request, *args, **kwargs):
-
-        results = {
-            "totals": 0,
-            "charg_counts": 0,
-            "faults": 0,
-        }
-
         if self.request.user.is_superuser:
             queryset = Order.objects.filter(charg_pile__isnull=False)
         elif self.request.user.station:
@@ -37,17 +30,38 @@ class OrderTodayStatusStats(APIView):
 
         cur_time = datetime.datetime.now().date()
         queryset = queryset.filter(begin_time__date=cur_time)
-        # 总数量
-        totals = queryset.count()
+        # 已支付
+        paid_count = queryset.filter(status=2).count()
+        # 待支付
+        nopaid_count = queryset.filter(status=1).count()
         # 充电中
-        charg_counts = queryset.filter(charg_status_id=6).count()
+        charg_count = queryset.filter(charg_status_id=6).count()
         # 故障数量
         faults = queryset.filter(charg_status__fault=1).count()
-        print(totals, charg_counts, faults)
+        print(paid_count, nopaid_count, charg_count, faults)
+        # 今日充电量
+        readings = queryset.aggregate(readings=Sum("total_readings"))
+        # 今日创建订单
+        today_moneys = queryset.aggregate(total_moneys=Sum("consum_money"), power_fees=Sum("power_fee"), service_fees=Sum("service_fee"))
+        # 昨日创建订单
+        yesterday = datetime.datetime.now() + datetime.timedelta(days=-1)
+        yesterday = yesterday.date()
+        yesterday_moneys = Order.objects.filter(begin_time__date=yesterday, end_time__date=cur_time).aggregate(total_moneys=Sum("consum_money"), power_fees=Sum("power_fee"), service_fees=Sum("service_fee"))
 
-        results["totals"] = totals
-        results["charg_counts"] = charg_counts
+        paid = {"name": "已支付", "value": paid_count}
+        nopaid = {"name": "未支付", "value": nopaid_count}
+        charging = {"name": "充电中", "value": charg_count}
+
+        results = dict()
+        counts_list = list()
+        counts_list.append(charging)
+        counts_list.append(nopaid)
+        counts_list.append(paid)
         results["faults"] = faults
+        results["counts"] = counts_list
+        # 充电量
+        results.update(readings)
+
         return Response(results)
 
 
