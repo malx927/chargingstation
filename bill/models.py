@@ -23,7 +23,7 @@ class InvoiceTitle(models.Model):
     total_money = models.DecimalField(verbose_name='充值总额', default=0, blank=True, max_digits=8, decimal_places=2)
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2)
     is_write = models.IntegerField(verbose_name='开票确认', default=0, choices=INVOICE_WRITE)
-    update_time = models.DateTimeField(verbose_name="更新时间", auto_now=True)
+    update_time = models.DateTimeField(verbose_name="开票时间", blank=True, null=True)
     add_time = models.DateTimeField(verbose_name="申请时间", auto_now_add=True)
 
     class Meta:
