@@ -204,15 +204,15 @@
         $('#myModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var uri = button.attr('data-uri');
-            console.log(uri);
             const id_curve = echarts.init(document.getElementById('id_curve'));
+
             $.ajax({
                 type: 'GET',
                 url: uri,
                 dataType: 'json',
                 timeout: 5000,
                 success: function(data){
-                    console.log(data);
+
                     $("#id_out_trade_no").text(data.out_trade_no);
                     $("#id_begin_time").text(data.begin_time);
                     $("#id_end_time").text(data.end_time);

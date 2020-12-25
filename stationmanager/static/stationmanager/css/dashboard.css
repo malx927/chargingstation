@@ -771,6 +771,9 @@
   color: #fff !important;
 }
 
+.min-height-400 {
+    min-height: 400px !important;
+}
 .text-primary {
   color: #007bff !important;
 }

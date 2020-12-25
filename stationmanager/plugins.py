@@ -91,6 +91,9 @@ class DashBoardPlugin(BaseAdminPlugin):
         media.add_css({'screen': [self.static('xadmin/vendor/selectize/selectize.bootstrap3.css'), ]})
         media.add_js([self.static('xadmin/vendor/bootstrap-datepicker/js/bootstrap-datepicker.js')])
         media.add_js([self.static('xadmin/vendor/bootstrap-datepicker/js/locales/bootstrap-datepicker.zh-CN.js')])
+        media.add_js([self.static('xadmin/vendor/bootstrap-datepicker/js/locales/bootstrap-datepicker.zh-CN.js')])
+        media.add_js([self.static('statistic/js/echarts.min.js')])
+        media.add_js([self.static('statistic/js/china.js')])
         return media
 
 

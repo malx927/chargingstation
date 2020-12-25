@@ -1,5 +1,37 @@
 <div class="row">
     <div class="col-sm-12 col-md-3  col-lg-3 mb-4">
+          <div class="card  shadow min-height-400">
+            <div class="card-body" id="id_counts">
+
+            </div>
+          </div>
+    </div>
+        <div class="col-sm-12 col-md-3 mb-4">
+      <div class="card   shadow min-height-400">
+        <div class="card-body" id="id_readings">
+
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-3 mb-4">
+      <div class="card   min-height-400 shadow ">
+        <div class="card-body" id="id_moneys">
+
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-3 mb-4">
+      <div class="card  min-height-400 shadow">
+        <div class="card-body" id="id_guns">
+
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-sm-12 col-md-3  col-lg-3 mb-4">
           <div class="card gradient-45deg-blue-indigo text-white shadow min-height-100">
             <div class="card-body">
                 <div>今日充电总量:<span class="pull-right"><em id="today_readings">0.00</em> KWH</span></div>
@@ -80,21 +112,7 @@
     <nav class="navbar navbar-default">
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse">
-{#            <ul class="nav navbar-nav">#}
-{#            <li class="dropdown">#}
-{#              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">请选择类别 <span class="caret"></span></a>#}
-{#              <ul class="dropdown-menu">#}
-{#                {% for station in stations  %}#}
-{#                {% if forloop.counter > 1 %}#}
-{#                <li role="separator" class="divider"></li>#}
-{#                {% endif %}#}
-{#                <li><a href="javascript:;" id="station_{{ station.id }}" data-item="{{ station.id }}">{{ station.name }}</a></li>#}
-{#                {% endfor %}#}
-{#              </ul>#}
-{#            </li>#}
-{#          </ul>#}
          <form class="navbar-form navbar-left">
-
             <div class="form-group">
                 <input type="text" id="begin_time" class="form-control" placeholder="开始时间">
             </div>
@@ -149,11 +167,18 @@
             language: "zh-CN",
             autoclose: true,
         });
-
+        const myCounts = echarts.init(document.getElementById('id_counts'));
+        const myReadings = echarts.init(document.getElementById('id_readings'));
+        const myMoneys = echarts.init(document.getElementById('id_moneys'));
+        const myGuns = echarts.init(document.getElementById('id_guns'));
         getTodayStatsData();
         getYesterdayStatsData();
         getMonthStatsData();
         getYearStatsData();
+        draw_counts();
+        draw_readings();
+        draw_moneys();
+        draw_guns();
 
         $("#btn_search").on("click", function(event){
             var begin_time = $("#begin_time").val();
@@ -167,7 +192,505 @@
             };
             getStatsData(params);
         });
+        window.addEventListener('resize',function () {//执行
+            myCounts.resize();
+            myReadings.resize();
+            myMoneys.resize();
+            myGuns.resize();
+        })
+        function draw_counts() {
+            let bgColor = '#fff';
+            let title = '今日订单量';
+            let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
+            let echartData = [{
+                    name: "A类",
+                    value: "3720"
+                },
+                {
+                    name: "B类",
+                    value: "2920"
+                },
+                {
+                    name: "C类",
+                    value: "2200"
+                },
+                {
+                    name: "D类",
+                    value: "1420"
+                }
+            ];
 
+            let formatNumber = function(num) {
+                let reg = /(?=(\B)(\d{3})+$)/g;
+                return num.toString().replace(reg, ',');
+            }
+            let total = echartData.reduce((a, b) => {
+                return a + b.value * 1
+            }, 0);
+
+            option = {
+                backgroundColor: bgColor,
+                color: color,
+                // tooltip: {
+                //     trigger: 'item'
+                // },
+                title: [{
+                    text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
+                    top: 'center',
+                    left: 'center',
+                    textStyle: {
+                        rich: {
+                            name: {
+                                fontSize: 14,
+                                fontWeight: 'normal',
+                                color: '#666666',
+                                padding: [10, 0]
+                            },
+                            val: {
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                                color: '#333333',
+                            }
+                        }
+                    }
+                },{
+                    text: '{title|今日订单量}\n\n{sub_title|今日0:00-24:00创建的订单量(单)}\n' + '{count|' + total + '}',
+                    top: 5,
+                    left: 5,
+                    textStyle: {
+                        rich: {
+                            title: {
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                                color: '#333333',
+
+                            },
+                            sub_title: {
+                                fontSize: 14,
+                                fontWeight: 'normal',
+                                color: '#666666',
+                                padding: [10, 0]
+                            },
+                            count: {
+                                fontSize: 24,
+                                fontWeight: 'bold',
+                                color: '#0E7CE2',
+
+                            },
+                        },
+
+                    }
+                }],
+
+                series: [{
+                    type: 'pie',
+                    radius: ['45%', '60%'],
+                    center: ['50%', '50%'],
+                    data: echartData,
+                    hoverAnimation: false,
+                    itemStyle: {
+                        normal: {
+                            borderColor: bgColor,
+                            borderWidth: 2
+                        }
+                    },
+                    labelLine: {
+                        normal: {
+                            length: 20,
+                            length2: 80,
+                            lineStyle: {
+                                color: '#e6e6e6'
+                            }
+                        }
+                    },
+                    label: {
+                        normal: {
+                            formatter: params => {
+                                return (
+                                    '{icon|●}{name|' + params.name + '}{value|' +
+                                    formatNumber(params.value) + '}'
+                                );
+                            },
+                            show:false,
+                            padding: [0 , -100, 25, -100],
+                            rich: {
+                                icon: {
+                                    fontSize: 12
+                                },
+                                name: {
+                                    fontSize: 12,
+                                    padding: [0, 10, 0, 4],
+                                    color: '#666666'
+                                },
+                                value: {
+                                    fontSize: 14,
+                                    fontWeight: 'bold',
+                                    color: '#333333'
+                                }
+                            }
+                        }
+                    },
+                }]
+            };
+            myCounts.setOption(option)
+        }
+   function draw_readings() {
+
+        let bgColor = '#fff';
+        let title = '总量';
+        let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
+        let echartData = [{
+                name: "A类",
+                value: "3720"
+            },
+            {
+                name: "B类",
+                value: "2920"
+            },
+            {
+                name: "C类",
+                value: "2200"
+            },
+            {
+                name: "D类",
+                value: "1420"
+            }
+        ];
+
+        let formatNumber = function(num) {
+            let reg = /(?=(\B)(\d{3})+$)/g;
+            return num.toString().replace(reg, ',');
+        }
+        let total = echartData.reduce((a, b) => {
+            return a + b.value * 1
+        }, 0);
+
+        option = {
+            backgroundColor: bgColor,
+            color: color,
+            // tooltip: {
+            //     trigger: 'item'
+            // },
+            title: [{
+                text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
+                top: 'center',
+                left: 'center',
+                textStyle: {
+                    rich: {
+                        name: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        val: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+                        }
+                    }
+                }
+            },{
+                text: '单位：个',
+                top: 20,
+                left: 20,
+                textStyle: {
+                    fontSize: 14,
+                    color:'#666666',
+                    fontWeight: 400
+                }
+            }],
+
+            series: [{
+                type: 'pie',
+                radius: ['45%', '60%'],
+                center: ['50%', '50%'],
+                data: echartData,
+                hoverAnimation: false,
+                itemStyle: {
+                    normal: {
+                        borderColor: bgColor,
+                        borderWidth: 2
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        length: 20,
+                        length2: 80,
+                        lineStyle: {
+                            color: '#e6e6e6'
+                        }
+                    }
+                },
+                label: {
+                    normal: {
+                        formatter: params => {
+                            return (
+                                '{icon|●}{name|' + params.name + '}{value|' +
+                                formatNumber(params.value) + '}'
+                            );
+                        },
+                        show:false,
+                        padding: [0 , -100, 25, -100],
+                        rich: {
+                            icon: {
+                                fontSize: 12
+                            },
+                            name: {
+                                fontSize: 12,
+                                padding: [0, 10, 0, 4],
+                                color: '#666666'
+                            },
+                            value: {
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: '#333333'
+                            }
+                        }
+                    }
+                },
+            }]
+        };
+        myReadings.setOption(option)
+    }
+   function draw_moneys() {
+
+        let bgColor = '#fff';
+        let title = '总量';
+        let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
+        let echartData = [{
+                name: "A类",
+                value: "3720"
+            },
+            {
+                name: "B类",
+                value: "2920"
+            },
+            {
+                name: "C类",
+                value: "2200"
+            },
+            {
+                name: "D类",
+                value: "1420"
+            }
+        ];
+
+        let formatNumber = function(num) {
+            let reg = /(?=(\B)(\d{3})+$)/g;
+            return num.toString().replace(reg, ',');
+        }
+        let total = echartData.reduce((a, b) => {
+            return a + b.value * 1
+        }, 0);
+
+        option = {
+            backgroundColor: bgColor,
+            color: color,
+            // tooltip: {
+            //     trigger: 'item'
+            // },
+            title: [{
+                text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
+                top: 'center',
+                left: 'center',
+                textStyle: {
+                    rich: {
+                        name: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        val: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+                        }
+                    }
+                }
+            },{
+                text: '单位：个',
+                top: 20,
+                left: 20,
+                textStyle: {
+                    fontSize: 14,
+                    color:'#666666',
+                    fontWeight: 400
+                }
+            }],
+
+            series: [{
+                type: 'pie',
+                radius: ['45%', '60%'],
+                center: ['50%', '50%'],
+                data: echartData,
+                hoverAnimation: false,
+                itemStyle: {
+                    normal: {
+                        borderColor: bgColor,
+                        borderWidth: 2
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        length: 20,
+                        length2: 80,
+                        lineStyle: {
+                            color: '#e6e6e6'
+                        }
+                    }
+                },
+                label: {
+                    normal: {
+                        formatter: params => {
+                            return (
+                                '{icon|●}{name|' + params.name + '}{value|' +
+                                formatNumber(params.value) + '}'
+                            );
+                        },
+                        show:false,
+                        padding: [0 , -100, 25, -100],
+                        rich: {
+                            icon: {
+                                fontSize: 12
+                            },
+                            name: {
+                                fontSize: 12,
+                                padding: [0, 10, 0, 4],
+                                color: '#666666'
+                            },
+                            value: {
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: '#333333'
+                            }
+                        }
+                    }
+                },
+            }]
+        };
+        myMoneys.setOption(option)
+    }
+   function draw_guns() {
+
+        let bgColor = '#fff';
+        let title = '总量';
+        let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
+        let echartData = [{
+                name: "A类",
+                value: "3720"
+            },
+            {
+                name: "B类",
+                value: "2920"
+            },
+            {
+                name: "C类",
+                value: "2200"
+            },
+            {
+                name: "D类",
+                value: "1420"
+            }
+        ];
+
+        let formatNumber = function(num) {
+            let reg = /(?=(\B)(\d{3})+$)/g;
+            return num.toString().replace(reg, ',');
+        }
+        let total = echartData.reduce((a, b) => {
+            return a + b.value * 1
+        }, 0);
+
+        option = {
+            backgroundColor: bgColor,
+            color: color,
+            // tooltip: {
+            //     trigger: 'item'
+            // },
+            title: [{
+                text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
+                top: 'center',
+                left: 'center',
+                textStyle: {
+                    rich: {
+                        name: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        val: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+                        }
+                    }
+                }
+            },{
+                text: '单位：个',
+                top: 20,
+                left: 20,
+                textStyle: {
+                    fontSize: 14,
+                    color:'#666666',
+                    fontWeight: 400
+                }
+            }],
+
+            series: [{
+                type: 'pie',
+                radius: ['45%', '60%'],
+                center: ['50%', '50%'],
+                data: echartData,
+                hoverAnimation: false,
+                itemStyle: {
+                    normal: {
+                        borderColor: bgColor,
+                        borderWidth: 2
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        length: 20,
+                        length2: 80,
+                        lineStyle: {
+                            color: '#e6e6e6'
+                        }
+                    }
+                },
+                label: {
+                    normal: {
+                        formatter: params => {
+                            return (
+                                '{icon|●}{name|' + params.name + '}{value|' +
+                                formatNumber(params.value) + '}'
+                            );
+                        },
+                        show:false,
+                        padding: [0 , -100, 25, -100],
+                        rich: {
+                            icon: {
+                                fontSize: 12
+                            },
+                            name: {
+                                fontSize: 12,
+                                padding: [0, 10, 0, 4],
+                                color: '#666666'
+                            },
+                            value: {
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: '#333333'
+                            }
+                        }
+                    }
+                },
+            }]
+        };
+        myGuns.setOption(option)
+    }
     });
      var seller_template = sellers => `
 	<table class="table table-hover table-striped">
@@ -272,7 +795,6 @@
     }
 
     function appendItem(data){
-{#        alert(JSON.stringify(data));#}
         $.each(data,function(index, item){
             var new_item = "<tr>" +
                         "<td><a href='./stationmanager/chargingpile/" + item.id +"/update'>" + item.name + "</a></td>" +
@@ -365,5 +887,4 @@
               }
         });
     }
-
 </script>

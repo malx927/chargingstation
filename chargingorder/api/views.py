@@ -1,17 +1,15 @@
 #-*-coding:utf-8-*-
 import datetime
 
-from django.db.models import Sum, Count, Q, F, DecimalField, FloatField, IntegerField, Avg, Case, When
-from django.db import connection
-from rest_framework import status
-from rest_framework.generics import ListAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from codingmanager.constants import GUN_WORKING_STATUS
+from django.db.models import Sum, Count, F, DecimalField, Avg
+
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+
 from rest_framework.views import APIView
 
 from chargingorder.models import Order, OrderChargDetail
-from stationmanager.models import ChargingPile, Station, Seller
+from stationmanager.models import ChargingGun
 
 __author__ = 'malixin'
 
@@ -19,14 +17,13 @@ __author__ = 'malixin'
 class OrderTodayStatusStats(APIView):
     """订单状态分类统计"""
     def get(self, request, *args, **kwargs):
-        if self.request.user.is_superuser:
-            queryset = Order.objects.filter(charg_pile__isnull=False)
-        elif self.request.user.station:
+
+        if self.request.user.station:
             queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
         elif self.request.user.seller:
             queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.none()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         cur_time = datetime.datetime.now().date()
         queryset = queryset.filter(begin_time__date=cur_time)
@@ -52,16 +49,64 @@ class OrderTodayStatusStats(APIView):
         nopaid = {"name": "未支付", "value": nopaid_count}
         charging = {"name": "充电中", "value": charg_count}
 
+        total_moneys = today_moneys.get("total_moneys", 0) if today_moneys.get("total_moneys", 0) else 0
+        yes_total_moneys = yesterday_moneys.get("total_moneys", 0) if yesterday_moneys.get("total_moneys", 0) else 0
+
+        today_total_money = {"name": "今日创建订单", "value": total_moneys}
+        yesterday_total_money = {"name": "昨日创建订单", "value": yes_total_moneys}
+
         results = dict()
+
+        counts_dict = dict()
         counts_list = list()
         counts_list.append(charging)
         counts_list.append(nopaid)
         counts_list.append(paid)
-        results["faults"] = faults
-        results["counts"] = counts_list
+        counts_dict["faults"] = faults
+        counts_dict["counts"] = counts_list
+        results["counts"] = counts_dict
         # 充电量
         results.update(readings)
+        # 金额
+        money_dict = dict()
+        money_list = list()
+        money_list.append(today_total_money)
+        money_list.append(yesterday_total_money)
+        money_dict["moneys"] = money_list
+        money_dict["total_moneys"] = total_moneys + yes_total_moneys
 
+        today_power_fees = today_moneys.get("power_fees", 0) if today_moneys.get("power_fees", 0) else 0
+        yes_power_fees = yesterday_moneys.get("power_fees", 0) if yesterday_moneys.get("power_fees", 0) else 0
+        today_service_fees = today_moneys.get("service_fees", 0) if today_moneys.get("service_fees", 0) else 0
+        yes_service_fees = yesterday_moneys.get("service_fees", 0) if yesterday_moneys.get("service_fees", 0) else 0
+
+        money_dict["total_power_fees"] = today_power_fees + yes_power_fees
+        money_dict["total_service_fees"] = today_service_fees + yes_service_fees
+        results["moneys"] = money_dict
+
+        # 充电枪状态
+        if self.request.user.station:
+            guns = ChargingGun.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            guns = ChargingGun.objects.filter(charg_pile__station__seller=self.request.user.seller)
+        else:
+            guns = ChargingGun.objects.all()
+
+        gun_totals = guns.values("work_status").annotate(value=Count("id"))
+
+        gun_status_list = [
+            {"work_status": 0, "name": "空闲", "value": 0},
+            {"work_status": 1, "name": "充电中", "value": 0},
+            {"work_status": 2, "name": "故障", "value": 0},
+            {"work_status": 3, "name": "占用未充电", "value": 0},
+            {"work_status": 9, "name": "离线", "value": 0},
+        ]
+
+        for item in gun_status_list:
+            for status in gun_totals:
+                if item["work_status"] == status["work_status"]:
+                    item["value"] = status["value"]
+        results["gun_counts"] = gun_status_list
         return Response(results)
 
 
@@ -84,7 +129,7 @@ class OrderDayStats(APIView):
         elif self.request.user.seller:
             queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.none()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         if flag is None:    # 当天
             cur_time = datetime.datetime.now().date()
@@ -138,7 +183,7 @@ class OrderMonthStats(APIView):
         elif self.request.user.seller:
             queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.none()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         if month is None:  # 当月
             cur_time = datetime.datetime.now()
@@ -179,7 +224,7 @@ class OrderYearStats(APIView):
         elif self.request.user.seller:
             queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
         else:
-            queryset = Order.objects.none()
+            queryset = Order.objects.filter(charg_pile__isnull=False)
 
         if year is None:  # 当年
             cur_time = datetime.datetime.now()
