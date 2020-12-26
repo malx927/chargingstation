@@ -1,27 +1,27 @@
 <div class="row">
     <div class="col-sm-12 col-md-3  col-lg-3 mb-4">
-          <div class="card  shadow min-height-400">
+          <div class="card  shadow min-height-420">
             <div class="card-body" id="id_counts">
 
             </div>
           </div>
     </div>
         <div class="col-sm-12 col-md-3 mb-4">
-      <div class="card   shadow min-height-400">
+      <div class="card   shadow min-height-420">
         <div class="card-body" id="id_readings">
 
         </div>
       </div>
     </div>
     <div class="col-sm-12 col-md-3 mb-4">
-      <div class="card   min-height-400 shadow ">
+      <div class="card   min-height-420 shadow ">
         <div class="card-body" id="id_moneys">
 
         </div>
       </div>
     </div>
     <div class="col-sm-12 col-md-3 mb-4">
-      <div class="card  min-height-400 shadow">
+      <div class="card  min-height-420 shadow">
         <div class="card-body" id="id_guns">
 
         </div>
@@ -203,27 +203,23 @@
             let title = '今日订单量';
             let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
             let echartData = [{
-                    name: "A类",
+                    name: "充电中",
                     value: "3720"
                 },
                 {
-                    name: "B类",
+                    name: "未支付",
                     value: "2920"
                 },
                 {
-                    name: "C类",
-                    value: "2200"
-                },
-                {
-                    name: "D类",
-                    value: "1420"
+                    name: "已支付",
+                    value: "20"
                 }
             ];
 
             let formatNumber = function(num) {
                 let reg = /(?=(\B)(\d{3})+$)/g;
                 return num.toString().replace(reg, ',');
-            }
+            };
             let total = echartData.reduce((a, b) => {
                 return a + b.value * 1
             }, 0);
@@ -234,13 +230,49 @@
                 color: color,
                 legend: {
                     orient: 'vertical',
-                    bottom: 10,
-                    left: 'center',
-                    data: ['A类', 'B类', 'C类']
+                    bottom: 25,
+                    itemGap: 15,            // 间隔
+                    itemWidth: 10,          // 图形宽度。
+                    itemHeight: 10,         // 图形高度。
+                    left: 5,
+                    data: ['充电中', '未支付', '已支付'],
+                    formatter: function (name) {
+                        let cur_value = 0;
+                        for (let i = 0, len = echartData.length; i < len; i++) {
+                            if (echartData[i].name == name) {
+                                cur_value = echartData[i].value;
+                            }
+                        }
+                        let arr = [
+                            '{a|' + name + '}',
+                            '{b|' + ((cur_value / total) * 100).toFixed(2) + '%}',
+                            '{c|' + cur_value + '单}'
+                        ];
+                        return arr.join('')
+                    },
+                    textStyle: {
+                        rich: {
+                            a: {
+                                fontSize: 12,
+                                verticalAlign: 'middle',
+                                align: 'left',
+                                padding: [0, 20, 0, 4]
+                            },
+                            b: {
+                                fontSize: 12,
+                                align: 'center',
+                                width: 80,
+                                padding: [0, 0, 0, 0],
+                            },
+                            c: {
+                                fontSize: 12,
+                                align: 'right',
+                                padding: [0, 4, 0, 20],
+                                {#lineHeight: 25#}
+                            }
+                        }
+                    },
                 },
-                // tooltip: {
-                //     trigger: 'item'
-                // },
                 title: [{
                     text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
                     top: 'center',
@@ -287,8 +319,34 @@
                         },
 
                     }
-                }],
+                },{
+                    text: '{sub_title|其中有23.8%异常订单}',
+                    bottom: -15,
+                    left: 5,
+                    textStyle: {
+                        rich: {
+                            title: {
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                                color: '#333333',
 
+                            },
+                            sub_title: {
+                                fontSize: 14,
+                                fontWeight: 'normal',
+                                color: '#666666',
+                                padding: [10, 0]
+                            },
+                            count: {
+                                fontSize: 24,
+                                fontWeight: 'bold',
+                                color: '#0E7CE2',
+
+                            },
+                        },
+
+                    }
+                }],
                 series: [{
                     type: 'pie',
                     radius: ['45%', '60%'],
@@ -367,7 +425,7 @@
         let formatNumber = function(num) {
             let reg = /(?=(\B)(\d{3})+$)/g;
             return num.toString().replace(reg, ',');
-        }
+        };
         let total = echartData.reduce((a, b) => {
             return a + b.value * 1
         }, 0);
@@ -486,7 +544,7 @@
         let formatNumber = function(num) {
             let reg = /(?=(\B)(\d{3})+$)/g;
             return num.toString().replace(reg, ',');
-        }
+        };
         let total = echartData.reduce((a, b) => {
             return a + b.value * 1
         }, 0);

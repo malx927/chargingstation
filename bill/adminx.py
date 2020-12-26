@@ -1,4 +1,5 @@
 # coding=utf8
+import datetime
 
 import xadmin
 from django.urls import reverse
@@ -11,7 +12,7 @@ class InvoiceTitleAdmin(object):
     """
     发票抬头信息
     """
-    list_display = ["name", "title", "category", "tax_number", "address", "telephone", "bank_account", "email", "is_write", "add_time"]
+    list_display = ["name", "title", "category", "tax_number", "address", "telephone", "bank_account", "email", "is_write", "update_time", "add_time"]
     search_fields = ["title", "name", "openid", "telephone"]
     list_filter = ['is_write']
     model_icon = 'fa fa-random'
@@ -36,6 +37,12 @@ class InvoiceTitleAdmin(object):
             media.add_css({'screen': ('bill/bill.css',)})
             # media.add_js([self.static('stationmanager/js/xadmin.areacode.js')])
         return media
+
+    def save_models(self):
+        obj = self.new_obj
+        if obj.is_write == 1 and obj.update_time is None:
+            obj.update_time = datetime.datetime.now()
+        super().save_models()
 
 
 xadmin.site.register(InvoiceTitle, InvoiceTitleAdmin)
