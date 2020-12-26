@@ -28,14 +28,14 @@ class OrderTodayStatusStats(APIView):
         cur_time = datetime.datetime.now().date()
         queryset = queryset.filter(begin_time__date=cur_time)
         # 已支付
-        paid_count = queryset.filter(status=2).count()
+        paid_count = queryset.filter(status=2).exclude(charg_status_id=6).count()
         # 待支付
-        nopaid_count = queryset.filter(status=1).count()
+        nopaid_count = queryset.filter(status=1).exclude(charg_status_id=6).count()
         # 充电中
         charg_count = queryset.filter(charg_status_id=6).count()
         # 故障数量
         faults = queryset.filter(charg_status__fault=1).count()
-        print(paid_count, nopaid_count, charg_count, faults)
+        # print(paid_count, nopaid_count, charg_count, faults)
         # 今日充电量
         readings = queryset.aggregate(readings=Sum("total_readings"))
         # 今日创建订单
@@ -64,7 +64,7 @@ class OrderTodayStatusStats(APIView):
         counts_list.append(paid)
         counts_dict["faults"] = faults
         counts_dict["counts"] = counts_list
-        results["counts"] = counts_dict
+        results["order_counts"] = counts_dict
         # 充电量
         results.update(readings)
         # 金额
@@ -82,7 +82,7 @@ class OrderTodayStatusStats(APIView):
 
         money_dict["total_power_fees"] = today_power_fees + yes_power_fees
         money_dict["total_service_fees"] = today_service_fees + yes_service_fees
-        results["moneys"] = money_dict
+        results["order_moneys"] = money_dict
 
         # 充电枪状态
         if self.request.user.station:

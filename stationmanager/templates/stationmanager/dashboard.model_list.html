@@ -167,18 +167,39 @@
             language: "zh-CN",
             autoclose: true,
         });
+
         const myCounts = echarts.init(document.getElementById('id_counts'));
         const myReadings = echarts.init(document.getElementById('id_readings'));
         const myMoneys = echarts.init(document.getElementById('id_moneys'));
         const myGuns = echarts.init(document.getElementById('id_guns'));
+
+        function getTodayStatusStatsData(){
+            $.ajax({
+                  type: 'GET',
+                  url: '{% url "order-status-stats" %}',
+                  dataType: 'json',
+                  timeout: 5000,
+                  success: function(data){
+                      console.log(data);
+                      const order_counts = data.order_counts;
+                      const readings = data.readings;
+                      const order_moneys = data.order_moneys;
+                      const gun_counts = data.gun_counts;
+                      console.log(order_counts)
+                      draw_counts(order_counts);
+                      draw_readings(readings);
+                      draw_moneys(order_moneys);
+                      draw_guns(gun_counts);
+                  }
+            });
+        }
+        getTodayStatusStatsData();
+
         getTodayStatsData();
         getYesterdayStatsData();
         getMonthStatsData();
         getYearStatsData();
-        draw_counts();
-        draw_readings();
-        draw_moneys();
-        draw_guns();
+
 
         $("#btn_search").on("click", function(event){
             var begin_time = $("#begin_time").val();
@@ -197,231 +218,14 @@
             myReadings.resize();
             myMoneys.resize();
             myGuns.resize();
-        })
-        function draw_counts() {
-            let bgColor = '#fff';
-            let title = '今日订单量';
-            let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
-            let echartData = [{
-                    name: "充电中",
-                    value: "3720"
-                },
-                {
-                    name: "未支付",
-                    value: "2920"
-                },
-                {
-                    name: "已支付",
-                    value: "20"
-                }
-            ];
+        });
 
-            let formatNumber = function(num) {
-                let reg = /(?=(\B)(\d{3})+$)/g;
-                return num.toString().replace(reg, ',');
-            };
-            let total = echartData.reduce((a, b) => {
-                return a + b.value * 1
-            }, 0);
-
-
-            option = {
-                backgroundColor: bgColor,
-                color: color,
-                legend: {
-                    orient: 'vertical',
-                    bottom: 25,
-                    itemGap: 15,            // 间隔
-                    itemWidth: 10,          // 图形宽度。
-                    itemHeight: 10,         // 图形高度。
-                    left: 5,
-                    data: ['充电中', '未支付', '已支付'],
-                    formatter: function (name) {
-                        let cur_value = 0;
-                        for (let i = 0, len = echartData.length; i < len; i++) {
-                            if (echartData[i].name == name) {
-                                cur_value = echartData[i].value;
-                            }
-                        }
-                        let arr = [
-                            '{a|' + name + '}',
-                            '{b|' + ((cur_value / total) * 100).toFixed(2) + '%}',
-                            '{c|' + cur_value + '单}'
-                        ];
-                        return arr.join('')
-                    },
-                    textStyle: {
-                        rich: {
-                            a: {
-                                fontSize: 12,
-                                verticalAlign: 'middle',
-                                align: 'left',
-                                padding: [0, 20, 0, 4]
-                            },
-                            b: {
-                                fontSize: 12,
-                                align: 'center',
-                                width: 80,
-                                padding: [0, 0, 0, 0],
-                            },
-                            c: {
-                                fontSize: 12,
-                                align: 'right',
-                                padding: [0, 4, 0, 20],
-                                {#lineHeight: 25#}
-                            }
-                        }
-                    },
-                },
-                title: [{
-                    text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
-                    top: 'center',
-                    left: 'center',
-                    textStyle: {
-                        rich: {
-                            name: {
-                                fontSize: 14,
-                                fontWeight: 'normal',
-                                color: '#666666',
-                                padding: [10, 0]
-                            },
-                            val: {
-                                fontSize: 18,
-                                fontWeight: 'bold',
-                                color: '#333333',
-                            }
-                        }
-                    }
-                },{
-                    text: '{title|今日订单量}\n\n{sub_title|今日0:00-24:00创建的订单量(单)}\n' + '{count|' + total + '}',
-                    top: 5,
-                    left: 5,
-                    textStyle: {
-                        rich: {
-                            title: {
-                                fontSize: 18,
-                                fontWeight: 'bold',
-                                color: '#333333',
-
-                            },
-                            sub_title: {
-                                fontSize: 14,
-                                fontWeight: 'normal',
-                                color: '#666666',
-                                padding: [10, 0]
-                            },
-                            count: {
-                                fontSize: 24,
-                                fontWeight: 'bold',
-                                color: '#0E7CE2',
-
-                            },
-                        },
-
-                    }
-                },{
-                    text: '{sub_title|其中有23.8%异常订单}',
-                    bottom: -15,
-                    left: 5,
-                    textStyle: {
-                        rich: {
-                            title: {
-                                fontSize: 18,
-                                fontWeight: 'bold',
-                                color: '#333333',
-
-                            },
-                            sub_title: {
-                                fontSize: 14,
-                                fontWeight: 'normal',
-                                color: '#666666',
-                                padding: [10, 0]
-                            },
-                            count: {
-                                fontSize: 24,
-                                fontWeight: 'bold',
-                                color: '#0E7CE2',
-
-                            },
-                        },
-
-                    }
-                }],
-                series: [{
-                    type: 'pie',
-                    radius: ['45%', '60%'],
-                    center: ['50%', '50%'],
-                    data: echartData,
-                    hoverAnimation: false,
-                    itemStyle: {
-                        normal: {
-                            borderColor: bgColor,
-                            borderWidth: 2
-                        }
-                    },
-                    labelLine: {
-                        normal: {
-                            length: 20,
-                            length2: 80,
-                            lineStyle: {
-                                color: '#e6e6e6'
-                            }
-                        }
-                    },
-                    label: {
-                        normal: {
-                            formatter: params => {
-                                return (
-                                    '{icon|●}{name|' + params.name + '}{value|' +
-                                    formatNumber(params.value) + '}'
-                                );
-                            },
-                            show:false,
-                            padding: [0 , -100, 25, -100],
-                            rich: {
-                                icon: {
-                                    fontSize: 12
-                                },
-                                name: {
-                                    fontSize: 12,
-                                    padding: [0, 10, 0, 4],
-                                    color: '#666666'
-                                },
-                                value: {
-                                    fontSize: 14,
-                                    fontWeight: 'bold',
-                                    color: '#333333'
-                                }
-                            }
-                        }
-                    },
-                }]
-            };
-            myCounts.setOption(option)
-        }
-   function draw_readings() {
-
+    function draw_counts( data ) {
         let bgColor = '#fff';
-        let title = '总量';
+        let title = '今日订单量';
         let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
-        let echartData = [{
-                name: "A类",
-                value: "3720"
-            },
-            {
-                name: "B类",
-                value: "2920"
-            },
-            {
-                name: "C类",
-                value: "2200"
-            },
-            {
-                name: "D类",
-                value: "1420"
-            }
-        ];
-
+        let echartData = data.counts;
+        let faults_count = data.faults;
         let formatNumber = function(num) {
             let reg = /(?=(\B)(\d{3})+$)/g;
             return num.toString().replace(reg, ',');
@@ -430,12 +234,59 @@
             return a + b.value * 1
         }, 0);
 
+        let legend_data = echartData.map(item=>item.name);
+
         option = {
             backgroundColor: bgColor,
             color: color,
-            // tooltip: {
-            //     trigger: 'item'
-            // },
+            tooltip: {
+                 trigger: 'item'
+             },
+            legend: {
+                orient: 'vertical',
+                bottom: 25,
+                itemGap: 12,            // 间隔
+                itemWidth: 10,          // 图形宽度。
+                itemHeight: 10,         // 图形高度。
+                left: "center",
+                data: legend_data,
+                formatter: function (name) {
+                    let cur_value = 0;
+                    for (let i = 0, len = echartData.length; i < len; i++) {
+                        if (echartData[i].name == name) {
+                            cur_value = echartData[i].value;
+                        }
+                    }
+                    let arr = [
+                        '{a|' + name + '}',
+                        '{b|' + ((total >0 ? cur_value / total: 0) * 100).toFixed(2) + '%}',
+                        '{c|' + cur_value + '单}'
+                    ];
+                    return arr.join('')
+                },
+                textStyle: {
+                    rich: {
+                        a: {
+                            fontSize: 12,
+                            verticalAlign: 'middle',
+                            align: 'left',
+                            padding: [0, 20, 0, 4]
+                        },
+                        b: {
+                            fontSize: 12,
+                            align: 'center',
+                            width: 80,
+                            padding: [0, 0, 0, 0],
+                        },
+                        c: {
+                            fontSize: 12,
+                            align: 'right',
+                            padding: [0, 4, 0, 20],
+                            {#lineHeight: 25#}
+                        }
+                    }
+                },
+            },
             title: [{
                 text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
                 top: 'center',
@@ -456,16 +307,60 @@
                     }
                 }
             },{
-                text: '单位：个',
-                top: 20,
-                left: 20,
+                text: '{title|'+ title +'}\n\n{sub_title|今日0:00-24:00创建的订单量(单)}\n' + '{count|' + total + '}',
+                top: 5,
+                left: 5,
                 textStyle: {
-                    fontSize: 14,
-                    color:'#666666',
-                    fontWeight: 400
+                    rich: {
+                        title: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+
+                        },
+                        sub_title: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        count: {
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                            color: '#0E7CE2',
+
+                        },
+                    },
+
+                }
+            },{
+                text: '{sub_title|其中有'+ ((total > 0 ? faults_count / total: 0) * 100).toFixed(2) +'%异常订单}',
+                bottom: -15,
+                left: "center",
+                textStyle: {
+                    rich: {
+                        title: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+
+                        },
+                        sub_title: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        count: {
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                            color: '#0E7CE2',
+
+                        },
+                    },
+
                 }
             }],
-
             series: [{
                 type: 'pie',
                 radius: ['45%', '60%'],
@@ -516,29 +411,17 @@
                 },
             }]
         };
-        myReadings.setOption(option)
+        myCounts.setOption(option)
     }
-   function draw_moneys() {
+   function draw_readings(data) {
 
         let bgColor = '#fff';
-        let title = '总量';
+        let title = '今日充电量';
         let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
         let echartData = [{
-                name: "A类",
-                value: "3720"
+                name: "00:00-24:00",
+                value: data
             },
-            {
-                name: "B类",
-                value: "2920"
-            },
-            {
-                name: "C类",
-                value: "2200"
-            },
-            {
-                name: "D类",
-                value: "1420"
-            }
         ];
 
         let formatNumber = function(num) {
@@ -549,12 +432,57 @@
             return a + b.value * 1
         }, 0);
 
+        let legend_data = echartData.map(item=>item.name);
+
         option = {
             backgroundColor: bgColor,
             color: color,
-            // tooltip: {
-            //     trigger: 'item'
-            // },
+             tooltip: {
+                 trigger: 'item'
+             },
+            legend: {
+                orient: 'vertical',
+                bottom: 45,
+                itemGap: 12,            // 间隔
+                itemWidth: 10,          // 图形宽度。
+                itemHeight: 10,         // 图形高度。
+                left: "center",
+                data: legend_data,
+                formatter: function (name) {
+                    let cur_value = 0;
+                    for (let i = 0, len = echartData.length; i < len; i++) {
+                        if (echartData[i].name == name) {
+                            cur_value = echartData[i].value;
+                        }
+                    }
+                    let arr = [
+                        '{a|' + name + '}',
+                        '{b|' + ((total >0 ? cur_value / total: 0) * 100).toFixed(2) + '%}',
+                        '{c|' + cur_value + '度}'
+                    ];
+                    return arr.join('')
+                },
+                textStyle: {
+                    rich: {
+                        a: {
+                            fontSize: 12,
+                            verticalAlign: 'middle',
+                            align: 'left',
+                            padding: [0, 20, 0, 4]
+                        },
+                        b: {
+                            fontSize: 12,
+                            align: 'center',
+                            padding: [0, 0, 0, 0],
+                        },
+                        c: {
+                            fontSize: 12,
+                            align: 'right',
+                            padding: [0, 4, 0, 20],
+                        }
+                    }
+                },
+            },
             title: [{
                 text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
                 top: 'center',
@@ -575,13 +503,216 @@
                     }
                 }
             },{
-                text: '单位：个',
-                top: 20,
-                left: 20,
+                text: '{title|'+ title +'}\n\n{sub_title|今日0:00-24:00充电总量(度)}\n' + '{count|' + total + '}',
+                top: 5,
+                left: 5,
                 textStyle: {
-                    fontSize: 14,
-                    color:'#666666',
-                    fontWeight: 400
+                    rich: {
+                        title: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+
+                        },
+                        sub_title: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        count: {
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                            color: '#0E7CE2',
+
+                        },
+                    },
+
+                }
+            }],
+
+            series: [{
+                type: 'pie',
+                radius: ['45%', '60%'],
+                center: ['50%', '50%'],
+                data: echartData,
+                hoverAnimation: false,
+                itemStyle: {
+                    normal: {
+                        borderColor: bgColor,
+                        borderWidth: 0
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        length: 20,
+                        length2: 80,
+                        lineStyle: {
+                            color: '#e6e6e6'
+                        }
+                    }
+                },
+                label: {
+                    normal: {
+                        formatter: params => {
+                            return (
+                                '{icon|●}{name|' + params.name + '}{value|' +
+                                formatNumber(params.value) + '}'
+                            );
+                        },
+                        show:false,
+                        padding: [0 , -100, 25, -100],
+                        rich: {
+                            icon: {
+                                fontSize: 12
+                            },
+                            name: {
+                                fontSize: 12,
+                                padding: [0, 10, 0, 4],
+                                color: '#666666'
+                            },
+                            value: {
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: '#333333'
+                            }
+                        }
+                    }
+                },
+            }]
+        };
+        myReadings.setOption(option)
+    }
+   function draw_moneys(data) {
+
+        let bgColor = '#fff';
+        let title = '今日营收';
+        let color = ['#F8456B', '#4AEAB0', '#00FFFF', '#0E7CE2', '#FF8352', '#E271DE', ];
+        let echartData = data.moneys;
+
+        let formatNumber = function(num) {
+            let reg = /(?=(\B)(\d{3})+$)/g;
+            return num.toString().replace(reg, ',');
+        };
+        let total = echartData.reduce((a, b) => {
+            return a + b.value * 1
+        }, 0);
+        let power_fees = data.total_power_fees;
+        let service_fees = data.total_service_fees;
+
+        let legend_data = echartData.map(item => item.name);
+
+        option = {
+            backgroundColor: bgColor,
+            color: color,
+             tooltip: {
+                 trigger: 'item'
+             },
+            legend: {
+                orient: 'vertical',
+                bottom: 25,
+                itemGap: 12,            // 间隔
+                itemWidth: 10,          // 图形宽度。
+                itemHeight: 10,         // 图形高度。
+                left: "center",
+                data: legend_data,
+                formatter: function (name) {
+                    let cur_value = 0;
+                    for (let i = 0, len = echartData.length; i < len; i++) {
+                        if (echartData[i].name == name) {
+                            cur_value = echartData[i].value;
+                        }
+                    }
+                    let arr = [
+                        '{a|' + name + '}',
+                        '{b|' + ((total >0 ? cur_value / total: 0) * 100).toFixed(2) + '%}',
+                        '{c|' + cur_value + '元}'
+                    ];
+                    return arr.join('')
+                },
+                textStyle: {
+                    rich: {
+                        a: {
+                            fontSize: 12,
+                            verticalAlign: 'middle',
+                            align: 'left',
+                            padding: [0, 20, 0, 4]
+                        },
+                        b: {
+                            fontSize: 12,
+                            align: 'center',
+                            width: 40,
+                            padding: [0, 0, 0, 0],
+                        },
+                        c: {
+                            fontSize: 12,
+                            align: 'right',
+                            padding: [0, 4, 0, 20],
+                            {#lineHeight: 25#}
+                        }
+                    }
+                },
+            },
+            title: [{
+                text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
+                top: 'center',
+                left: 'center',
+                textStyle: {
+                    rich: {
+                        name: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        val: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+                        }
+                    }
+                }
+            },{
+                text: '{title|'+ title +'}\n\n{sub_title|订单金额(元)}\n' + '{count|' + total + '}',
+                top: 5,
+                left: 5,
+                textStyle: {
+                    rich: {
+                        title: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+
+                        },
+                        sub_title: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        count: {
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                            color: '#0E7CE2',
+
+                        },
+                    },
+
+                }
+            },{
+                text: '\n\n\n{sub_title|电费: '+ power_fees +'\n服务费: ' + service_fees + '}',
+                top: 5,
+                right: 5,
+                textStyle: {
+                    rich: {
+                        sub_title: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [2, 0]
+                        },
+                    },
+
                 }
             }],
 
@@ -637,28 +768,12 @@
         };
         myMoneys.setOption(option)
     }
-   function draw_guns() {
+   function draw_guns(data) {
 
         let bgColor = '#fff';
-        let title = '总量';
+        let title = '充电枪状态';
         let color = ['#0E7CE2', '#FF8352', '#E271DE', '#F8456B', '#00FFFF', '#4AEAB0'];
-        let echartData = [{
-                name: "A类",
-                value: "3720"
-            },
-            {
-                name: "B类",
-                value: "2920"
-            },
-            {
-                name: "C类",
-                value: "2200"
-            },
-            {
-                name: "D类",
-                value: "1420"
-            }
-        ];
+        let echartData = data
 
         let formatNumber = function(num) {
             let reg = /(?=(\B)(\d{3})+$)/g;
@@ -668,12 +783,58 @@
             return a + b.value * 1
         }, 0);
 
+        let legend_data = echartData.map(item=>item.name);
+
         option = {
             backgroundColor: bgColor,
             color: color,
-            // tooltip: {
-            //     trigger: 'item'
-            // },
+             tooltip: {
+                 trigger: 'item'
+             },
+            legend: {
+                orient: 'vertical',
+                bottom: 0,
+                itemGap: 8,            // 间隔
+                itemWidth: 10,          // 图形宽度。
+                itemHeight: 10,         // 图形高度。
+                left: "center",
+                data: legend_data,
+                formatter: function (name) {
+                    let cur_value = 0;
+                    for (let i = 0, len = echartData.length; i < len; i++) {
+                        if (echartData[i].name == name) {
+                            cur_value = echartData[i].value;
+                        }
+                    }
+                    let arr = [
+                        '{a|' + name + '}',
+                        '{b|' + ((total >0 ? cur_value / total: 0) * 100).toFixed(2) + '%}',
+                        '{c|' + cur_value + '}'
+                    ];
+                    return arr.join('')
+                },
+                textStyle: {
+                    rich: {
+                        a: {
+                            fontSize: 12,
+                            verticalAlign: 'middle',
+                            align: 'left',
+                            width: 80,
+                        },
+                        b: {
+                            fontSize: 12,
+                            align: 'center',
+                            padding: [0, 20, 0, 20],
+                        },
+                        c: {
+                            fontSize: 12,
+                            align: 'right',
+                            padding: [0, 4, 0, 20],
+                            {#lineHeight: 25#}
+                        }
+                    }
+                },
+            },
             title: [{
                 text: '{name|' + title + '}\n{val|' + formatNumber(total) + '}',
                 top: 'center',
@@ -694,13 +855,31 @@
                     }
                 }
             },{
-                text: '单位：个',
-                top: 20,
-                left: 20,
+                text: '{title|'+ title +'}\n\n{sub_title|今日0:00-24:00充电枪状态}\n' + '{count|' + total + '}',
+                top: 5,
+                left: 5,
                 textStyle: {
-                    fontSize: 14,
-                    color:'#666666',
-                    fontWeight: 400
+                    rich: {
+                        title: {
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: '#333333',
+
+                        },
+                        sub_title: {
+                            fontSize: 14,
+                            fontWeight: 'normal',
+                            color: '#666666',
+                            padding: [10, 0]
+                        },
+                        count: {
+                            fontSize: 24,
+                            fontWeight: 'bold',
+                            color: '#0E7CE2',
+
+                        },
+                    },
+
                 }
             }],
 
