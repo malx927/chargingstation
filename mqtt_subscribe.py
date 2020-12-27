@@ -909,7 +909,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
 def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=None):
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
-        logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
+        # logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
 
         # if work_status is None and gun.charg_status_id == charg_status:     # 充电回复,更新充电状态
         #     logging.info("gun.charg_status_id == charg_status")
@@ -1497,7 +1497,7 @@ def calculate_order(**kwargs):
     order_status = kwargs.pop("status", 0)
     end_reading = kwargs.get("end_reading", 0)
 
-    logging.info(kwargs)
+    # logging.info(kwargs)
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
     except ChargingGun.DoesNotExist as ex:
@@ -1821,7 +1821,7 @@ def is_legal_message(byte_msg):
     byte_data = byte_msg
     head_flag = bytes.hex(byte_data[0:2])
     tail_flag = bytes.hex(byte_data[-2:])
-    logging.info("header:{}----tail:{}".format(head_flag, tail_flag))
+    # logging.info("header:{}----tail:{}".format(head_flag, tail_flag))
 
     if head_flag.upper() == 'AAAA' and tail_flag == "5555":
         # 去除转义符
