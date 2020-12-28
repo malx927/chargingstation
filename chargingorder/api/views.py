@@ -43,7 +43,15 @@ class OrderTodayStatusStats(APIView):
         # 昨日创建订单
         yesterday = datetime.datetime.now() + datetime.timedelta(days=-1)
         yesterday = yesterday.date()
-        yesterday_moneys = Order.objects.filter(begin_time__date=yesterday, end_time__date=cur_time).aggregate(total_moneys=Sum("consum_money"), power_fees=Sum("power_fee"), service_fees=Sum("service_fee"))
+
+        if self.request.user.station:
+            orders = Order.objects.filter(charg_pile__station=self.request.user.station)
+        elif self.request.user.seller:
+            orders = Order.objects.filter(charg_pile__station__seller=self.request.user.seller)
+        else:
+            orders = Order.objects.all()
+
+        yesterday_moneys = orders.filter(begin_time__date=yesterday, end_time__date=cur_time).aggregate(total_moneys=Sum("consum_money"), power_fees=Sum("power_fee"), service_fees=Sum("service_fee"))
 
         paid = {"name": "已支付", "value": paid_count}
         nopaid = {"name": "未支付", "value": nopaid_count}
