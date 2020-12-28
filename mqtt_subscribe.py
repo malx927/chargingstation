@@ -884,6 +884,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
     logging.info("订单号:{}".format(out_trade_no))
     # 充电状态
     charg_status = byte_msg[71]
+    logging.info("充电状态:{}".format(charg_status))
     begin_reading = byte2integer(byte_msg, 72, 76)
     # 保留（25字节）
 
