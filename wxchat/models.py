@@ -58,8 +58,6 @@ class UserInfo(models.Model):
     seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     id_card = models.CharField(verbose_name='身份证号', max_length=20, blank=True, default='')
     telephone = models.CharField(verbose_name='手机号码', max_length=18, blank=True, default='')
-    # ic_card = models.CharField(verbose_name='IC卡号', max_length=24, blank=True, default='')
-    # ic_pwd = models.CharField(verbose_name='IC卡秘钥', max_length=20, blank=True, default='')
     total_money = models.DecimalField(verbose_name='充值总额(元)', default=0, blank=True, max_digits=8, decimal_places=2, help_text='<font color=red>用户清零请将充值总额和消费总额设置为零</font>')
     consume_money = models.DecimalField(verbose_name='消费总额', default=0, blank=True, max_digits=8, decimal_places=2, help_text='<font color=red>用户清零请将充值总额和消费总额设置为零</font>')
     binding_amount = models.DecimalField(verbose_name='赠送金额(元)', default=0, blank=True, max_digits=6, decimal_places=2)

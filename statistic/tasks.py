@@ -16,6 +16,7 @@ from django_redis import get_redis_connection
 
 from chargingorder.models import Order, OrderChargDetail
 from stationmanager.models import ChargingPile
+from wxchat.models import UserInfo
 
 log = get_task_logger(__name__)
 
@@ -25,9 +26,10 @@ def get_hour_data(current_date, limit_hour=24):
     # 充电次数,充电量,充电金额
     charging_stats = Order.objects.filter(begin_time__date=current_date).extra(select={'hour': "HOUR(begin_time)"}).values("hour").annotate(count=Count("id"), readings=Sum("total_readings"), money=Sum("consum_money")).order_by("hour")
 
-    power_stats = OrderChargDetail.objects.filter(current_time__date=current_date) \
-        .extra(select={'hour': "HOUR(`current_time`)"}) \
-        .values("hour").annotate(power=Sum(F("output_voltage") * F("output_current")) / 1000).order_by("hour")
+    # 分时电力
+    # power_stats = OrderChargDetail.objects.filter(current_time__date=current_date) \
+    #     .extra(select={'hour': "HOUR(`current_time`)"}) \
+    #     .values("hour").annotate(power=Sum(F("output_voltage") * F("output_current")) / 1000).order_by("hour")
 
     count_results = {k: 0 for k in range(limit_hour)}
     readings_results = {k: 0 for k in range(limit_hour)}
@@ -38,16 +40,16 @@ def get_hour_data(current_date, limit_hour=24):
         readings_results[key] = int(item["readings"])
         money_results[key] = int(item["money"])
 
-    power_results = {k: 0 for k in range(limit_hour)}
-    for item in power_stats:
-        key = item["hour"]
-        power_results[key] = int(item["power"])
+    # power_results = {k: 0 for k in range(limit_hour)}
+    # for item in power_stats:
+    #     key = item["hour"]
+    #     power_results[key] = int(item["power"])
 
     dict_results = dict()
     dict_results["count"] = count_results
     dict_results["readings"] = readings_results
     dict_results["money"] = money_results
-    dict_results["power"] = power_results
+    # dict_results["power"] = power_results
 
     return dict_results
 
@@ -67,7 +69,7 @@ def charging_yesterday_data():
     conn.hmset("yd_yesterday_hour_count", yesterday_results.get("count"))
     conn.hmset("yd_yesterday_hour_readings", yesterday_results.get("readings"))
     conn.hmset("yd_yesterday_hour_money", yesterday_results.get("money"))
-    conn.hmset("yd_yesterday_hour_power", yesterday_results.get("power"))
+    # conn.hmset("yd_yesterday_hour_power", yesterday_results.get("power"))
 
     log.info('Leave update_yesterday_data task')
 
@@ -99,11 +101,19 @@ def charging_accumulative_total_stats():
     results = Order.objects.filter(status=2, consum_money__gt=0). \
         aggregate(accum_readings=Sum("total_readings"), accum_counts=Count("id"), accum_fees=Sum("consum_money"))
 
+    # 注册用户
+    person_counts = UserInfo.objects.count()
+    # 服务车辆
+    car_counts = UserInfo.objects.filter(Q(car_number__isnull=False) | Q(car_type__isnull=False)).count()
+
     conn = get_redis_connection("default")
 
     conn.set("yd_accum_readings", float(results.get("accum_readings", 0)))
     conn.set("yd_accum_counts", results.get("accum_counts", 0))
     conn.set("yd_accum_fees", float(results.get("accum_fees", 0)))
+    conn.set("yd_accum_fees", float(results.get("accum_fees", 0)))
+    conn.set("yd_person_counts", person_counts)
+    conn.set("yd_car_counts", car_counts)
 
     log.info('Leave charging_accumulative_total_stats task')
 
@@ -158,14 +168,14 @@ def real_time_power_stats():
 def charging_today_data():
     """当天充电次数、充电电量、充电金额、充电电力"""
     cur_date = datetime.datetime.now().date()
-    # yester_date = (datetime.datetime.now() + datetime.timedelta(days=-1)).date()
     today_totals = Order.objects.filter(charg_pile__isnull=False, begin_time__date=cur_date)\
         .aggregate(today_total_counts=Count("id"), today_total_readings=Sum("total_readings", output_field=FloatField()), today_total_money=Sum("consum_money", output_field=FloatField()))
     log.info(today_totals)
 
-    today_total_power = OrderChargDetail.objects.filter(current_time__date=cur_date) \
-        .aggregate(today_total_power=Sum(F("output_voltage") * F("output_current")) / 1000)
-    log.info(today_total_power)
+    # 今日电力合计
+    # today_total_power = OrderChargDetail.objects.filter(current_time__date=cur_date) \
+    #     .aggregate(today_total_power=Sum(F("output_voltage") * F("output_current")) / 1000)
+    # log.info(today_total_power)
 
     cur_date = datetime.datetime.now().date()
     cur_hour = datetime.datetime.now().hour + 1
@@ -176,20 +186,19 @@ def charging_today_data():
     today_total_counts = today_totals.get("today_total_counts") if today_totals.get("today_total_counts") is not None else 0
     today_total_readings = today_totals.get("today_total_readings") if today_totals.get("today_total_readings") is not None else 0
     today_total_money = today_totals.get("today_total_money") if today_totals.get("today_total_money") is not None else 0
-
-    today_total_power = today_total_power.get("today_total_power") if today_total_power.get("today_total_power") is not None else 0
+    # today_total_power = today_total_power.get("today_total_power") if today_total_power.get("today_total_power") is not None else 0
 
     conn.set("yd_today_total_counts", today_total_counts)
     conn.set("yd_today_total_readings", today_total_readings)
     conn.set("yd_today_total_money", today_total_money)
-    conn.set("yd_today_total_power", round(today_total_power, 2))
+    # conn.set("yd_today_total_power", round(today_total_power, 2))
 
     conn.delete("yd_today_hour_count")
     conn.delete("yd_today_hour_readings")
     conn.delete("yd_today_hour_money")
-    conn.delete("yd_today_hour_power")
+    # conn.delete("yd_today_hour_power")
     conn.hmset("yd_today_hour_count", today_results.get("count"))
     conn.hmset("yd_today_hour_readings", today_results.get("readings"))
     conn.hmset("yd_today_hour_money", today_results.get("money"))
-    conn.hmset("yd_today_hour_power", today_results.get("power"))
+    # conn.hmset("yd_today_hour_power", today_results.get("power"))
 

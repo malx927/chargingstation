@@ -113,8 +113,21 @@
                         </ul>
                     </div>
                 </div>
-
-                <div class="boxall">
+                <div class="bar">
+                    <div class="barbox">
+                        <ul class="clearfix">
+                            <li class="pulll_left counter" id="id_person_counts">0</li>
+                            <li class="pulll_left counter" id="id_car_counts">0</li>
+                        </ul>
+                    </div>
+                    <div class="barbox2">
+                        <ul class="clearfix">
+                            <li class="pulll_left">注册用户(人)</li>
+                            <li class="pulll_left">服务车辆(辆)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="boxall"  style="margin-top:.3rem">
                     <div class="alltitle">今日充电金额:  <span class="title" id="id_total_money">0</span>元</div>
                     <div id="id_today_money" class="boxcontent"></div>
                     <div class="boxfoot"></div>
@@ -143,7 +156,7 @@
                 </div>
             </li>
             <li>
-               <div class="boxall" style="margin-top:.3rem">
+               <div class="boxall">
                     <div class="alltitle">今日充电量:   <span class="title" id="id_total_readings">0</span>千瓦时</div>
                     <div id="id_today_readings" class="boxcontent"></div>
                     <div class="boxfoot"></div>
@@ -194,13 +207,19 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
+                  console.log(JSON.stringify(data));
+
                 $("#id_accum_counts").text(data.accum_counts);
                 $("#id_accum_readings").text(data.accum_readings.toFixed(2));
                 $("#id_device_counts").text(data.device_counts);
+                $("#id_person_counts").text(data.person_counts);
+                $("#id_car_counts").text(data.car_counts);
                 $('.counter').countUp();
                 $("#id_accum_counts").removeClass("counter");
                 $("#id_accum_readings").removeClass("counter");
                 $("#id_device_counts").removeClass("counter");
+                $("#id_person_counts").removeClass("counter");
+                $("#id_car_counts").removeClass("counter");
               },
               error: function(error){
                 console.log(JSON.stringify(error));
@@ -512,100 +531,100 @@
             });
         }
 
-        var today_power = echarts.init(document.getElementById('id_today_power'));
+        {#var today_power = echarts.init(document.getElementById('id_today_power'));#}
 
-        function today_power_stats(){
-            $.ajax({
-              type: 'GET',
-              url: '/stats/big_today_power_stats/',
-              dataType: 'json',
-              timeout: 5000,
-              success: function(data){
-                console.log(JSON.stringify(data));
-                $("#id_total_power").text(data.total_power);
-                var option = {
-                        title: {
-                            text: '今日充电电力曲线(KW)',
-                            textStyle: {
-                              color: '#ffffff',
-                              fontSize: 16,
-                            }
-                        },
-                        tooltip:{
-                            trigger: 'axis',
-                            axisPointer: {
-                                type: 'cross',
-                                label: {
-                                    backgroundColor: '#6a7985'
-                                }
-                            }
-                        },
-                        legend: {
-                            data:['今日', '昨日'],
-                             x: 'right',
-                            textStyle:{
-                                color: '#ffffff',
-                            }
-                        },
-                        xAxis: {
-                            type: 'category',
-                            boundaryGap : false,
-                            axisLabel:{
-                                interval:1,
-                                color: '#ffffff',
-                            },
-                            axisLine:{
-                                lineStyle:{
-                                    color: '#ffffff',
-                                },
-                            },
-                            data: data.hour_list,
-                        },
-                        yAxis: {
-                            type: 'value',
-                            axisLabel:{
-                                interval:1,
-                                color: '#ffffff',
-                            },
-                            axisLine:{
-                                lineStyle:{
-                                    color: '#ffffff',
-                                },
-                            },
-                        },
-                        series: [
-                            {
-                                name: '昨日',
-                                type: 'line',
-                                smooth: true,
-                                itemStyle:{
-                                  color: '#ffffff',
-                                },
-                                data: data.yesterday_power,
-                            },
-                            {
-                                name: '今日',
-                                type: 'line',
-                                smooth: true,
-                                itemStyle:{
-                                  color: '#ff5346',
-                                },
-                                data: data.today_power,
-                            },
-                        ]
-                    };
-                today_power.setOption(option);
-              },
-              error: function(error){
-                console.log(JSON.stringify(error));
-              }
-            });
-        }
+        {#function today_power_stats(){#}
+        {#    $.ajax({#}
+        {#      type: 'GET',#}
+        {#      url: '/stats/big_today_power_stats/',#}
+        {#      dataType: 'json',#}
+        {#      timeout: 5000,#}
+        {#      success: function(data){#}
+        {#        console.log(JSON.stringify(data));#}
+        {#        $("#id_total_power").text(data.total_power);#}
+        {#        var option = {#}
+        {#                title: {#}
+        {#                    text: '今日充电电力曲线(KW)',#}
+        {#                    textStyle: {#}
+        {#                      color: '#ffffff',#}
+        {#                      fontSize: 16,#}
+        {#                    }#}
+        {#                },#}
+        {#                tooltip:{#}
+        {#                    trigger: 'axis',#}
+        {#                    axisPointer: {#}
+        {#                        type: 'cross',#}
+        {#                        label: {#}
+        {#                            backgroundColor: '#6a7985'#}
+        {#                        }#}
+        {#                    }#}
+        {#                },#}
+        {#                legend: {#}
+        {#                    data:['今日', '昨日'],#}
+        {#                     x: 'right',#}
+        {#                    textStyle:{#}
+        {#                        color: '#ffffff',#}
+        {#                    }#}
+        {#                },#}
+        {#                xAxis: {#}
+        {#                    type: 'category',#}
+        {#                    boundaryGap : false,#}
+        {#                    axisLabel:{#}
+        {#                        interval:1,#}
+        {#                        color: '#ffffff',#}
+        {#                    },#}
+        {#                    axisLine:{#}
+        {#                        lineStyle:{#}
+        {#                            color: '#ffffff',#}
+        {#                        },#}
+        {#                    },#}
+        {#                    data: data.hour_list,#}
+        {#                },#}
+        {#                yAxis: {#}
+        {#                    type: 'value',#}
+        {#                    axisLabel:{#}
+        {#                        interval:1,#}
+        {#                        color: '#ffffff',#}
+        {#                    },#}
+        {#                    axisLine:{#}
+        {#                        lineStyle:{#}
+        {#                            color: '#ffffff',#}
+        {#                        },#}
+        {#                    },#}
+        {#                },#}
+        {#                series: [#}
+        {#                    {#}
+        {#                        name: '昨日',#}
+        {#                        type: 'line',#}
+        {#                        smooth: true,#}
+        {#                        itemStyle:{#}
+        {#                          color: '#ffffff',#}
+        {#                        },#}
+        {#                        data: data.yesterday_power,#}
+        {#                    },#}
+        {#                    {#}
+        {#                        name: '今日',#}
+        {#                        type: 'line',#}
+        {#                        smooth: true,#}
+        {#                        itemStyle:{#}
+        {#                          color: '#ff5346',#}
+        {#                        },#}
+        {#                        data: data.today_power,#}
+        {#                    },#}
+        {#                ]#}
+        {#            };#}
+        {#        today_power.setOption(option);#}
+        {#      },#}
+        {#      error: function(error){#}
+        {#        console.log(JSON.stringify(error));#}
+        {#      }#}
+        {#    });#}
+        {#}#}
         $(document).ready(function () {
             today_counts.resize();
             today_readings.resize();
             today_money.resize();
-            today_power.resize();
+            {#today_power.resize();#}
         });
         window.addEventListener("resize", function () {
             today_counts.resize();

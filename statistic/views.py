@@ -35,11 +35,15 @@ class BigScreenChargStatsAPIView(APIView):
         today_total_counts = conn.get("yd_today_total_counts")
         # accum_fees = conn.get("yd_accum_fees")
         device_counts = conn.get("yd_device_counts")
-        # print(today_total_readings, accum_readings, accum_counts, today_total_counts)
+        person_counts = conn.get("yd_person_counts")
+        car_counts = conn.get("yd_car_counts")
+
         results = dict()
         results["accum_readings"] = float(accum_readings) + float(today_total_readings)
         results["accum_counts"] = int(accum_counts) + int(today_total_counts)
         results["device_counts"] = device_counts
+        results["person_counts"] = person_counts if person_counts else 0
+        results["car_counts"] = car_counts if car_counts else 0
         logger.info(results)
         logger.info("Leave BigScreenChargStatsAPIView")
         return Response(results)
