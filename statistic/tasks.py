@@ -26,7 +26,7 @@ def get_hour_data(current_date, limit_hour=24):
     # 充电次数,充电量,充电金额
     charging_stats = Order.objects.filter(begin_time__date=current_date).extra(select={'hour': "HOUR(begin_time)"}).values("hour").annotate(count=Count("id"), readings=Sum("total_readings"), money=Sum("consum_money")).order_by("hour")
 
-    # 分时电力
+    # 电力数据
     # power_stats = OrderChargDetail.objects.filter(current_time__date=current_date) \
     #     .extra(select={'hour': "HOUR(`current_time`)"}) \
     #     .values("hour").annotate(power=Sum(F("output_voltage") * F("output_current")) / 1000).order_by("hour")
