@@ -37,7 +37,7 @@ class OrderTodayStatusStats(APIView):
         faults = queryset.filter(charg_status__fault=1).count()
         # print(paid_count, nopaid_count, charg_count, faults)
         # 今日充电量
-        readings = queryset.aggregate(readings=Sum("total_readings"))
+        total_readings = queryset.aggregate(readings=Sum("total_readings"))
         # 今日创建订单
         today_moneys = queryset.aggregate(total_moneys=Sum("consum_money"), power_fees=Sum("power_fee"), service_fees=Sum("service_fee"))
         # 昨日创建订单
@@ -74,7 +74,8 @@ class OrderTodayStatusStats(APIView):
         counts_dict["counts"] = counts_list
         results["order_counts"] = counts_dict
         # 充电量
-        results.update(readings)
+        readings = total_readings.get("readings", 0) if total_readings.get("readings", 0) else 0
+        results["readings"] = readings
         # 金额
         money_dict = dict()
         money_list = list()
