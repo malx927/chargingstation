@@ -1495,7 +1495,7 @@ def calculate_order(**kwargs):
     output_voltage = kwargs.get("output_voltage", 0)
     output_current = kwargs.get("output_current", 0)
     charg_status = kwargs.pop("charg_status", None)
-    order_status = kwargs.pop("status", 0)
+    order_status = kwargs.pop("status", None)       # 前端主动停止
     end_reading = kwargs.get("end_reading", 0)
 
     # logging.info(kwargs)
@@ -1600,7 +1600,8 @@ def calculate_order(**kwargs):
     order.charg_status = charg_status if charg_status is not None else gun.charg_status
     order.output_voltage = output_voltage
     order.output_current = output_current
-    order.status = order_status
+    if order_status:
+        order.status = order_status
     order.save(update_fields=['end_time', 'prev_reading', 'end_reading',
                               'total_readings', 'park_fee', 'power_fee', 'service_fee',
                               'consum_money', 'end_soc', 'charg_status', 'status', 'output_voltage', 'output_current'])
