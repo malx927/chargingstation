@@ -196,7 +196,7 @@ class OrderMonthStats(APIView):
 
         if month is None:  # 当月
             cur_time = datetime.datetime.now()
-            results = queryset.filter(begin_time__year=cur_time.year, begin_time__month=cur_time.month) \
+            results = queryset.filter(status=2, begin_time__year=cur_time.year, begin_time__month=cur_time.month) \
                 .aggregate(
                 readings=Sum("total_readings"),
                 counts=Count("id"),
@@ -206,7 +206,7 @@ class OrderMonthStats(APIView):
             )
         else:  # 任意月
             s_date = datetime.datetime.strptime(month, "%Y-%m")
-            results = queryset.filter(begin_time__year=s_date.year, begin_time__month=s_date.month) \
+            results = queryset.filter(status=2, begin_time__year=s_date.year, begin_time__month=s_date.month) \
                 .aggregate(
                 readings=Sum("total_readings"),
                 counts=Count("id"),
