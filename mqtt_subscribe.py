@@ -1514,12 +1514,12 @@ def calculate_order(**kwargs):
     charg_pile = gun.charg_pile
     if charg_pile.station is None:
         logging.warning("{}:电桩或电站的价格策略没有设置".format(charg_pile.station.name))
-        return None
+        return order
 
     price = get_charging_price(charg_pile.station.id, end_time)
     if price is None:
         logging.warning("{}充电桩价格不能为空.".format(charg_pile.station))
-        return None
+        return order
 
     try:
         currRec = OrderRecord.objects.get(out_trade_no=out_trade_no, price_begin_time=price.begin_time, price_end_time=price.end_time)
@@ -1748,7 +1748,10 @@ def pile_charging_stop_handler(topic, byte_msg):
             return
 
     # 用户账号扣款
-    user_account_deduct_money(order)
+    if order:
+        user_account_deduct_money(order)
+    else:
+        logging.info("订单不存在")
 
     # stop_code = 0 桩端主动停止
     if stop_code == 0:
