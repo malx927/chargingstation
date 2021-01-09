@@ -163,3 +163,26 @@ def charging_status_overtime():
 def order_charging_detail_remove():
     # 清理15天前的数据
     OrderChargDetail.objects.filter(update_time__lte=datetime.datetime.now() - datetime.timedelta(days=25)).delete()
+
+
+@shared_task
+def order_deduct():
+    print('Enter order_deduct')
+    for order in Order.objects.filter(charg_status_id=6):
+        end_time = order.end_time
+        current_time = datetime.datetime.now()
+        diff_hour = (current_time - end_time).total_seconds() / 3600
+        print("order_deduct:{}".format(diff_hour))
+        if diff_hour > 3:
+            print("order_deduct:订单{}".format(order.out_trade_no))
+            # 情况用户使用的电桩sn和枪口号
+            user_update_pile_gun(order.openid, order.start_model, None, None)
+
+            order.charg_status_id = 92       # 后台主动停止－通讯超时
+            order.status = 2
+            order.save(update_fields=["status", "charg_status"])
+
+            user_account_deduct_money(order)
+
+        time.sleep(0.5)
+    print('Leave order_deduct')

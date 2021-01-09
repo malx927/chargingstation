@@ -51,6 +51,10 @@ app.conf.update(
             'task': 'chargingorder.tasks.send_start_stop_cmd_overtime',
             'schedule': timedelta(seconds=5),
         },
+        'order_deduct_task': {
+            'task': 'chargingorder.tasks.order_deduct',
+            'schedule': timedelta(seconds=60),
+        },
         'charging_status_overtime_task': {
             'task': 'chargingorder.tasks.charging_status_overtime',
             'schedule': timedelta(seconds=5),
