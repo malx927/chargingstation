@@ -1,16 +1,12 @@
 # coding=utf8
+import datetime
 import os
 import time
 
-from django.db.models import Q
-from django.forms import CharField
-import qrcode
 from django.conf import settings
 from django.urls import reverse
-from django.utils.safestring import mark_safe
 
 from codingmanager.models import AreaCode
-from users.models import UserProfile
 from xadmin.sites import site
 from stationmanager.plugins import DashBoardPlugin, WarningPlugin
 import xadmin
@@ -572,6 +568,14 @@ class ChargingPriceAdmin(object):
                 kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)
 
         return super(ChargingPriceAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
+
+    def save_related(self):
+        obj = self.new_obj
+        super(ChargingPriceAdmin, self).save_related()
+        for inst in obj.prices.all():
+            if inst.end_time.hour == 23 and inst.end_time.minute == 59 and inst.end_time.second == 0:
+                inst.end_time = datetime.time(hour=23, minute=59, second=59, microsecond=0)
+                inst.save()
 
 
 xadmin.site.register(ChargingPrice, ChargingPriceAdmin)
