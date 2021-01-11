@@ -53,7 +53,7 @@ app.conf.update(
         },
         'order_deduct_task': {
             'task': 'chargingorder.tasks.order_deduct',
-            'schedule': crontab(minute='0', hour='12'),
+            'schedule': crontab(minute='40', hour='12'),
         },
         'charging_status_overtime_task': {
             'task': 'chargingorder.tasks.charging_status_overtime',
