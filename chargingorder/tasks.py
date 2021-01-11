@@ -169,6 +169,11 @@ def order_deduct():
     print('Enter order_deduct')
     for order in Order.objects.filter(Q(status=0) | Q(status=1), charg_status_id__lte=7, charg_status_id__gt=0):
         end_time = order.end_time
+        if end_time:
+            pass
+        else:
+            end_time = order.begin_time
+
         current_time = datetime.datetime.now()
         diff_hour = (current_time - end_time).total_seconds() / 3600
         print("order_deduct:{}".format(diff_hour))
@@ -177,7 +182,7 @@ def order_deduct():
             # 情况用户使用的电桩sn和枪口号
             user_update_pile_gun(order.openid, order.start_model, None, None)
 
-            order.charg_status_id = 92       # 后台主动停止－通讯超时
+            order.charg_status_id = 92  # 后台主动停止－通讯超时
             order.status = 2
             order.save(update_fields=["status", "charg_status"])
 
