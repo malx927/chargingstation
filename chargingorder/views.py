@@ -16,7 +16,7 @@ from django.views import View
 from django.views.generic import DetailView
 
 from stationmanager.models import ChargingPile, ChargingGun
-from chargingorder.models import Order, OrderRecord
+from chargingorder.models import Order, OrderRecord, Track
 from chargingstation import settings
 from chargingorder.mqtt import server_send_charging_cmd, server_send_stop_charging_cmd
 from wxchat.decorators import weixin_decorator
@@ -136,6 +136,9 @@ class RechargeView(View):
                     "gun_num": pile_gun.gun_num,
                     "balance": user_info.account_balance(),
                 }
+                # 记录扫描时间
+                request.session['qrcode_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
                 return render(request, template_name='chargingorder/recharge.html', context=context)  # 进入充电界面
             elif pile_gun.work_status in [1, 3]:         # 1-充电中 3-充电结束(未拔枪)
                 order = Order.objects.filter(openid=openid, out_trade_no=pile_gun.out_trade_no, status__lte=2).first()
@@ -224,6 +227,14 @@ class RechargeView(View):
         balance = int(order.balance * 100)
         logger.info("余额：{}".format(balance))
         data["balance"] = balance
+
+        # 记录用户发送充电请求操作
+        # qrcode_data = {
+        #     'oper_name': '扫描',
+        #     'oper_user': '用户',
+        #     'oper_time': request.session['qrcode_time'] or datetime.now()
+        # }
+        # Track.objects.create(**qrcode_data)
 
         server_send_charging_cmd(**data)
 

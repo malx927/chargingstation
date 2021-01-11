@@ -280,3 +280,17 @@ class ChargingStatusRecord(models.Model):
         verbose_name_plural = verbose_name
 
 
+class Track(models.Model):
+    """用户充电轨迹"""
+    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32, blank=True, null=True)
+    oper_name = models.CharField(verbose_name='执行操作', max_length=32, blank=True, null=True)
+    oper_user = models.CharField(verbose_name='执行者', max_length=32, blank=True, null=True)
+    oper_time = models.DateTimeField(verbose_name='执行时间', blank=True, null=True)
+    comments = models.CharField(verbose_name='备注', max_length=512, blank=True, null=True)
+
+    def __str__(self):
+        return self.oper_name
+
+    class Meta:
+        verbose_name = "用户充电轨迹"
+        verbose_name_plural = verbose_name
