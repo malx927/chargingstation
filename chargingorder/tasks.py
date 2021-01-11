@@ -2,23 +2,22 @@
 from __future__ import absolute_import, unicode_literals
 
 import decimal
-import json
-import random
+
 import logging
 import datetime
 import time
-from time import sleep
+
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from channels.layers import get_channel_layer
+
 from chargingorder.models import Order, ChargingStatusRecord, ChargingCmdRecord, OrderChargDetail
 from chargingorder.mqtt import server_publish, server_send_stop_charging_cmd
 from chargingorder.utils import send_data_to_client, user_account_deduct_money, user_update_pile_gun
 from chargingstation import settings
 from codingmanager.models import FaultCode
+from django.db.models import Q
 
 from stationmanager.models import ChargingGun
-from stationmanager.utils import connect_redis
 
 logging.basicConfig(level=logging.INFO, filename='./logs/celery.log',
                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s', filemode='a')
@@ -168,7 +167,7 @@ def order_charging_detail_remove():
 @shared_task
 def order_deduct():
     print('Enter order_deduct')
-    for order in Order.objects.filter(charg_status_id=6):
+    for order in Order.objects.filter(Q(status=0) | Q(status=1), charg_status_id__lte=7, charg_status_id__gt=0):
         end_time = order.end_time
         current_time = datetime.datetime.now()
         diff_hour = (current_time - end_time).total_seconds() / 3600
