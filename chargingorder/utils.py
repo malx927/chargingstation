@@ -8,7 +8,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from cards.models import ChargingCard
-from chargingorder.models import ChargingCmdRecord, GroupName
+from chargingorder.models import ChargingCmdRecord, GroupName, Track
 from chargingstation import settings
 from django.db.models import F
 from wxchat.models import UserInfo, UserAcountHistory, SubAccountConsume, GiftMoneyRecord, GiftConsumeRecord
@@ -214,6 +214,14 @@ def user_account_deduct_money(order):
         consum_money = order.consum_money
         openid = order.openid
         logging.info("启动方式：{},{}".format(order.start_model, consum_money))
+        log_data = {
+            'out_trade_no': order.out_trade_no,
+            'oper_name': '',
+            'oper_user': '后台',
+            'oper_time': datetime.datetime.now(),
+            'comments': '',
+        }
+
         if order.start_model == 1:      # 储值卡启动
             try:
                 card = ChargingCard.objects.get(face_num=openid)
@@ -224,8 +232,12 @@ def user_account_deduct_money(order):
                 order.cash_fee = consum_money
                 order.balance = card.money
                 order.save(update_fields=['pay_time', 'cash_fee', 'balance'])
+                log_data["oper_name"] = "储值卡结算"
+                log_data["comments"] = "订单金额:{},账户余额:{}".format(consum_money, card.money)
             except ChargingCard.DoesNotExist as ex:
                 logging.info(ex)
+                log_data["oper_name"] = "储值卡结算失败"
+                log_data["comments"] = "储值卡不存在"
         else:
             try:
                 user = UserInfo.objects.get(openid=openid)
@@ -246,8 +258,7 @@ def user_account_deduct_money(order):
                     }
                     logging.info(order_data)
                     SubAccountConsume.objects.create(**order_data)
-                    # UserInfo.objects.filter(openid=sub_account.main_user.openid).update(
-                    #     consume_money=F('consume_money') + consum_money)
+
                     account_balance_calc(user, consum_money, order.out_trade_no)
                 else:
                     his_data = {
@@ -262,6 +273,8 @@ def user_account_deduct_money(order):
                     # 扣款(余额扣款，不足则扣赠送金额)
                     # UserInfo.objects.filter(openid=openid).update(consume_money=F('consume_money') + consum_money)
                     account_balance_calc(user, consum_money, order.out_trade_no)
+                    log_data["oper_name"] = "微信结算"
+                    log_data["comments"] = "订单金额:{},账户余额:{}".format(consum_money, user.account_balance())
 
                 order.pay_time = datetime.datetime.now()
                 order.cash_fee = consum_money
@@ -271,6 +284,10 @@ def user_account_deduct_money(order):
                     send_charging_end_message_to_user(order)
             except UserInfo.DoesNotExist as ex:
                 logging.warning(ex)
+                log_data["oper_name"] = "微信结算失败"
+                log_data["comments"] = "用户不存在"
+
+            create_oper_log(**log_data)
     logging.info("---------------Leave user_account_deduct_money--------------------")
 
 
@@ -318,3 +335,8 @@ def user_update_pile_gun(openid, start_model, pile_sn, gun_num):
         UserInfo.objects.filter(openid=openid).update(pile_sn=pile_sn, gun_num=gun_num)
     elif start_model == 1:
         ChargingCard.objects.filter(card_num=openid).update(pile_sn=pile_sn, gun_num=gun_num)
+
+
+def create_oper_log(**kwargs):
+    # print(kwargs)
+    Track.objects.create(**kwargs)

@@ -18,7 +18,7 @@ __author__ = 'Administrator'
 logger = logging.getLogger("django")
 
 from .utils import get_32_byte, get_byte_daytime, get_pile_sn, byte2integer, uchar_checksum, get_data_nums, \
-    message_escape, save_charging_cmd_to_db, user_update_pile_gun
+    message_escape, save_charging_cmd_to_db, user_update_pile_gun, create_oper_log
 from codingmanager.constants import *
 
 SUB_TOPIC = 'sub'
@@ -110,6 +110,16 @@ def server_send_charging_cmd(*args, **kwargs):
     # 更新用户使用电桩情况，用于杜绝一卡多充的情况
     openid = kwargs.get("openid", None)
     user_update_pile_gun(openid, start_model, pile_sn, gun_num)
+
+    req_send_cmd_data = {
+        'out_trade_no': out_trade_no,
+        'oper_name': '发送启动命令',
+        'oper_user': '后台',
+        'oper_time': datetime.now(),
+        'comments': '后台向充电桩发送启动命令',
+    }
+    create_oper_log(**req_send_cmd_data)
+
     logger.info("Leave server_send_charging_cmd function")
 
 
@@ -185,5 +195,13 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     openid = kwargs.get("openid", None)
     start_model = kwargs.get("start_model", None)
     user_update_pile_gun(openid, start_model, None, None)
-
+    # 操作记录
+    req_send_cmd_data = {
+        'out_trade_no': out_trade_no,
+        'oper_name': '后台发送停止充电命令',
+        'oper_user': '后台',
+        'oper_time': datetime.now(),
+        'comments': '后台向充电桩发送停充命令[故障代码:{}]'.format(fault_code),
+    }
+    create_oper_log(**req_send_cmd_data)
     logger.info("Leave server_send_stop_charging_cmd function")

@@ -6,6 +6,7 @@ import json
 import random
 import decimal
 
+from chargingorder.utils import create_oper_log
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
@@ -229,12 +230,23 @@ class RechargeView(View):
         data["balance"] = balance
 
         # 记录用户发送充电请求操作
-        # qrcode_data = {
-        #     'oper_name': '扫描',
-        #     'oper_user': '用户',
-        #     'oper_time': request.session['qrcode_time'] or datetime.now()
-        # }
-        # Track.objects.create(**qrcode_data)
+        qrcode_data = {
+            'out_trade_no': out_trade_no,
+            'oper_name': '扫描',
+            'oper_user': '用户',
+            'oper_time': request.session['qrcode_time'] or datetime.now(),
+            'comments': ''
+        }
+        create_oper_log(**qrcode_data)
+
+        req_charg_data = {
+            'out_trade_no': out_trade_no,
+            'oper_name': '启动',
+            'oper_user': '用户',
+            'oper_time': datetime.now(),
+            'comments': '用户启动请求',
+        }
+        create_oper_log(**req_charg_data)
 
         server_send_charging_cmd(**data)
 
@@ -428,6 +440,16 @@ class OrderChargeStopView(View):
                 "start_model": order.start_model,
             }
             logger.info(stop_data)
+            # 操作记录
+            req_send_cmd_data = {
+                'out_trade_no': out_trade_no,
+                'oper_name': '用户发起停止充电请求',
+                'oper_user': '用户',
+                'oper_time': datetime.now(),
+                'comments': '用户向后台发送停止充电请求[故障代码:{}]'.format(stop_data["fault_code"]),
+            }
+            create_oper_log(**req_send_cmd_data)
+
             server_send_stop_charging_cmd(**stop_data)
         except Order.DoesNotExist as ex:
             logger.info(ex)

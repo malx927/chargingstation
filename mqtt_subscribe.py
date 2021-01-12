@@ -30,7 +30,7 @@ from stationmanager.models import ChargingPile, ChargingGun,  ChargingPrice
 from codingmanager.constants import *
 from chargingorder.utils import uchar_checksum, byte2integer, get_pile_sn, get_32_byte, get_byte_daytime, \
     get_data_nums, get_byte_version, get_datetime_from_byte, message_escape, save_charging_cmd_to_db, \
-    send_data_to_client, user_account_deduct_money, user_update_pile_gun, get_byte_date
+    send_data_to_client, user_account_deduct_money, user_update_pile_gun, get_byte_date, create_oper_log
 from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order,  OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
@@ -903,7 +903,14 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
 
     update_gun_order_status(**data)
     # 清除发送充电命令超时判断
-
+    # req_reply_cmd_data = {
+    #     'out_trade_no': out_trade_no,
+    #     'oper_name': '电桩回复充电命令',
+    #     'oper_user': '充电桩',
+    #     'oper_time': datetime.datetime.now(),
+    #     'comments': '充电桩响应充电命令',
+    # }
+    # create_oper_log(**req_reply_cmd_data)
     logging.info("Leave pile_reply_charging_cmd_handler")
 
 
@@ -1069,6 +1076,14 @@ def pile_report_car_info_handler(topic, byte_msg):
     }
     logging.info(save_data)
     update_order_car_info(**save_data)
+    # log_data = {
+    #     'out_trade_no': out_trade_no,
+    #     'oper_name': '电桩上传车辆信息',
+    #     'oper_user': '充电桩',
+    #     'oper_time': datetime.datetime.now(),
+    #     'comments': '直流桩上传充电车辆信息',
+    # }
+    # create_oper_log(**log_data)
 
 
 def get_charging_price(station_id, curTime):
@@ -1259,6 +1274,16 @@ def pile_charging_status_handler(topic, byte_msg):
         prev_reading = order.prev_reading if order.prev_reading >= order.begin_reading else order.begin_reading
         order.prev_reading = curr_readings
         order.save(update_fields=['prev_reading'])
+        # 记录充电过程
+        # if order.end_time is None:
+        #     req_charging_data = {
+        #         'out_trade_no': out_trade_no,
+        #         'oper_name': '进入充电中',
+        #         'oper_user': '充电桩',
+        #         'oper_time': datetime.datetime.now(),
+        #         'comments': '充电桩开始上传充电数据',
+        #     }
+        #     create_oper_log(**req_charging_data)
     except Order.DoesNotExist as ex:
         logging.warning("{}订单不存在".format(out_trade_no))
 
@@ -1298,6 +1323,7 @@ def pile_charging_status_handler(topic, byte_msg):
     }
     logging.info(org_data)
     OrderChargDetail.objects.create(**org_data)
+
     save_pile_charg_status_to_db(**data)
 
     charg_pile = ChargingPile.objects.filter(pile_sn=pile_sn).first()
@@ -1673,6 +1699,14 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     # 保存停止充电指令
     if stop_code == 0:
         save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "stop")
+        # req_send_cmd_data = {
+        #     'out_trade_no': out_trade_no,
+        #     'oper_name': '发送停止充电命令',
+        #     'oper_user': '后台',
+        #     'oper_time': datetime.datetime.now(),
+        #     'comments': '后台向充电桩发送停充命令[故障代码:{}]'.format(fault_code),
+        # }
+        # create_oper_log(**req_send_cmd_data)
 
     openid = kwargs.get("openid", None)
     start_model = kwargs.get("start_model", None)
@@ -1736,6 +1770,14 @@ def pile_charging_stop_handler(topic, byte_msg):
     # 订单计算(前端主动停止)
     if stop_code == 0:
         order = calculate_order(**data)
+        # req_send_cmd_data = {
+        #     'out_trade_no': out_trade_no,
+        #     'oper_name': '充电桩发送停止充电命令',
+        #     'oper_user': '充电桩',
+        #     'oper_time': datetime.datetime.now(),
+        #     'comments': '充电桩向后台发送停充命令[故障代码:{}]'.format(fault_code),
+        # }
+        # create_oper_log(**req_send_cmd_data)
     else:
         try:
             order = Order.objects.get(out_trade_no=out_trade_no, status__lt=2)
