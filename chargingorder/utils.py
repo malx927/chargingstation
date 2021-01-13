@@ -338,5 +338,5 @@ def user_update_pile_gun(openid, start_model, pile_sn, gun_num):
 
 
 def create_oper_log(**kwargs):
-    # print(kwargs)
+    logging.info(kwargs)
     Track.objects.create(**kwargs)
