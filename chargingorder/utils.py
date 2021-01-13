@@ -287,7 +287,7 @@ def user_account_deduct_money(order):
                 log_data["oper_name"] = "微信结算失败"
                 log_data["comments"] = "用户不存在"
 
-            create_oper_log(**log_data)
+        create_oper_log(**log_data)
     logging.info("---------------Leave user_account_deduct_money--------------------")
 
 
