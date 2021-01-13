@@ -232,7 +232,7 @@ class RechargeView(View):
         # 记录用户发送充电请求操作
         qrcode_data = {
             'out_trade_no': out_trade_no,
-            'oper_name': '扫描',
+            'oper_name': '扫码',
             'oper_user': '用户',
             'oper_time': request.session['qrcode_time'] or datetime.now(),
             'comments': ''
@@ -244,7 +244,7 @@ class RechargeView(View):
             'oper_name': '启动',
             'oper_user': '用户',
             'oper_time': datetime.now(),
-            'comments': '用户启动请求',
+            'comments': '用户发送启动请求',
         }
         create_oper_log(**req_charg_data)
 
