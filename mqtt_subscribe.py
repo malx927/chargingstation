@@ -898,19 +898,19 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
         "status": 1,  # 未结帐
     }
     logging.info(data)
-
+    # 清除发送充电命令超时判断
     ChargingCmdRecord.objects.filter(out_trade_no=out_trade_no, pile_sn=pile_sn, cmd_flag="start").delete()
 
     update_gun_order_status(**data)
-    # 清除发送充电命令超时判断
-    # req_reply_cmd_data = {
-    #     'out_trade_no': out_trade_no,
-    #     'oper_name': '电桩回复充电命令',
-    #     'oper_user': '充电桩',
-    #     'oper_time': datetime.datetime.now(),
-    #     'comments': '充电桩响应充电命令',
-    # }
-    # create_oper_log(**req_reply_cmd_data)
+
+    req_reply_cmd_data = {
+        'out_trade_no': out_trade_no,
+        'oper_name': '电桩回复充电命令',
+        'oper_user': '充电桩',
+        'oper_time': datetime.datetime.now(),
+        'comments': '充电桩响应后台充电命令',
+    }
+    create_oper_log(**req_reply_cmd_data)
     logging.info("Leave pile_reply_charging_cmd_handler")
 
 
@@ -1076,14 +1076,14 @@ def pile_report_car_info_handler(topic, byte_msg):
     }
     logging.info(save_data)
     update_order_car_info(**save_data)
-    # log_data = {
-    #     'out_trade_no': out_trade_no,
-    #     'oper_name': '电桩上传车辆信息',
-    #     'oper_user': '充电桩',
-    #     'oper_time': datetime.datetime.now(),
-    #     'comments': '直流桩上传充电车辆信息',
-    # }
-    # create_oper_log(**log_data)
+    log_data = {
+        'out_trade_no': out_trade_no,
+        'oper_name': '电桩上传车辆信息',
+        'oper_user': '充电桩',
+        'oper_time': datetime.datetime.now(),
+        'comments': '直流桩上传充电车辆信息',
+    }
+    create_oper_log(**log_data)
 
 
 def get_charging_price(station_id, curTime):
@@ -1275,15 +1275,15 @@ def pile_charging_status_handler(topic, byte_msg):
         order.prev_reading = curr_readings
         order.save(update_fields=['prev_reading'])
         # 记录充电过程
-        # if order.end_time is None:
-        #     req_charging_data = {
-        #         'out_trade_no': out_trade_no,
-        #         'oper_name': '进入充电中',
-        #         'oper_user': '充电桩',
-        #         'oper_time': datetime.datetime.now(),
-        #         'comments': '充电桩开始上传充电数据',
-        #     }
-        #     create_oper_log(**req_charging_data)
+        if order.end_time is None:
+            req_charging_data = {
+                'out_trade_no': out_trade_no,
+                'oper_name': '进入充电中',
+                'oper_user': '充电桩',
+                'oper_time': datetime.datetime.now(),
+                'comments': '充电桩开始上传充电数据',
+            }
+            create_oper_log(**req_charging_data)
     except Order.DoesNotExist as ex:
         logging.warning("{}订单不存在".format(out_trade_no))
 
