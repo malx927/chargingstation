@@ -6,7 +6,7 @@ from django.urls import reverse
 from stationmanager.models import Station, ChargingPile
 import xadmin
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText, Col, TabHolder, Tab
-from .models import Order, OrderRecord, OrderChargDetail, ChargingOrder
+from .models import Order, OrderRecord, OrderChargDetail, ChargingOrder, Track
 
 CHARG_STATUS = 6    # 充电中编码
 
@@ -396,3 +396,13 @@ class OrderChargDetailAdmin(object):
 
 
 xadmin.site.register(OrderChargDetail, OrderChargDetailAdmin)
+
+
+class TrackAdmin(object):
+    list_display = ['out_order_no', 'oper_name', 'oper_user', 'oper_time', 'comments']
+    search_fields = ['out_trade_no']
+    list_per_page = 50
+    model_icon = 'fa fa-file-text'
+
+
+xadmin.site.register(Track, TrackAdmin)
