@@ -599,6 +599,16 @@ def pile_card_charging_request_hander(topic, byte_msg):
                 "fault_code": 0,
                 "start_model": order.start_model,
             }
+
+            req_reply_cmd_data = {
+                'out_trade_no': order.out_trade_no,
+                'oper_name': '刷卡停充请求',
+                'oper_user': '充电桩',
+                'oper_time': datetime.datetime.now(),
+                'comments': '充电桩向后台发送刷卡停充请求',
+            }
+            create_oper_log(**req_reply_cmd_data)
+
             server_send_stop_charging_cmd(**stop_data)
 
     if oper_type == 1 and card.money > settings.ACCOUNT_BALANCE:
@@ -649,6 +659,16 @@ def pile_card_charging_request_hander(topic, byte_msg):
         data["charging_policy_value"] = charging_policy_value
         data["balance"] = int(card.money * 100)
         logging.info(data)
+
+        req_reply_cmd_data = {
+            'out_trade_no': out_trade_no,
+            'oper_name': '刷卡充电请求',
+            'oper_user': '充电桩',
+            'oper_time': datetime.datetime.now(),
+            'comments': '充电桩向后台发送刷卡充电请求',
+        }
+        create_oper_log(**req_reply_cmd_data)
+
         server_send_charging_cmd(**data)
 
     logging.info("0x83 Leave pile_card_charging_request_hander")
@@ -857,6 +877,16 @@ def server_send_charging_cmd(*args, **kwargs):
     # 更新用户使用电桩情况，用于杜绝一卡多充的情况
     openid = kwargs.get("openid", None)
     user_update_pile_gun(openid, start_model, pile_sn, gun_num)
+
+    req_send_cmd_data = {
+        'out_trade_no': out_trade_no,
+        'oper_name': '发送启动命令.',
+        'oper_user': '后台',
+        'oper_time': datetime.datetime.now(),
+        'comments': '后台向充电桩发送启动命令.',
+    }
+    create_oper_log(**req_send_cmd_data)
+
     logging.info("Leave server_send_charging_cmd function")
 
 
@@ -1699,14 +1729,14 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     # 保存停止充电指令
     if stop_code == 0:
         save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "stop")
-        # req_send_cmd_data = {
-        #     'out_trade_no': out_trade_no,
-        #     'oper_name': '发送停止充电命令',
-        #     'oper_user': '后台',
-        #     'oper_time': datetime.datetime.now(),
-        #     'comments': '后台向充电桩发送停充命令[故障代码:{}]'.format(fault_code),
-        # }
-        # create_oper_log(**req_send_cmd_data)
+        req_send_cmd_data = {
+            'out_trade_no': out_trade_no,
+            'oper_name': '发送停止充电命令。',
+            'oper_user': '后台',
+            'oper_time': datetime.datetime.now(),
+            'comments': '后台向充电桩发送停充命令.[故障代码:{}]'.format(fault_code),
+        }
+        create_oper_log(**req_send_cmd_data)
 
     openid = kwargs.get("openid", None)
     start_model = kwargs.get("start_model", None)
@@ -1770,14 +1800,14 @@ def pile_charging_stop_handler(topic, byte_msg):
     # 订单计算(前端主动停止)
     if stop_code == 0:
         order = calculate_order(**data)
-        # req_send_cmd_data = {
-        #     'out_trade_no': out_trade_no,
-        #     'oper_name': '充电桩发送停止充电命令',
-        #     'oper_user': '充电桩',
-        #     'oper_time': datetime.datetime.now(),
-        #     'comments': '充电桩向后台发送停充命令[故障代码:{}]'.format(fault_code),
-        # }
-        # create_oper_log(**req_send_cmd_data)
+        req_send_cmd_data = {
+            'out_trade_no': out_trade_no,
+            'oper_name': '充电桩发送停止充电命令',
+            'oper_user': '充电桩',
+            'oper_time': datetime.datetime.now(),
+            'comments': '充电桩向后台发送停充命令[故障代码:{}, 运行状态码:{}]'.format(fault_code, state_code),
+        }
+        create_oper_log(**req_send_cmd_data)
     else:
         try:
             order = Order.objects.get(out_trade_no=out_trade_no, status__lt=2)

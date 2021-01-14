@@ -9,15 +9,13 @@ from chargingorder.models import Order
 from chargingorder.mqtt import server_send_charging_cmd, server_send_stop_charging_cmd
 from chargingstation import settings
 from django.db.models import Q, Sum, F
-from django.http import HttpResponse
 
-from .models import StationInfo, ConnectorInfo, OperatorInfo, EquipmentInfo, Token
+from .models import StationInfo, ConnectorInfo, Token
 from .paginations import PagePagination
 from .serializers import StationInfoSerializer, StationStatusInfoSerializer
-from .utils import get_hmac_md5, data_encode, data_decode, req_signature_check, EchargeNet, get_order_status, \
+from .utils import get_hmac_md5, data_encode, data_decode, get_order_status, \
     get_equipment_connector_status
-from .tasks import notification_start_charge_result, notification_stop_charge_result
-from rest_framework.generics import ListAPIView
+
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
