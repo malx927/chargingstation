@@ -199,7 +199,7 @@ class ChargingPile(models.Model):
     max_gun = models.IntegerField(verbose_name='最大枪口数', blank=True, default=0)
     fireware = models.CharField(verbose_name='固件版本', max_length=24, blank=True, null=True)
     business_mode = models.IntegerField(verbose_name='运营属性', blank=True, null=True, choices=BUSINESS_MODE)
-    station = models.ForeignKey(Station, verbose_name='所属充电站', on_delete=models.SET_NULL, blank=True, null=True, db_constraint=False)
+    station = models.ForeignKey(Station, verbose_name='充电站', on_delete=models.SET_NULL, blank=True, null=True, db_constraint=False)
     power = models.DecimalField(verbose_name='充电设备总功率', max_digits=7, decimal_places=1, default=0)
     symbol_4g = models.NullBooleanField(verbose_name='4G使用标志', blank=True, null=True)
     symbol_eth = models.NullBooleanField(verbose_name='ETH使用标志', blank=True, null=True)
