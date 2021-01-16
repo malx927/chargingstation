@@ -166,7 +166,7 @@ class OrderAdmin(object):
         'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'charg_status', 'status', 'report_result', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid', 'car_type']
-    list_filter = ['charg_pile__station', 'charg_pile', 'charg_mode', 'charg_status', 'begin_time', 'status', 'report_result']
+    list_filter = ['charg_pile__station__seller', 'charg_pile__station', 'charg_pile', 'charg_mode', 'charg_status', 'begin_time', 'status', 'report_result']
     exclude = ['charg_type']
     date_hierarchy = 'begin_time'
     list_per_page = 50
