@@ -1,0 +1,22 @@
+<table class="table table-striped ">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>执行操作</th>
+          <th>执行者</th>
+          <th>执行时间</th>
+          <th>备注</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for track in tracks %}
+        <tr>
+          <th scope="row">{{forloop.counter}}</th>
+          <td>{{ track.oper_name }}</td>
+          <td>{{ track.oper_user }}</td>
+          <td>{{ track.oper_time }}</td>
+          <td>{{ track.comments }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+</table>

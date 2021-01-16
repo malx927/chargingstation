@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from wxchat.views import OrderPayView, pay_notify
 
 from .views import index, RechargeView, RechargeOrderStatusView, ChargingStatusView, ChargingStatusDetailView, \
-   OrderChargeStopView, OrderView, OrderDetailView
+   OrderChargeStopView, OrderView, OrderDetailView, ChargingTrackListView
 
 urlpatterns = [
    url(r'^$', index, name='order-index'),
@@ -20,6 +20,7 @@ urlpatterns = [
    url(r'chargestop/$', OrderChargeStopView.as_view(), name='order-charge-stop'),
    url(r'orderlist/$', OrderView.as_view(), name='user-order-list'),
    url(r'orderdetail/(?P<pk>\d+)/$', OrderDetailView.as_view(), name='user-order-detail'),
+   url(r'charging_track/$', ChargingTrackListView.as_view(), name='charging-track-list'),
 
    # url(r'^chargingstatus/$', ChargingStatusView.as_view(), name='pile-charging-status'),
    # url(r'^chargingstatusdetail/$', ChargingStatusDetailView.as_view(), name='pile-charging-status-detail'),

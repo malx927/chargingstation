@@ -475,3 +475,15 @@ class OrderDetailView(DetailView):
     model = Order
     template_name = 'weixin/user_order_detail.html'
 
+
+class ChargingTrackListView(View):
+    """订单充电操作轨迹"""
+    def get(self, request, *args, **kwargs):
+        out_trade_no = request.GET.get("out_trade_no")
+
+        tracks = Track.objects.filter(out_trade_no=out_trade_no).order_by("oper_time")
+
+        context = {
+            "tracks": tracks
+        }
+        return render(request, template_name="chargingorder/include/charging_track.html", context=context)

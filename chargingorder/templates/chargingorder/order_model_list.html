@@ -167,9 +167,16 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">充电监控曲线</h4>
+                    <h4 class="modal-title" id="myModalLabel">充电监控</h4>
                 </div>
                 <div class="modal-body">
+                  <ul class="nav nav-tabs">
+                    <li class="active"><a href="#curve" data-toggle="tab">充电曲线</a></li>
+                    <li ><a href="#track" data-toggle="tab">操作轨迹</a></li>
+                  </ul>
+                  <!-- Tab panes -->
+                  <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="curve">
                     <table class="table">
                       <thead>
                         <tr>
@@ -191,6 +198,12 @@
                       </tbody>
                     </table>
                     <div id="id_curve" style="width: 960px; height: 450px;"></div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="track">
+
+                    </div>
+                  </div>
+
                 </div>
                 <div class="modal-footer">
 {#                    <button type="submit" class="btn btn-primary" data-dismiss="modal" id="save-edit-btn">退款</button>#}
@@ -204,7 +217,16 @@
         $('#myModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var uri = button.attr('data-uri');
+            uri = uri.substring(0, uri.lastIndexOf('/'));
+
             const id_curve = echarts.init(document.getElementById('id_curve'));
+            var out_trade_no = uri.split('/').pop();
+            var track_uri = '{% url 'charging-track-list' %}?out_trade_no=' + out_trade_no;
+            $(this).find('#track').load(track_uri, function (response, status, xhr) {
+                if (status === "error") {
+                    console.log("error");
+                }
+            });
 
             $.ajax({
                 type: 'GET',
