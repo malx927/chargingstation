@@ -284,6 +284,8 @@ class RechargeView(View):
             "start_model": 0,
             "charg_mode": charg_mode,
             "out_trade_no": out_trade_no,
+            "seller_id": gun.charg_pile.station.seller_id,
+            "station": gun.charg_pile.station,
             "charg_pile": gun.charg_pile,
             "gun": gun,
             "balance": balance,
