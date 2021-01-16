@@ -5,7 +5,7 @@ from django.db import models
 from codingmanager.constants import *
 from codingmanager.models import FaultCode
 from django.urls import reverse
-from stationmanager.models import ChargingPile
+from stationmanager.models import ChargingPile, Seller, Station
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from wxchat.models import UserInfo
@@ -22,6 +22,8 @@ class Order(models.Model):
     out_trade_no = models.CharField(verbose_name='订单编号', max_length=32, db_index=True)  # 电桩编号 + YYYYMMDD + random
     openid = models.CharField(verbose_name='用户ID(openid)', max_length=64, blank=True, null=True,)
     name = models.CharField(verbose_name='姓名(或昵称)', max_length=64, blank=True, null=True,)
+    seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
+    station = models.ForeignKey(Station, verbose_name='充电站', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True,)
     protocol = models.IntegerField(verbose_name='充电国标协议', choices=INTER_PROTOCAL, blank=True, null=True)

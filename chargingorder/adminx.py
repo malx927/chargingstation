@@ -162,7 +162,7 @@ xadmin.site.register(ChargingOrder, ChargingOrderAdmin)
 # 订单admin
 class OrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
+        'out_trade_no', 'name', 'charg_mode', 'station_name', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
         'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'charg_status', 'status', 'report_result', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid', 'car_type']
@@ -270,11 +270,11 @@ class OrderAdmin(object):
     curve.allow_tags = True
     curve.is_column = True
 
-    def station(self, obj):
+    def station_name(self, obj):
         return obj.charg_pile.station.name
-    station.short_description = '充电站'
-    station.allow_tags = True
-    station.is_column = True
+    station_name.short_description = '充电站'
+    station_name.allow_tags = True
+    station_name.is_column = True
 
     def queryset(self):
         queryset = super(OrderAdmin, self).queryset()
