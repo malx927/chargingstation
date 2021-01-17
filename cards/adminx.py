@@ -310,9 +310,9 @@ class CardOrderAdmin(object):
         queryset = super().queryset()
 
         if self.request.user.station:
-            return queryset.filter(charg_pile__station=self.request.user.station, start_model=1)
+            return queryset.filter(station=self.request.user.station, start_model=1)
         elif self.request.user.seller:
-            return queryset.filter(charg_pile__station__seller=self.request.user.seller, start_model=1)
+            return queryset.filter(seller=self.request.user.seller, start_model=1)
         else:
             return queryset.filter(start_model=1)
 

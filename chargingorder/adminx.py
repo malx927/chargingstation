@@ -115,9 +115,9 @@ class ChargingOrderAdmin(object):
         queryset = super().queryset()
 
         if self.request.user.station:
-            return queryset.filter(charg_pile__station=self.request.user.station, charg_status_id=CHARG_STATUS).exclude(status=2)
+            return queryset.filter(station=self.request.user.station, charg_status_id=CHARG_STATUS).exclude(status=2)
         elif self.request.user.seller:
-            return queryset.filter(charg_pile__station__seller=self.request.user.seller, charg_status_id=CHARG_STATUS).exclude(status=2)
+            return queryset.filter(seller=self.request.user.seller, charg_status_id=CHARG_STATUS).exclude(status=2)
         else:
             return queryset.filter(charg_status_id=CHARG_STATUS).exclude(status=2)
 
@@ -281,9 +281,9 @@ class OrderAdmin(object):
     def queryset(self):
         queryset = super(OrderAdmin, self).queryset()
         if self.request.user.station:
-            return queryset.filter(charg_pile__station=self.request.user.station)
+            return queryset.filter(station=self.request.user.station)
         elif self.request.user.seller:
-            return queryset.filter(charg_pile__station__seller=self.request.user.seller)
+            return queryset.filter(seller=self.request.user.seller)
         else:
             return queryset
 
