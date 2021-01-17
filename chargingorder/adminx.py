@@ -2,11 +2,12 @@
 import decimal
 import logging
 from django.contrib import admin
+from django.db.models import Q
 from django.urls import reverse
 from stationmanager.models import Station, ChargingPile
 import xadmin
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText, Col, TabHolder, Tab
-from .models import Order, OrderRecord, OrderChargDetail, ChargingOrder, Track
+from .models import Order, OrderRecord, OrderChargDetail, ChargingOrder, Track, UnusualOrder
 
 CHARG_STATUS = 6    # 充电中编码
 
@@ -158,6 +159,139 @@ class ChargingOrderAdmin(object):
 
 
 xadmin.site.register(ChargingOrder, ChargingOrderAdmin)
+
+
+class UnusualOrderAdmin(object):
+    list_display = [
+        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time',
+        'consum_money', 'power_fee', 'service_fee', 'charg_status', 'curve'
+    ]
+    search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
+    list_filter = ['charg_status', 'begin_time', 'status']
+    exclude = ['charg_type']
+    list_per_page = 50
+    model_icon = 'fa fa-file-text'
+    show_all_rel_details = False
+    relfield_style = 'fk_ajax'
+    object_list_template = "chargingorder/order_model_list.html"
+
+    form_layout = (
+        Main(
+            Fieldset(
+                '订单信息',
+                Row('out_trade_no', 'name'),
+                Row('seller', 'station'),
+                Row('charg_pile', 'gun_num'),
+                Row('charg_mode', 'protocol'),
+                Row('start_model', 'openid'),
+                Row(
+                    AppendedText('total_fee', '元'),
+                    AppendedText('charg_min_val', '分钟'),
+                ),
+                Row(
+                    AppendedText('charg_soc_val', '%'),
+                    AppendedText('charg_reading_val', '度'),
+                ),
+            ),
+            Fieldset(
+                '充电信息',
+                Row(
+                    AppendedText('begin_soc', '%'),
+                    AppendedText('end_soc', '%'),
+                ),
+                Row(
+                    'begin_time',
+                    'end_time',
+                ),
+                Row(
+                    AppendedText('begin_reading', '度'),
+                    AppendedText('end_reading', '度')
+                ),
+                Row(
+                    AppendedText('total_readings', 'KWH'),
+                    AppendedText('park_fee', '元'),
+                ),
+                Row(
+                    AppendedText('power_fee', '元'),
+                    AppendedText('service_fee', '元'),
+                ),
+            ),
+            Fieldset(
+                '支付情况',
+                Row(
+                    AppendedText('cash_fee', '元'),
+                    AppendedText('consum_money', '元'),
+                ),
+                Row(
+                    'transaction_id',
+                    'pay_time',
+                ),
+                Row(
+                    'balance',
+                    'main_openid',
+                ),
+            ),
+            Fieldset(
+                '充电状态信息',
+                 Row('charg_status', 'status'),
+            ),
+        ),
+        Side(
+            Fieldset(
+                '车辆信息',
+                'car_type',
+                'vin_code',
+                AppendedText('max_current', '安'),
+                AppendedText('max_voltage', '伏'),
+                AppendedText('max_single_voltage', '伏'),
+                AppendedText('max_temp', '度'),
+            ),
+            Fieldset(
+                '其他信息',
+                'output_voltage',
+                'output_current',
+                'prev_reading',
+                'start_charge_seq',
+                'report_result',
+                'report_time',
+            ),
+        ),
+
+    )
+
+    def queryset(self):
+        queryset = super().queryset()
+
+        if self.request.user.station:
+            return queryset.filter(station=self.request.user.station).filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1))
+        elif self.request.user.seller:
+            print(queryset.filter(seller=self.request.user.seller).filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1)).query)
+            return queryset.filter(seller=self.request.user.seller).filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1))
+        else:
+            print(queryset.filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1)).query)
+            return queryset.filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1))
+
+    def has_add_permission(self):
+        return False
+
+    def has_change_permission(self, obj=None):
+        return False
+
+    def has_delete_permission(self, obj=None):
+        return False
+
+    def curve(self, obj):
+        curve_url = reverse("order-detail-list", kwargs={"out_trade_no": obj.out_trade_no})
+        refund_btn = "<a class='btn btn-xs btn-primary' data-toggle='modal' data-target='#myModal' " \
+                     "data-uri='{}'>监控曲线</a>".format(curve_url)
+        return refund_btn
+
+    curve.short_description = "充电监控"
+    curve.allow_tags = True
+    curve.is_column = True
+
+
+xadmin.site.register(UnusualOrder, UnusualOrderAdmin)
 
 
 # 订单admin

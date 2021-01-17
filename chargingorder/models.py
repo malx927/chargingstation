@@ -151,6 +151,14 @@ class ChargingOrder(Order):
         verbose_name_plural = verbose_name
 
 
+class UnusualOrder(Order):
+    """异常订单"""
+    class Meta:
+        proxy = True
+        verbose_name = '异常订单'
+        verbose_name_plural = verbose_name
+
+
 class OrderRecord(models.Model):
     """
     充值记录表
