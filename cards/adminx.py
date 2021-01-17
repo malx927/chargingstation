@@ -228,6 +228,7 @@ class CardOrderAdmin(object):
             Fieldset(
                 '订单信息',
                 Row('out_trade_no', 'name'),
+                Row('seller', 'station'),
                 Row('charg_pile', 'gun_num'),
                 Row('charg_mode', 'protocol'),
                 Row('start_model', 'openid'),

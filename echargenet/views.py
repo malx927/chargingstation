@@ -355,6 +355,8 @@ class StartChargeAPIView(APIView):
             "charg_mode": charg_mode,
             "out_trade_no": out_trade_no,
             "charg_pile": charg_pile,
+            "seller_id": charg_pile.station.seller_id,
+            "station": charg_pile.station,
             "start_model": start_model,
         }
         # order = Order.objects.create(**params)

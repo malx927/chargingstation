@@ -624,6 +624,8 @@ def pile_card_charging_request_hander(topic, byte_msg):
             "charg_mode": 0,    # 充满为止
             "out_trade_no": out_trade_no,
             "charg_pile": pile,
+            "seller_id": pile.station.seller_id,
+            "station": pile.station,
             "start_model": start_model,   # 储值卡启动
             "balance": card.money,
         }
