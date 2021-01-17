@@ -940,7 +940,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
         'oper_name': '电桩回复充电命令',
         'oper_user': '充电桩',
         'oper_time': datetime.datetime.now(),
-        'comments': '充电桩响应后台充电命令',
+        'comments': '充电桩响应后台充电命令, 充电状态:{}'.format(charg_status),
     }
     create_oper_log(**req_reply_cmd_data)
     logging.info("Leave pile_reply_charging_cmd_handler")
