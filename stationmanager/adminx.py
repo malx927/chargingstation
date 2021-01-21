@@ -44,7 +44,7 @@ class CommXadminSetting(object):
     site_title = settings.SITE_TITLE
     # img_url = "/static/stationmanager/images/logo-1.png"
     # site_title = mark_safe("<img src='{}' width='120' height='50'/>{}".format(img_url, settings.SITE_TITLE))
-    site_footer = mark_safe(settings.SITE_FOOTER + " <a href='https://beian.miit.gov.cn'>京ICP备17043415号-1</a>")
+    site_footer = mark_safe(settings.SITE_FOOTER + " <a href='https://beian.miit.gov.cn'>京ICP备19030806号-1</a>")
 
 
 xadmin.site.register(views.CommAdminView, CommXadminSetting)
