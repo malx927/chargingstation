@@ -2,7 +2,7 @@
 import datetime
 
 from codingmanager.constants import GUN_WORKING_STATUS
-from django.db.models import Sum, Count, F, DecimalField, Avg
+from django.db.models import Sum, Count, F, DecimalField, Avg, Q
 
 from rest_framework.response import Response
 
@@ -19,9 +19,9 @@ class OrderTodayStatusStats(APIView):
     def get(self, request, *args, **kwargs):
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -34,7 +34,7 @@ class OrderTodayStatusStats(APIView):
         # 充电中
         charg_count = queryset.filter(charg_status_id=6).count()
         # 故障数量
-        faults = queryset.filter(charg_status__fault=1).count()
+        faults = queryset.filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1)).count()
         # print(paid_count, nopaid_count, charg_count, faults)
         # 今日充电量
         total_readings = queryset.aggregate(readings=Sum("total_readings"))

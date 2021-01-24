@@ -265,10 +265,8 @@ class UnusualOrderAdmin(object):
         if self.request.user.station:
             return queryset.filter(station=self.request.user.station).filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1))
         elif self.request.user.seller:
-            print(queryset.filter(seller=self.request.user.seller).filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1)).query)
             return queryset.filter(seller=self.request.user.seller).filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1))
         else:
-            print(queryset.filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1)).query)
             return queryset.filter(Q(total_readings=0) & Q(status=2) | Q(charg_status__fault=1))
 
     def has_add_permission(self):
