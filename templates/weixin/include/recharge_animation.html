@@ -1,0 +1,259 @@
+<style>
+    .wrap {
+            display: flex;
+        }
+
+        .g-container {
+            position: relative;
+            width: 100%;
+            height: 12.0rem;
+            background: #000;
+            overflow: hidden;
+            flex: 1 0;
+        }
+
+        .g-number {
+            position: absolute;
+            width: 100%;
+            top: 28%;
+            text-align: center;
+            font-size: 1.2rem;
+            z-index: 10;
+            color: #fff;
+        }
+
+        .g-contrast {
+            filter: contrast(15) hue-rotate(0);
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: hueRotate 10s infinite linear;
+        }
+
+        .g-circle {
+            position: relative;
+            width: 10.0rem;
+            height: 10.0rem;
+            box-sizing: border-box;
+            filter: blur(8px);
+        }
+
+        .g-circle::after {
+            content: "";
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(0);
+            width: 7.5rem;
+            height: 7.5rem;
+            background-color: #00ff6f;
+            border-radius: 42% 38% 62% 49% / 45%;
+            animation: rotate 10s infinite linear;
+        }
+
+        .g-circle::before {
+            content: "";
+            position: absolute;
+            width: 6.0rem;
+            height: 6.0rem;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background-color: #000;
+            z-index: 10;
+        }
+
+        .g-bubbles {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 7rem;
+            height: 1rem;
+            transform: translate(-50%, 0);
+            border-radius: 82px 82px 0 0;
+            background-color: #00ff6f;
+            filter: blur(5px);
+        }
+
+
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: #00ff6f;
+            animation: moveToTop ease-in-out infinite;
+            animation-fill-mode: none;
+            animation-play-state: paused;
+        }
+
+        .bubble:nth-child(1) {
+            width: 18px;
+            height: 18px;
+            left: 50%;
+            animation-duration: 4s;
+            animation-delay: 2s;
+        }
+
+        .bubble:nth-child(2) {
+            width: 15px;
+            height: 15px;
+            left: 51%;
+            animation-duration: 2s;
+            animation-delay: 4s;
+        }
+
+
+        .bubble:nth-child(3) {
+            width: 15px;
+            height: 15px;
+            left: 40%;
+            animation-duration: 3s;
+            animation-delay: 1s;
+        }
+
+
+        .bubble:nth-child(4) {
+            width: 15px;
+            height: 15px;
+            left: 20%;
+            animation-duration: 5s;
+            animation-delay: 1s;
+        }
+
+        .bubble:nth-child(5) {
+            width: 15px;
+            height: 15px;
+            left: 10%;
+            animation-duration: 3.5s;
+            animation-delay: 5s;
+        }
+
+
+        .bubble:nth-child(6) {
+            width: 15px;
+            height: 15px;
+            left: 65%;
+            animation-duration: 4.7s;
+            animation-delay: 1.2s;
+        }
+
+
+        .bubble:nth-child(7) {
+            width: 15px;
+            height: 15px;
+            left: 75%;
+            animation-duration: 5.5s;
+            animation-delay: 3.5s;
+        }
+
+        .charge-right {
+            background-color: #000;
+            flex: 1 0;
+            padding-right: 2px;
+        }
+
+        .bg-none {
+            background-color: transparent;
+            color: #cbcbd1;
+
+        }
+
+        .van-cell__value {
+            color: #fff;
+            font-size: 1.1rem;
+            text-align: left;
+        }
+
+        .unit {
+            padding-left: 2px;
+            font-size: 0.8rem;
+            color: #cbcbd1
+        }
+
+        @keyframes rotate {
+            50% {
+                border-radius: 45% / 42% 38% 58% 49%;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(720deg);
+            }
+        }
+
+        @keyframes moveToTop {
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: .1;
+                transform: translate(-50%, -70px);
+            }
+        }
+
+        @keyframes hueRotate {
+            100% {
+                filter: contrast(15) hue-rotate(360deg);
+            }
+        }
+</style>
+
+<div class="wrap">
+    <div class="g-container">
+        <span id="id_state" style="display: none"></span>
+        <div class="g-number" ><span id="id_soc">{{ order.end_soc|default:0}}</span>%</div>
+        <div class="g-contrast">
+            <div class="g-circle"></div>
+            <ul class="g-bubbles">
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+                <li class="bubble"></li>
+            </ul>
+        </div>
+    </div>
+    <div class="charge-right">
+
+        <div class="van-cell bg-none">
+            <div class="van-cell__title"><span>充电时间</span></div>
+            <div class="van-cell__value">
+                <span id="id_total_minutes">{{ order.total_minutes }}</span><span class="unit">分</span>
+            </div>
+        </div>
+        <div class="van-cell bg-none">
+            <div class="van-cell__title"><span>充电电量</span></div>
+            <div class="van-cell__value">
+                <span id="id_total_reading">{{ order.get_total_reading }}</span><span class="unit">度</span>
+            </div>
+        </div>
+        <div class="van-cell bg-none">
+            <div class="van-cell__title"><span>消费金额</span></div>
+            <div class="van-cell__value">
+                <span id="id_consum_money">{{ order.consum_money }}</span><span class="unit">元</span>
+            </div>
+        </div>
+        <div class="van-cell bg-none">
+            <div class="van-cell__title"><span>充电功率</span></div>
+            <div class="van-cell__value">
+
+                <span id="id_output_power">{{ order.power|floatformat:2 }}</span><span class="unit">KW</span>
+            </div>
+        </div>
+    </div>
+</div>
