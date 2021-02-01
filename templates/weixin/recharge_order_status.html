@@ -200,30 +200,34 @@
             var data = JSON.parse( message.data);
             var msg = JSON.parse(data.message);
             console.log(msg);
-            if(msg.cmd == "01"){            /*充电桩上报状态信息*/
-                if(msg.return_code == "success"){
+            if(msg.cmd === "01"){            /*充电桩上报状态信息*/
+                if(msg.return_code === "success"){
                     $("#id_work_status").text(msg.work_status);
                     $("#id_charg_status").text(msg.charg_status);
+                    console.log("01:", msg.charg_status, msg.charg_status)
                 }
             }
-            else if(msg.cmd == "04"){           /*充电桩回复充电指令*/
-                if(msg.return_code == "success"){
+            else if(msg.cmd === "04"){           /*充电桩回复充电指令*/
+                if(msg.return_code === "success"){
                     $("#id_charg_status").text(msg.charg_status);
                     $("#id_begin_time").text(msg.begin_time);
+                    console.log("04:", msg.charg_status, msg.begin_time)
                 }
                 else{
                     M.toast({html: msg.message});
                 }
             }
-            else if(msg.cmd == "05"){               /*上报车辆信息*/
-                if(msg.return_code == "success"){
+            else if(msg.cmd === "05"){               /*上报车辆信息*/
+                if(msg.return_code === "success"){
                     $("#id_charg_status").text(msg.charg_status);
                     $("#id_order_status").text(msg.order_status);
                     $("#id_begin_time").text(msg.begin_time);
                     {% if not is_ac %}
                      $("#id_soc").text(msg.begin_soc);
+                     console.log("05:", msg.charg_status, msg.begin_soc)
                     {% endif %}
                     $("#id_stop").addClass("pulse");
+                    console.log("05:", msg.charg_status, msg.begin_time)
                 }
                 else{
                      M.toast({html: msg.message});
@@ -235,16 +239,20 @@
                     $("#id_total_minutes").text(msg.total_minutes);
                     $("#id_total_reading").text(msg.total_reading);
                     $("#id_consum_money").text(msg.consum_money);
+                    console.log("06:", msg.total_minutes, msg.total_reading, msg.consum_money);
                     {% if not is_ac %}
                     $("#id_voltage").text(msg.voltage);
                     $("#id_current").text(msg.current);
                     $("#id_soc").text(msg.current_soc);
+                    console.log("061:", msg.voltage, msg.current, msg.current_soc);
                     {% else %}
                         $("#id_soc").text(msg.total_reading + '度');
+                        console.log("062:", msg.total_reading);
                     {% endif %}
                     $("#id_output_voltage").text(msg.output_voltage);
                     $("#id_output_current").text(msg.output_current);
                     let state = $("#id_state").text();
+                     console.log("06:", state, msg.output_voltage, msg.output_current);
                     if(state !== "running"){
                         charge_animation("running")
                         $("#id_state").text("running");
@@ -252,12 +260,12 @@
 
                 }
             }
-            else if(msg.cmd == "07"){
-                if(msg.return_code == "success"){
+            else if(msg.cmd === "07"){
+                if(msg.return_code === "success"){
                     $("#id_charg_status").text(msg.charg_status);
                     $("#id_order_status").text(msg.order_status);
                     $("#id_total_minutes").text(msg.total_minutes);
-                    $("#id_total_reading").text(msg.total_reading);
+                    $("#id_total_reading").text();
                     $("#id_consum_money").text(msg.consum_money);
                     {% if not is_ac %}
                     $("#id_voltage").text('0');
@@ -267,6 +275,7 @@
                     $("#id_output_current").text('0');
                     charge_animation("paused");
                     $("#id_state").text("paused");
+                     console.log("07:", msg.charg_status, msg.total_reading)
                     window.location.href=window.location.href;
                 }
             }
@@ -282,19 +291,20 @@
     });
     $("#id_stop").on("click", function () {
         var out_trade_no = $(this).attr("data-item");
-
+        console.log("id_stop:",out_trade_no);
         var params = {
             out_trade_no: out_trade_no,
             pile_sn: '{{ order.charg_pile.pile_sn }}',
             gun_num: {{ order.gun_num }},
             csrfmiddlewaretoken: '{{ csrf_token }}',
         };
+        console.log("id_stop:",params);
         let state = $("#id_state").text();
         if(state === "running"){
             charge_animation("paused");
             $("#id_state").text("paused");
         }
-
+        console.log("id_stop:", "request post");
         $.ajax({
               type: 'POST',
               url: '{% url "order-charge-stop" %}',
@@ -319,6 +329,7 @@
             if(temp_state == state) return;
             element.style.animationPlayState = state;
         });
+        console.log("charge_animation:", state)
     }
 
    {% endif %}
