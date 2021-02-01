@@ -239,6 +239,8 @@
                     $("#id_voltage").text(msg.voltage);
                     $("#id_current").text(msg.current);
                     $("#id_soc").text(msg.current_soc);
+                    {% else %}
+                        $("#id_soc").text(msg.total_reading + '度');
                     {% endif %}
                     $("#id_output_voltage").text(msg.output_voltage);
                     $("#id_output_current").text(msg.output_current);
