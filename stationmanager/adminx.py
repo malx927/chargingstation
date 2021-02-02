@@ -499,7 +499,7 @@ class FaultChargingGunAdmin(object):
     list_display = ['charg_pile', 'gun_num', 'work_status', 'charg_status', 'status', 'fault_time']
     search_fields = ['gun_num', 'charg_pile__pile_sn']
     list_display_links = ['gun_num', 'charg_pile']
-    list_filter = ['charg_pile', 'work_status', 'charg_status', 'fault_time']
+    list_filter = ['charg_pile__station', 'charg_pile__pile_type', 'charg_pile', 'work_status', 'charg_status', 'fault_time']
     model_icon = 'fa fa-sitemap'
     show_all_rel_details = False
 
