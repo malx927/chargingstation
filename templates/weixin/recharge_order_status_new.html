@@ -1,0 +1,337 @@
+{% extends 'weixin/wx_base.html' %}{% load static %}
+{% block extra %}
+<style>
+
+.item-action{
+    min-height: 24px;
+}
+</style>
+{% endblock extra %}
+{% block title %}充电信息{% endblock %}
+{% block content %}
+    <div class="app-content">
+        {% load chargingorder %}
+        {% is_AC order as is_ac %}
+        {% if order %}
+        <div class="van-cell-group van-hairline--top-bottom">
+            <div class="coupon-section__list">
+                <div class="coupon-item-container">
+                    <div class="coupon-item">
+                        <div class="coupon-item__container">
+                            <div class="coupon-item__left coupon-item__block">
+                                <div class="avatar-image-wrapper">
+                                {% if request.session.headimgurl %}
+                                <div class="avatar-image" style="background-image: url('{{ request.session.headimgurl }}'); width: 60px; height: 60px;"></div>
+                                <img  src="{{ request.session.headimgurl }}"  alt="avatar">
+                                {% else %}
+                                <div class="avatar-image" style="background-image: url('{% static "weixin/images/logo.jpg" %}'); width: 60px; height: 60px;"></div>
+                                {% endif %}
+                                </div>
+                            </div>
+                            <div class="coupon-item__block coupon-item__center">
+                                <div class="coupon-item__center-title ellipsis">
+                                    <span class="coupon-item__title-tag"></span>{{ order.name }} [{{ order.get_charg_mode_display }}]
+                                </div>
+                                <div class="coupon-item__center-time">{{ order.out_trade_no }}</div>
+                            </div>
+                            <div class="coupon-item__right coupon-item__block">
+                                <div class="coupon-item__action1" id="id_stop" data-item="{{ order.out_trade_no }}">停止</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% include 'weixin/include/recharge_animation.html' %}
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>工作状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action" id="id_work_status">{{ order.get_work_status|default:'' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>充电状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action" id="id_charg_status">{{ order.charg_status.name|default:'' }}</div>
+                    </div>
+                </div>
+            </div>
+            {% if not is_ac %}
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电压</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ order.output_voltage|default:0 }}</span> V</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电流</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ order.output_current|default:0 }}</span> A</div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>充电所需电压</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_voltage">0</span> V</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>充电所需电流</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_current">0</span> A</div>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电压</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_voltage">{{ order.output_voltage|default:0 }}</span> V</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="base-info-cell">
+                    <div class="van-cell">
+                        <div class="van-cell__title"><span>实际输出电流</span></div>
+                        <div class="van-cell__value van-ellipsis">
+                            <div class="coupon-item__action  item-action"><span id="id_output_current">{{ order.output_current|default:0 }}</span> A</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>订单状态</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action"><span id="id_order_status">{{ order.get_status_display|default:'' }}</span></div>
+                    </div>
+                </div>
+            </div>
+            {% if order.charg_mode == 1 %}
+             <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按充电金额</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.total_fee }} 元</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 2 %}
+             <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按充电时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_min_val }} 分钟</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 3 %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按SOC值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_soc_val }} %</div>
+                    </div>
+                </div>
+            </div>
+            {% elif order.charg_mode == 4 %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>按电量值</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action  item-action">{{ order.charg_reading_val }} 度</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>开始时间</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action" id="id_begin_time">{{ order.begin_time|default:'' }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>电桩编码SN</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action">{{ order.charg_pile.pile_sn|default:''}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="base-info-cell">
+                <div class="van-cell">
+                    <div class="van-cell__title"><span>枪口号</span></div>
+                    <div class="van-cell__value van-ellipsis">
+                        <div class="coupon-item__action item-action">{{ order.gun_num|default:''}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}
+
+{% block bottomjs %}
+<script type="text/javascript">
+
+    {% if order %}
+    $(function () {
+        // Correctly decide between ws:// and wss://
+        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+        var ws_path = ws_scheme + '://' + window.location.host + "/ws/recharge/{{ order.charg_pile.pile_sn }}/{{ order.gun_num }}/";
+        console.log("Connecting to " + ws_path);
+        var socket = new ReconnectingWebSocket(ws_path);
+        // Handle incoming messages
+        socket.onmessage = function (message) {
+            var data = JSON.parse( message.data);
+            var msg = JSON.parse(data.message);
+            console.log(msg);
+            if(msg.cmd === "01"){            /*充电桩上报状态信息*/
+                if(msg.return_code === "success"){
+                    $("#id_work_status").text(msg.work_status);
+                    $("#id_charg_status").text(msg.charg_status);
+                    console.log("01:", msg.charg_status, msg.charg_status)
+                }
+            }
+            else if(msg.cmd === "04"){           /*充电桩回复充电指令*/
+                if(msg.return_code === "success"){
+                    $("#id_charg_status").text(msg.charg_status);
+                    $("#id_begin_time").text(msg.begin_time);
+                    console.log("04:", msg.charg_status, msg.begin_time)
+                }
+                else{
+                    M.toast({html: msg.message});
+                }
+            }
+            else if(msg.cmd === "05"){               /*上报车辆信息*/
+                if(msg.return_code === "success"){
+                    $("#id_charg_status").text(msg.charg_status);
+                    $("#id_order_status").text(msg.order_status);
+                    $("#id_begin_time").text(msg.begin_time);
+                    {% if not is_ac %}
+                     $("#id_soc").text(msg.begin_soc);
+                     console.log("05:", msg.charg_status, msg.begin_soc)
+                    {% endif %}
+                    $("#id_stop").addClass("pulse");
+                    console.log("05:", msg.charg_status, msg.begin_time)
+                }
+                else{
+                     M.toast({html: msg.message});
+                }
+            }
+            else if(msg.cmd === "06"){               /*充电中状态上报*/
+                if(msg.return_code === "success"){
+                    $("#id_order_status").text(msg.order_status);
+                    $("#id_total_minutes").text(msg.total_minutes);
+                    $("#id_total_reading").text(msg.total_reading);
+                    $("#id_consum_money").text(msg.consum_money);
+                    console.log("06:", msg.total_minutes, msg.total_reading, msg.consum_money);
+                    {% if not is_ac %}
+                    $("#id_voltage").text(msg.voltage);
+                    $("#id_current").text(msg.current);
+                    $("#id_soc").text(msg.current_soc);
+                    console.log("061:", msg.voltage, msg.current, msg.current_soc);
+                    {% else %}
+                        $("#id_soc").text(msg.total_reading + '度');
+                        console.log("062:", msg.total_reading);
+                    {% endif %}
+                    $("#id_output_voltage").text(msg.output_voltage);
+                    $("#id_output_current").text(msg.output_current);
+                    let state = $("#id_state").text();
+                     console.log("06:", state, msg.output_voltage, msg.output_current);
+                    if(state !== "running"){
+                        charge_animation("running")
+                        $("#id_state").text("running");
+                    }
+
+                }
+            }
+            else if(msg.cmd === "07"){
+                if(msg.return_code === "success"){
+                    $("#id_charg_status").text(msg.charg_status);
+                    $("#id_order_status").text(msg.order_status);
+                    $("#id_total_minutes").text(msg.total_minutes);
+                    $("#id_total_reading").text();
+                    $("#id_consum_money").text(msg.consum_money);
+                    {% if not is_ac %}
+                    $("#id_voltage").text('0');
+                    $("#id_current").text('0');
+                    {% endif %}
+                    $("#id_output_voltage").text('0');
+                    $("#id_output_current").text('0');
+                    charge_animation("paused");
+                    $("#id_state").text("paused");
+                     console.log("07:", msg.charg_status, msg.total_reading)
+                    window.location.href=window.location.href;
+                }
+            }
+
+        };
+        // Helpful debugging
+        socket.onopen = function () {
+            console.log("Connected to chat socket");
+        };
+        socket.onclose = function () {
+            console.log("Disconnected from chat socket");
+        }
+    });
+    $("#id_stop").on("click", function () {
+        var out_trade_no = $(this).attr("data-item");
+        console.log("id_stop:",out_trade_no);
+        var params = {
+            out_trade_no: out_trade_no,
+            pile_sn: '{{ order.charg_pile.pile_sn }}',
+            gun_num: {{ order.gun_num }},
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+        };
+        console.log("id_stop:",params);
+        let state = $("#id_state").text();
+        if(state === "running"){
+            charge_animation("paused");
+            $("#id_state").text("paused");
+        }
+        console.log("id_stop:", "request post");
+        $.ajax({
+              type: 'POST',
+              url: '{% url "order-charge-stop" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                 if(data.return_code == "FAIL") {
+                     M.toast({html: data.errmsg});
+                 }
+              },
+              error: function(error){
+                    M.toast({html: '停止充电失败!'});
+              }
+        });
+    });
+
+    function charge_animation(state){
+        let elems = document.getElementsByClassName('bubble');
+        Array.prototype.forEach.call(elems, (element,index) => {
+            let temp_state = element.style.animationPlayState;
+            if(temp_state == state) return;
+            element.style.animationPlayState = state;
+        });
+        console.log("charge_animation:", state)
+    }
+
+   {% endif %}
+</script>
+{% endblock bottomjs %}

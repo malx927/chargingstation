@@ -144,6 +144,8 @@ class RechargeView(View):
             elif pile_gun.work_status in [1, 3]:         # 1-充电中 3-充电结束(未拔枪)
                 order = Order.objects.filter(openid=openid, out_trade_no=pile_gun.out_trade_no, status__lte=2).first()
                 if order:
+                    if openid == 'o6Lcy5jOuH-efHvQJPyGFIw7PbGA' or openid == 'o6Lcy5tGWI8YBzqvowipqyoSLros':
+                        return render(request, template_name='weixin/recharge_order_status_new.html', context={"order": order})
                     return render(request, template_name='weixin/recharge_order_status.html', context={"order": order})
 
         return render(request, template_name="chargingorder/charging_pile_status.html", context={"pile_gun": pile_gun})
