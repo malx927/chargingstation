@@ -374,6 +374,10 @@ class RechargeOrderStatusView(View):
         except Order.DoesNotExist as ex:
             order = None
 
+        openid = request.session.get("openid", None)
+        if openid == 'o6Lcy5jOuH-efHvQJPyGFIw7PbGA' or openid == 'o6Lcy5tGWI8YBzqvowipqyoSLros':
+            return render(request, template_name='weixin/recharge_order_status_new.html', context={"order": order})
+
         return render(request, template_name="weixin/recharge_order_status.html", context={"order": order})
 
 
