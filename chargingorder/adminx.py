@@ -294,7 +294,7 @@ class OrderAdmin(object):
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid', 'car_type']
     list_filter = ['seller', 'station', 'charg_pile', 'charg_mode', 'charg_status', 'begin_time', 'status', 'report_result']
-    exclude = ['charg_type']
+    exclude = ['charg_type', 'seller', 'station', 'charg_pile']
     date_hierarchy = 'begin_time'
     list_per_page = 50
     model_icon = 'fa fa-file-text'
