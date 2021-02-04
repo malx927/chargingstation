@@ -1,7 +1,8 @@
-#-*-coding:utf-8-*-
+# -*-coding:utf-8-*-
 __author__ = 'malxin'
 
 from rest_framework.pagination import PageNumberPagination
+
 
 class PagePagination(PageNumberPagination):
 

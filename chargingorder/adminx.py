@@ -14,7 +14,7 @@ CHARG_STATUS = 6    # 充电中编码
 
 class ChargingOrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time',
+        'out_trade_no', 'name', 'charg_mode', 'station_name', 'pile_name', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time',
         'consum_money', 'power_fee', 'service_fee', 'charg_status', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
@@ -33,8 +33,8 @@ class ChargingOrderAdmin(object):
             Fieldset(
                 '订单信息',
                 Row('out_trade_no', 'name'),
-                Row('seller', 'station'),
-                Row('charg_pile', 'gun_num'),
+                Row('seller_name', 'station_name'),
+                Row('pile_name', 'gun_num'),
                 Row('charg_mode', 'protocol'),
                 Row('start_model', 'openid'),
                 Row(
@@ -141,12 +141,6 @@ class ChargingOrderAdmin(object):
     def has_delete_permission(self, obj=None):
         return False
 
-    def station(self, obj):
-        return obj.charg_pile.station.name
-    station.short_description = '充电站'
-    station.allow_tags = True
-    station.is_column = True
-
     def curve(self, obj):
         curve_url = reverse("order-detail-list", kwargs={"out_trade_no": obj.out_trade_no})
         refund_btn = "<a class='btn btn-xs btn-primary' data-toggle='modal' data-target='#myModal' " \
@@ -163,7 +157,7 @@ xadmin.site.register(ChargingOrder, ChargingOrderAdmin)
 
 class UnusualOrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time',
+        'out_trade_no', 'name', 'charg_mode', 'station_name', 'pile_name', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time',
         'consum_money', 'power_fee', 'service_fee', 'charg_status', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
@@ -180,8 +174,8 @@ class UnusualOrderAdmin(object):
             Fieldset(
                 '订单信息',
                 Row('out_trade_no', 'name'),
-                Row('seller', 'station'),
-                Row('charg_pile', 'gun_num'),
+                Row('seller_name', 'station_name'),
+                Row('pile_name', 'gun_num'),
                 Row('charg_mode', 'protocol'),
                 Row('start_model', 'openid'),
                 Row(
@@ -295,7 +289,7 @@ xadmin.site.register(UnusualOrder, UnusualOrderAdmin)
 # 订单admin
 class OrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'station', 'charg_pile', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
+        'out_trade_no', 'name', 'charg_mode', 'station_name', 'pile_name', 'gun_num', 'car_type', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
         'consum_money', 'power_fee', 'service_fee', 'cash_fee', 'charg_status', 'status', 'report_result', 'curve'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid', 'car_type']
@@ -315,8 +309,8 @@ class OrderAdmin(object):
             Fieldset(
                 '订单信息',
                 Row('out_trade_no', 'name'),
-                Row('seller', 'station'),
-                Row('charg_pile', 'gun_num'),
+                Row('seller_name', 'station_name'),
+                Row('pile_name', 'gun_num'),
                 Row('charg_mode', 'protocol'),
                 Row('start_model', 'openid'),
                 Row(
@@ -403,12 +397,6 @@ class OrderAdmin(object):
     curve.short_description = "充电监控"
     curve.allow_tags = True
     curve.is_column = True
-
-    # def station_name(self, obj):
-    #     return obj.charg_pile.station.name
-    # station_name.short_description = '充电站'
-    # station_name.allow_tags = True
-    # station_name.is_column = True
 
     def queryset(self):
         queryset = super(OrderAdmin, self).queryset()
