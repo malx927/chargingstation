@@ -19,6 +19,7 @@ pywin32==224
 websockets==7.0
 redis==3.2.1
 pycryptodome==3.8.1
+django-redis==4.7.0
 
 
 
