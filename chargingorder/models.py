@@ -19,12 +19,15 @@ class Order(models.Model):
         (0, '上报'),
         (None,  '空'),
     )
-    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32, db_index=True)  # 电桩编号 + YYYYMMDD + random
+    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32, db_index=True)
     openid = models.CharField(verbose_name='用户ID(openid)', max_length=64, blank=True, null=True,)
     name = models.CharField(verbose_name='姓名(或昵称)', max_length=64, blank=True, null=True,)
-    seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
-    station = models.ForeignKey(Station, verbose_name='充电站', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
-    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', blank=True, null=True, on_delete=models.SET_NULL, db_constraint=False)
+    seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.DO_NOTHING, db_constraint=False)
+    seller_name = models.CharField(verbose_name='运营商名', max_length=64, blank=True, null=True)
+    station = models.ForeignKey(Station, verbose_name='充电站', blank=True, null=True, on_delete=models.DO_NOTHING, db_constraint=False)
+    station_name = models.CharField(verbose_name='充电站名', max_length=100, blank=True, null=True)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', blank=True, null=True, on_delete=models.DO_NOTHING, db_constraint=False)
+    pile_name = models.CharField(verbose_name='充电站名', max_length=64, blank=True, null=True)
     gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True,)
     protocol = models.IntegerField(verbose_name='充电国标协议', choices=INTER_PROTOCAL, blank=True, null=True)
     start_model = models.IntegerField(verbose_name='启动方式', choices=STARTUP_MODEL, default=0)
