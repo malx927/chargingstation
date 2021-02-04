@@ -21,7 +21,7 @@ from .models import Seller, Station, ChargingPile, ChargingPrice, ChargingPriceD
     PowerModuleStatus, StationImage, FaultChargingGun
 
 site.register_plugin(DashBoardPlugin, Dashboard)
-site.register_plugin(WarningPlugin, CommAdminView)
+# site.register_plugin(WarningPlugin, CommAdminView)
 
 
 # 修改登录界面标题

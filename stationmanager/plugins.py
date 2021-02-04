@@ -19,42 +19,27 @@ class DashBoardPlugin(BaseAdminPlugin):
         return bool(self.is_dashboard)
 
     def get_context(self, context):
-        # if self.request.user.is_superuser:
-        #     stations = Station.objects.all()
-        #     fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9))
-        # elif self.request.user.station:
-        #     stations = Station.objects.filter(id=self.request.user.station.id)
-        #     fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station=self.request.user.station)
-        # elif self.request.user.seller:
-        #     stations = Station.objects.filter(seller=self.request.user.seller)
-        #     fault_guns = ChargingGun.objects.filter(Q(work_status=2) | Q(work_status=9), charg_pile__station__seller=self.uest.user.seller)
-        # else:
-        #     stations = None
-        #     fault_guns = None
-        #
-        # context.update({'stations': stations})
-        # context.update({'fault_guns': fault_guns})
         curr_date = datetime.datetime.now().date()
-        orders = Order.objects.filter(begin_time__date=curr_date)
+        orders = Order.objects.filter(begin_time__date=curr_date, station_id__isnull=False, station_name__isnull=False)
         stations = Station.objects.all()
         if self.request.user.is_superuser:
             pass
         elif self.request.user.station:
-            orders = orders.filter(charg_pile__station=self.request.user.station)
+            orders = orders.filter(station=self.request.user.station)
             stations = stations.filter(id=self.request.user.station.id)
         elif self.request.user.seller:
-            orders = orders.filter(charg_pile__station__seller=self.request.user.seller)
+            orders = orders.filter(seller=self.request.user.seller)
             stations = stations.filter(seller=self.request.user.seller)
-
-        today_results = orders.values(station_id=F("charg_pile__station"), station_name=F("charg_pile__station__name")) \
+        # print(orders)
+        today_results = orders.values("station_id", "station_name") \
             .annotate(
                 total_readings=Sum("total_readings", output_field=FloatField()),
                 counts=Count("id"),
                 total_fees=Sum("consum_money", output_field=FloatField()),
                 service_fees=Sum("service_fee"),
                 times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60))
-            ).order_by("station_id")
-
+            ).order_by("station_id", "station_name")
+        print("total:", today_results)
         stations = stations.values("id", "name")
 
         stations_list = list(stations)
@@ -72,7 +57,7 @@ class DashBoardPlugin(BaseAdminPlugin):
                     station["times"] = result.get("times", 0)
                     station["service_fees"] = result.get("service_fees", 0)
 
-        # print(stations_list)
+        print(stations_list)
         context.update({'stations_list': stations_list})
         return context
 
