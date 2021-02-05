@@ -211,12 +211,12 @@ xadmin.site.register(CardRecharge, CardRechargeAdmin)
 
 class CardOrderAdmin(object):
     list_display = [
-        'out_trade_no', 'name', 'charg_mode', 'charg_pile', 'gun_num', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
+        'out_trade_no', 'name', 'charg_mode', 'pile_name', 'gun_num', 'total_minutes', 'total_readings', 'begin_time', 'pay_time',
         'consum_money', 'cash_fee', 'status'
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_status', 'begin_time', 'status']
-    exclude = ['charg_type']
+    exclude = ['charg_type', 'seller', 'station', 'charg_pile']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
@@ -228,8 +228,8 @@ class CardOrderAdmin(object):
             Fieldset(
                 '订单信息',
                 Row('out_trade_no', 'name'),
-                Row('seller', 'station'),
-                Row('charg_pile', 'gun_num'),
+                Row('seller_name', 'station_name'),
+                Row('pile_name', 'gun_num'),
                 Row('charg_mode', 'protocol'),
                 Row('start_model', 'openid'),
                 Row(
