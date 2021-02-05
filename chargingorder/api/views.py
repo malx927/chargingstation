@@ -134,9 +134,9 @@ class OrderDayStats(APIView):
         if self.request.user.is_superuser:
             queryset = Order.objects.filter(charg_pile__isnull=False)
         elif self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -188,9 +188,9 @@ class OrderMonthStats(APIView):
         if self.request.user.is_superuser:
             queryset = Order.objects.filter(charg_pile__isnull=False)
         elif self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -229,9 +229,9 @@ class OrderYearStats(APIView):
         if self.request.user.is_superuser:
             queryset = Order.objects.filter(charg_pile__isnull=False)
         elif self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -274,9 +274,9 @@ class OrderCategoryStats(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -289,7 +289,7 @@ class OrderCategoryStats(APIView):
 
         result = None
         if category == "1":     # 按运营商统计
-            result = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name").order_by("charg_pile__station__seller").\
+            result = queryset.values("seller", "seller_name").order_by("seller").\
                 annotate(
                 readings=Sum("total_readings"),
                 counts=Count("id"),
@@ -298,8 +298,8 @@ class OrderCategoryStats(APIView):
                 times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60))
             )
         elif category == "2":     # 按充电站统计
-            result = queryset.values("charg_pile__station__seller__name", "charg_pile__station", "charg_pile__station__name")\
-                            .order_by("charg_pile__station"). \
+            result = queryset.values("seller_name", "station", "station_name")\
+                            .order_by("station"). \
                             annotate(
                                 readings=Sum("total_readings"),
                                 counts=Count("id"),
@@ -308,7 +308,7 @@ class OrderCategoryStats(APIView):
                                 times=Sum((F("end_time") - F("begin_time")) / (1000000 * 60 * 60))
                             )
         elif category == "3":     # 按充电桩统计
-            result = queryset.values("charg_pile", "charg_pile__name", "charg_pile__station__seller__name", "charg_pile__station__name")\
+            result = queryset.values("charg_pile", "pile_name", "seller_name", "station_name")\
                             .order_by("charg_pile"). \
                             annotate(
                 readings=Sum("total_readings"),
@@ -331,9 +331,9 @@ class OrderDayAnalysis(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -345,8 +345,8 @@ class OrderDayAnalysis(APIView):
 
         totals = None
         if category == "1":     # 按运营商统计
-            results = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name")\
-                            .order_by("charg_pile__station__seller")\
+            results = queryset.values("seller", "seller_name")\
+                            .order_by("seller")\
                             .annotate(
                                 readings=Sum("total_readings"),
                                 counts=Count("id"),
@@ -363,8 +363,8 @@ class OrderDayAnalysis(APIView):
             )
             totals["results"] = results
         elif category == "2":     # 按充电站统计
-            results = queryset.values("charg_pile__station", "charg_pile__station__name")\
-                            .order_by("charg_pile__station")\
+            results = queryset.values("station", "station_name")\
+                            .order_by("station")\
                             .annotate(
                                 readings=Sum("total_readings"),
                                 counts=Count("id"),
@@ -381,7 +381,7 @@ class OrderDayAnalysis(APIView):
             )
             totals["results"] = results
         elif category == "3":     # 按充电桩统计
-            results = queryset.values("charg_pile", "charg_pile__name")\
+            results = queryset.values("charg_pile", "pile_name")\
                             .order_by("charg_pile")\
                             .annotate(
                                 readings=Sum("total_readings"),
@@ -412,9 +412,9 @@ class OrderMonthAnalysis(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -426,8 +426,8 @@ class OrderMonthAnalysis(APIView):
 
         totals = None
         if category == "1":     # 按运营商统计
-            results = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name")\
-                            .order_by("charg_pile__station__seller")\
+            results = queryset.values("seller", "seller_name")\
+                            .order_by("seller")\
                             .annotate(
                                 readings=Sum("total_readings"),
                                 counts=Count("id"),
@@ -444,8 +444,8 @@ class OrderMonthAnalysis(APIView):
             )
             totals["results"] = results
         elif category == "2":     # 按充电站统计
-            results = queryset.values("charg_pile__station", "charg_pile__station__name")\
-                            .order_by("charg_pile__station")\
+            results = queryset.values("station", "station_name")\
+                            .order_by("station")\
                             .annotate(
                                 readings=Sum("total_readings"),
                                 counts=Count("id"),
@@ -462,7 +462,7 @@ class OrderMonthAnalysis(APIView):
             )
             totals["results"] = results
         elif category == "3":     # 按充电桩统计
-            results = queryset.values("charg_pile", "charg_pile__name")\
+            results = queryset.values("charg_pile", "pile_name")\
                             .order_by("charg_pile")\
                             .annotate(
                 readings=Sum("total_readings"),
@@ -493,9 +493,9 @@ class OrderYearAnalysis(APIView):
             category = "1"
 
         if self.request.user.station:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station=self.request.user.station)
+            queryset = Order.objects.filter(charg_pile__isnull=False, station=self.request.user.station)
         elif self.request.user.seller:
-            queryset = Order.objects.filter(charg_pile__isnull=False, charg_pile__station__seller=self.request.user.seller)
+            queryset = Order.objects.filter(charg_pile__isnull=False, seller=self.request.user.seller)
         else:
             queryset = Order.objects.filter(charg_pile__isnull=False)
 
@@ -507,8 +507,8 @@ class OrderYearAnalysis(APIView):
 
         totals = None
         if category == "1":     # 按运营商统计
-            results = queryset.values("charg_pile__station__seller", "charg_pile__station__seller__name")\
-                            .order_by("charg_pile__station__seller")\
+            results = queryset.values("seller", "seller_name")\
+                            .order_by("seller")\
                             .annotate(
                                 readings=Sum("total_readings"),
                                 counts=Count("id"),
@@ -525,8 +525,8 @@ class OrderYearAnalysis(APIView):
             )
             totals["results"] = results
         elif category == "2":     # 按充电站统计
-            results = queryset.values("charg_pile__station", "charg_pile__station__name")\
-                            .order_by("charg_pile__station")\
+            results = queryset.values("station", "station_name")\
+                            .order_by("station")\
                             .annotate(
                                 readings=Sum("total_readings"),
                                 counts=Count("id"),
@@ -543,7 +543,7 @@ class OrderYearAnalysis(APIView):
             )
             totals["results"] = results
         elif category == "3":     # 按充电桩统计
-            results = queryset.values("charg_pile", "charg_pile__name")\
+            results = queryset.values("charg_pile", "pile_name")\
                             .order_by("charg_pile")\
                             .annotate(
                 readings=Sum("total_readings"),
