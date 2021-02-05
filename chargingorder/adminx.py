@@ -19,7 +19,7 @@ class ChargingOrderAdmin(object):
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_status', 'begin_time', 'status']
-    exclude = ['charg_type']
+    exclude = ['charg_type', 'station', 'seller', 'charg_pile']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
@@ -162,7 +162,7 @@ class UnusualOrderAdmin(object):
     ]
     search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
     list_filter = ['charg_status', 'begin_time', 'status']
-    exclude = ['charg_type']
+    exclude = ['charg_type', 'seller', 'station', 'charg_pile']
     list_per_page = 50
     model_icon = 'fa fa-file-text'
     show_all_rel_details = False
