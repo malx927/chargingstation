@@ -175,7 +175,7 @@ def update_connector_info(sender, instance, created, **kwargs):
         }
 
         ret = ConnectorInfo.objects.update_or_create(ID=str(ID), defaults=defaults)
-        logging.info(ret)
+
     except EquipmentInfo.DoesNotExist as ex:
         logging.warning(ex)
 

@@ -130,7 +130,7 @@ def message_dispatch(topic, byte_msg):
     logging.info('************************enter message_dispach*******************************')
 
     byte_command = byte_msg[37:38]
-    logging.info(byte_command)
+
     if byte_command == CMD_PILE_STATUS:     # 充电桩状态上报
         pile_status_handler_v12(topic, byte_msg)
 
@@ -692,19 +692,15 @@ def pile_status_handler_v12(topic, byte_msg):
     data_nums = get_data_nums(byte_msg)
     # 读取电桩编码(sn)
     pile_sn = get_pile_sn(byte_msg)
-    logging.info("充电桩Sn编码:{}".format(pile_sn))
     # 电桩类型
     pile_type = byte2integer(byte_msg, 38, 39)
-    logging.info('电桩类型: {}'.format(pile_type))
     # 桩类型扩展
     ext_type = byte2integer(byte_msg, 39, 40)
     max_gun = ext_type & 0x0F       # 枪口数量D3-D0
-    logging.info('枪口数量:{}'.format(max_gun))
     pile_mode = ext_type >> 7 & 0x01    # D7位
-    logging.info('电桩类型模式:{}'.format(pile_mode))
     # 桩属性
     pile_prop = byte_msg[40]
-    logging.info('桩属性:{}'.format(pile_prop))
+    logging.info('充电桩Sn编码:{},电桩类型: {},枪口数量:{}, 电桩类型模式:{}, 桩属性:{}'.format(pile_sn, pile_type, max_gun, pile_mode, pile_prop))
 
     ver_max = byte_msg[41]
     ver_mid = byte_msg[42]
@@ -1599,7 +1595,6 @@ def calculate_order(**kwargs):
         if currRec.seller_id is None:
             currRec.seller_id = charg_pile.station.seller_id
 
-        logging.info(currRec)
         currRec.save()
     except OrderRecord.DoesNotExist as ex:
         logging.info("the first record:{}".format(ex))

@@ -16,9 +16,8 @@ def connector_status_init(instance, **kwargs):
 
 @receiver(post_save, sender=ConnectorInfo)
 def notification_connector_status(sender, instance, created, update_fields, **kwargs):
-    logging.info("{}-{}-{}".format(created, instance.org_Status, instance.Status))
     if not created and instance.org_Status != instance.Status and instance.EquipmentID.is_subsidy == 1:
         echarge = EchargeNet(settings.MQTT_REDIS_URL, settings.MQTT_REDIS_PORT)
         status = echarge.notification_station_status(instance.ConnectorID, instance.Status)
         logging.info("signal ret value:{}".format(status))
-        print("signal ret value:", status)
+        # print("signal ret value:", status)
