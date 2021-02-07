@@ -8,8 +8,9 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from cards.models import ChargingCard
-from chargingorder.models import ChargingCmdRecord, GroupName, Track
+from chargingorder.models import ChargingCmdRecord, GroupName, Track, Order
 from chargingstation import settings
+from codingmanager.models import FaultCode
 from django.db.models import F
 from wxchat.models import UserInfo, UserAcountHistory, SubAccountConsume, GiftMoneyRecord, GiftConsumeRecord
 from wxchat.utils import send_charging_end_message_to_user
@@ -197,11 +198,6 @@ def save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, send_cmd, flag):
 def send_data_to_client(pile_sn, gun_num, **data):
     group_name = 'group_{}_{}'.format(pile_sn, gun_num)
     async_to_sync(channel_layer.group_send)(group_name, {"type": "chat.message", "message": json.dumps(data)})
-    # try:
-    #     group = GroupName.objects.get(name=group_name)
-    #     async_to_sync(channel_layer.group_send)(group.name, {"type": "chat.message", "message": json.dumps(data)})
-    # except GroupName.DoesNotExist as ex:
-    #     print(ex)
 
 
 def user_account_deduct_money(order):
@@ -314,18 +310,6 @@ def account_balance_calc(user, consum_money, out_trade_no):
         }
         logging.info(recs)
         GiftConsumeRecord.objects.create(**recs)
-        # recs = GiftMoneyRecord.objects.filter(openid=user.openid, status=True)
-        # for r in recs:
-        #     rm = r.remain_money()
-        #     if rm > diff_val:
-        #         r.consume_amount += diff_val
-        #         r.save(update_fields=["consume_amount"])
-        #         break
-        #     else:
-        #         r.consume_amount += rm
-        #         diff_val -= rm
-        #         r.status = False
-        #         r.save(update_fields=["consume_amount", "status"])
 
 
 def user_update_pile_gun(openid, start_model, pile_sn, gun_num):
@@ -340,3 +324,21 @@ def user_update_pile_gun(openid, start_model, pile_sn, gun_num):
 def create_oper_log(**kwargs):
     logging.info(kwargs)
     Track.objects.create(**kwargs)
+
+
+def get_fault_code(status_id):
+    """返回故障码"""
+    fault_code = FaultCode.objects.filter(id=status_id).first()
+    return fault_code
+
+
+def get_user_by_openid(openid):
+    """返回用户信息通过openid"""
+    user = UserInfo.objects.filter(openid=openid).first()
+    return user
+
+
+def get_order_by_no(out_trade_no):
+    """订单号返回订单"""
+    order = Order.objects.filter(out_trade_no=out_trade_no).first()
+    return order

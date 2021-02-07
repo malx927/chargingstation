@@ -30,7 +30,7 @@ from stationmanager.models import ChargingPile, ChargingGun,  ChargingPrice
 from codingmanager.constants import *
 from chargingorder.utils import uchar_checksum, byte2integer, get_pile_sn, get_32_byte, get_byte_daytime, \
     get_data_nums, get_byte_version, get_datetime_from_byte, message_escape, save_charging_cmd_to_db, \
-    send_data_to_client, user_account_deduct_money, user_update_pile_gun, get_byte_date, create_oper_log
+    send_data_to_client, user_account_deduct_money, user_update_pile_gun, get_byte_date, create_oper_log, get_fault_code
 from codingmanager.models import FaultCode
 from chargingorder.models import OrderRecord, Order,  OrderChargDetail, ChargingStatusRecord, \
     ChargingCmdRecord
@@ -709,12 +709,12 @@ def pile_status_handler_v12(topic, byte_msg):
 
     # 工作状态枪1 and 工作状态枪 2
     gun1_status = byte_msg[44]  # 00空闲，01：故障， 10充电，11充电结束未拔枪
-    gun1_desc = byte_msg[45]        # D7-D0位（低字节） 故障、充电、预约阶段代码
+    gun1_desc = byte_msg[45]
     logging.info('工作状态枪1:{}[{}]'.format(gun1_status, gun1_desc))
     # 枪1工作状态代码详细信息46 + 8
 
     gun2_status = byte_msg[54]
-    gun2_desc = byte_msg[55]       # D5-D0位 故障、充电、预约阶段代码
+    gun2_desc = byte_msg[55]
     logging.info('工作状态枪2:{}[{}]'.format(gun2_status, gun2_desc))
 
     # 更新枪口状态
@@ -731,13 +731,36 @@ def pile_status_handler_v12(topic, byte_msg):
         send_data["work_status"] = gun1.get_work_status_display()
         send_data["charg_status"] = gun1.charg_status.name
         logging.info(send_data)
-        send_data_to_client(pile_sn, gun1.gun_num, **send_data)
+        # 非空闲状态
+        if gun1.work_status > 0 and gun1.charg_status_id > 0:
+            send_data_to_client(pile_sn, gun1.gun_num, **send_data)
+
+        if gun1.work_status == 1 and 6 > gun1.charg_status_id > 0:
+            req_reply_cmd_data = {
+                'out_trade_no': gun1.out_trade_no,
+                'oper_name': '充电状态上报',
+                'oper_user': '充电桩',
+                'oper_time': datetime.datetime.now(),
+                'comments': '充电桩上报状态,充电状态:【{}】{}'.format(gun1.charg_status_id, gun1.charg_status.name),
+            }
+            create_oper_log(**req_reply_cmd_data)
 
     if gun2:
         send_data["work_status"] = gun2.get_work_status_display()
         send_data["charg_status"] = gun2.charg_status.name
         logging.info(send_data)
-        send_data_to_client(pile_sn, gun2.gun_num, **send_data)
+        if gun2.work_status > 0 and gun1.charg_status_id > 0:
+            send_data_to_client(pile_sn, gun2.gun_num, **send_data)
+
+        if gun2.work_status == 1 and 6 > gun2.charg_status_id > 0:
+            req_reply_cmd_data = {
+                'out_trade_no': gun2.out_trade_no,
+                'oper_name': '充电状态上报',
+                'oper_user': '充电桩',
+                'oper_time': datetime.datetime.now(),
+                'comments': '充电桩上报状态,充电状态:【{}】{}'.format(gun2.charg_status_id, gun2.charg_status.name),
+            }
+            create_oper_log(**req_reply_cmd_data)
     # 2、回复版本信息to device
     try:
         charg_pile = ChargingPile.objects.get(pile_sn=pile_sn)
@@ -934,12 +957,15 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
 
     update_gun_order_status(**data)
 
+    fault_code = get_fault_code(charg_status)
+    status_name = fault_code.name if fault_code else "无"
+
     req_reply_cmd_data = {
         'out_trade_no': out_trade_no,
         'oper_name': '电桩回复充电命令',
         'oper_user': '充电桩',
         'oper_time': datetime.datetime.now(),
-        'comments': '充电桩响应后台充电命令, 充电状态:{}'.format(charg_status),
+        'comments': '充电桩响应后台充电命令,充电状态:【{}】{},初始电表:{}'.format(charg_status, status_name, begin_reading),
     }
     create_oper_log(**req_reply_cmd_data)
     logging.info("Leave pile_reply_charging_cmd_handler")
@@ -948,21 +974,8 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
 def update_charging_gun_status(pile_sn, gun_num, charg_status=None, work_status=None):
     try:
         gun = ChargingGun.objects.get(charg_pile__pile_sn=pile_sn, gun_num=gun_num)
-        # logging.info("1、{}--{}--{}--{}--{}".format(gun, pile_sn, gun_num, charg_status, work_status))
-
-        # if work_status is None and gun.charg_status_id == charg_status:     # 充电回复,更新充电状态
-        #     logging.info("gun.charg_status_id == charg_status")
-        #     return gun
-        #
-        # logging.info("1.1-{}--{}".format(work_status, type(work_status), gun.work_status, type(gun.work_status),
-        #                                  gun.charg_status_id, type(gun.charg_status_id), charg_status,
-        #                                  type(charg_status)))
-        # if gun.charg_status_id == charg_status and gun.work_status == work_status:  # 充电状态上报
-        #     logging.info("gun.charg_status_id == charg_status and gun.work_status == work_status")
-        #     return gun
 
         if charg_status is not None:
-            # fault_code = FaultCode.objects.get(id=charg_status)
             gun.charg_status_id = charg_status
         if work_status is not None:
 
@@ -1002,7 +1015,6 @@ def update_gun_order_status(**data):
     gun = update_charging_gun_status(pile_sn, gun_num, charg_status)
     # 更新订单状态和初始表值
     try:
-        # fault_code = FaultCode.objects.get(pk=charg_status)
         order = Order.objects.get(out_trade_no=out_trade_no)
         order.charg_status_id = charg_status
         order.begin_reading = begin_reading
@@ -1010,6 +1022,9 @@ def update_gun_order_status(**data):
         order.begin_time = begin_time
         order.status = status
         order.save()
+        # 同步枪口订单时间
+        gun.order_time = begin_time
+        gun.save(update_fields=["order_time"])
 
         user = UserInfo.objects.filter(openid=order.openid).first()
         if user:
@@ -1039,7 +1054,7 @@ def update_gun_order_status(**data):
                 Data["StartChargeSeqStat"] = get_order_status(gun.charg_status_id)
 
             logging.info(Data)
-            notification_start_charge_result(**Data)
+            notification_start_charge_result(**Data)    # 对接E充网
 
     except Order.DoesNotExist as ex:
         logging.warning(ex)
@@ -1088,9 +1103,14 @@ def pile_report_car_info_handler(topic, byte_msg):
     max_temp = byte_msg[95]
 
     begin_soc = byte_msg[96]
-    logging.info('车辆最高单体电池电压:{},车辆最高充电电压:{},车辆最高充电电流:{},车辆最高充电温度:{},初始SOC:{}'.format(
+    logging.info('最高单体电池电压:{},最高充电电压:{},最高充电电流:{},最高充电温度:{},初始SOC:{}'.format(
         max_single_voltage, max_voltage, max_current, max_temp, begin_soc
     ))
+    max_single_voltage = int(max_single_voltage * settings.FACTOR_CURRENT)
+    max_voltage = int(max_voltage * settings.FACTOR_CURRENT)
+    max_current = int(max_current * settings.FACTOR_CURRENT)
+    max_temp = int(max_temp * settings.FACTOR_TEMPERATURE)
+    begin_soc = begin_soc * settings.FACTOR_BATTERY_SOC
 
     # Save Data to Order in database
     save_data = {
@@ -1099,11 +1119,11 @@ def pile_report_car_info_handler(topic, byte_msg):
         "out_trade_no": out_trade_no,
         "protocol": protocol,
         "vin_code": vin_code,
-        "max_current": int(max_current * settings.FACTOR_CURRENT),
-        "max_voltage": int(max_voltage * settings.FACTOR_CURRENT),
-        "max_single_voltage": int(max_single_voltage * settings.FACTOR_CURRENT),
-        "max_temp":  int(max_temp * settings.FACTOR_TEMPERATURE),
-        "begin_soc": begin_soc * settings.FACTOR_BATTERY_SOC,
+        "max_current": max_current,
+        "max_voltage": max_voltage,
+        "max_single_voltage": max_single_voltage,
+        "max_temp":  max_temp,
+        "begin_soc": begin_soc,
     }
     logging.info(save_data)
     update_order_car_info(**save_data)
@@ -1112,7 +1132,7 @@ def pile_report_car_info_handler(topic, byte_msg):
         'oper_name': '电桩上传车辆信息',
         'oper_user': '充电桩',
         'oper_time': datetime.datetime.now(),
-        'comments': '直流桩上传充电车辆信息',
+        'comments': '直流桩上传车辆信息，最高单体电池电压:{},最高充电电压:{},最高充电电流:{},最高充电温度:{},初始SOC:{}'.format(max_single_voltage, max_voltage, max_current, max_temp, begin_soc),
     }
     create_oper_log(**log_data)
 
@@ -1297,8 +1317,18 @@ def pile_charging_status_handler(topic, byte_msg):
 
     charg_time = datetime.datetime.strptime(charg_time, '%Y-%m-%d %H:%M:%S')
 
+    voltage = int(voltage * settings.FACTOR_VOLTAGE)
+    current = int(current * settings.FACTOR_CURRENT)
+    output_voltage = round(output_voltage * settings.FACTOR_VOLTAGE, 2)
+    output_current = round(output_current * settings.FACTOR_CURRENT, 2)
+    gun_temp = int(gun_temp * settings.FACTOR_TEMPERATURE)
+    gun_temp1 = int(gun_temp1 * settings.FACTOR_TEMPERATURE)
+    cab_temp = int(cab_temp * settings.FACTOR_TEMPERATURE)
+    cab_temp1 = int(cab_temp1 * settings.FACTOR_TEMPERATURE)
+    current_readings = current_readings * settings.FACTOR_READINGS
+
     prev_reading = 0
-    curr_readings = decimal.Decimal(current_readings * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01"))
+    curr_readings = decimal.Decimal(current_readings).quantize(decimal.Decimal("0.01"))
     try:
         order = Order.objects.get(out_trade_no=out_trade_no)
         stop_charging(order)
@@ -1312,7 +1342,7 @@ def pile_charging_status_handler(topic, byte_msg):
                 'oper_name': '进入充电中',
                 'oper_user': '充电桩',
                 'oper_time': datetime.datetime.now(),
-                'comments': '充电桩开始上传充电数据',
+                'comments': '充电桩开始上传充电数据,所需电压值:{},所需电流值:{},输出电压值:{},输出电流值:{},枪头温度值:{}/{},柜内温度值:{}/{},当前电表读数{}'.format(voltage, current, output_voltage, output_current, gun_temp, gun_temp1, cab_temp, cab_temp1, current_readings),
             }
             create_oper_log(**req_charging_data)
     except Order.DoesNotExist as ex:
@@ -1328,10 +1358,10 @@ def pile_charging_status_handler(topic, byte_msg):
         "end_time": datetime.datetime.now(),
         "end_reading": curr_readings,
         "current_soc": current_soc,
-        "voltage": int(voltage * settings.FACTOR_VOLTAGE),
-        "current": int(current * settings.FACTOR_CURRENT),
-        "output_voltage": round(output_voltage * settings.FACTOR_VOLTAGE, 2),
-        "output_current": round(output_current * settings.FACTOR_CURRENT, 2),
+        "voltage": voltage,
+        "current": current,
+        "output_voltage": output_voltage,
+        "output_current": output_current,
     }
     logging.info(data)
 
@@ -1341,14 +1371,14 @@ def pile_charging_status_handler(topic, byte_msg):
         "out_trade_no": out_trade_no,
         "current_time": datetime.datetime.now(),
         "current_soc": current_soc,
-        "voltage": int(voltage * settings.FACTOR_VOLTAGE),
-        "current": int(current * settings.FACTOR_CURRENT),
-        "output_voltage": round(output_voltage * settings.FACTOR_VOLTAGE, 2),
-        "output_current": round(output_current * settings.FACTOR_CURRENT, 2),
-        "gun_temp": int(gun_temp * settings.FACTOR_TEMPERATURE),
-        "gun_temp1": int(gun_temp1 * settings.FACTOR_TEMPERATURE),
-        "cab_temp": int(cab_temp * settings.FACTOR_TEMPERATURE),
-        "cab_temp1": int(cab_temp1 * settings.FACTOR_TEMPERATURE),
+        "voltage": voltage,
+        "current": current,
+        "output_voltage": output_voltage,
+        "output_current": output_current,
+        "gun_temp": gun_temp,
+        "gun_temp1": gun_temp1,
+        "cab_temp": cab_temp,
+        "cab_temp1": cab_temp1,
         "current_reading": curr_readings,
         "prev_reading": prev_reading,
     }
@@ -1729,12 +1759,15 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     # 保存停止充电指令
     if stop_code == 0:
         save_charging_cmd_to_db(pile_sn, gun_num, out_trade_no, bytes.hex(b_reply_proto), "stop")
+        fault = get_fault_code(fault_code)
+        status_name = fault.name if fault else '无'
+
         req_send_cmd_data = {
             'out_trade_no': out_trade_no,
             'oper_name': '发送停止充电命令。',
             'oper_user': '后台',
             'oper_time': datetime.datetime.now(),
-            'comments': '后台向充电桩发送停充命令.[故障代码:{}]'.format(fault_code),
+            'comments': '后台向充电桩发送停充命令.故障代码:[{}]{}'.format(fault_code, status_name),
         }
         create_oper_log(**req_send_cmd_data)
 
@@ -1775,8 +1808,8 @@ def pile_charging_stop_handler(topic, byte_msg):
     fault_code = byte_msg[78]
     logging.info("当前SOC:{},当前电表读数:{},停止充电回复代码:{},状态码:{}, 故障代码:{}".format(current_soc, current_reading, stop_code, state_code, fault_code))
     # 保留（7字节）
-    faultCode = FaultCode.objects.get(id=fault_code)
-
+    faultCode = get_fault_code(fault_code)
+    status_name = faultCode.name if FaultCode else '无'
     serial_num = '{0}{1}'.format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
 
     data = {
@@ -1805,7 +1838,7 @@ def pile_charging_stop_handler(topic, byte_msg):
             'oper_name': '充电桩发送停止充电命令',
             'oper_user': '充电桩',
             'oper_time': datetime.datetime.now(),
-            'comments': '充电桩向后台发送停充命令[故障代码:{}, 运行状态码:{}]'.format(fault_code, state_code),
+            'comments': '充电桩向后台发送停充命令, 故障代码:[{}]{}, 运行状态码:{}'.format(fault_code, status_name, state_code),
         }
         create_oper_log(**req_send_cmd_data)
     else:
@@ -1840,7 +1873,7 @@ def pile_charging_stop_handler(topic, byte_msg):
             "start_model": order.start_model,
         }
         logging.info(stop_data)
-        server_send_stop_charging_cmd(**stop_data)
+        server_send_stop_charging_cmd(**stop_data)  # 回复电桩
     # 判断是否为E充网充电
     if order.start_charge_seq and len(order.start_charge_seq) > 0:
         # 推送停止充电结果
