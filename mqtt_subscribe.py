@@ -941,13 +941,13 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
     logging.info("充电状态:{}".format(charg_status))
     begin_reading = byte2integer(byte_msg, 72, 76)
     # 保留（25字节）
-
+    begin_reading = decimal.Decimal(begin_reading * settings.FACTOR_READINGS)
     data = {
         "pile_sn": pile_sn,
         "gun_num": gun_num,
         "out_trade_no": out_trade_no,
         "charg_status": 2,
-        "begin_reading": decimal.Decimal(begin_reading * settings.FACTOR_READINGS),
+        "begin_reading": begin_reading,
         "begin_time": datetime.datetime.now(),
         "status": 1,  # 未结帐
     }
@@ -1767,7 +1767,7 @@ def server_send_stop_charging_cmd(*args, **kwargs):
             'oper_name': '发送停止充电命令。',
             'oper_user': '后台',
             'oper_time': datetime.datetime.now(),
-            'comments': '后台向充电桩发送停充命令.故障代码:[{}]{}'.format(fault_code, status_name),
+            'comments': '后台向充电桩发送停充命令.故障代码:[{}]{},运行状态:{}'.format(fault_code, status_name, state_code),
         }
         create_oper_log(**req_send_cmd_data)
 

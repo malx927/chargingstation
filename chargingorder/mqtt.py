@@ -18,7 +18,7 @@ __author__ = 'Administrator'
 logger = logging.getLogger("django")
 
 from .utils import get_32_byte, get_byte_daytime, get_pile_sn, byte2integer, uchar_checksum, get_data_nums, \
-    message_escape, save_charging_cmd_to_db, user_update_pile_gun, create_oper_log
+    message_escape, save_charging_cmd_to_db, user_update_pile_gun, create_oper_log, get_fault_code
 from codingmanager.constants import *
 
 SUB_TOPIC = 'sub'
@@ -195,13 +195,17 @@ def server_send_stop_charging_cmd(*args, **kwargs):
     openid = kwargs.get("openid", None)
     start_model = kwargs.get("start_model", None)
     user_update_pile_gun(openid, start_model, None, None)
+
+    faultCode = get_fault_code(fault_code)
+    status_name = faultCode.name if faultCode else '无'
+
     # 操作记录
     req_send_cmd_data = {
         'out_trade_no': out_trade_no,
         'oper_name': '后台发送停止充电命令',
         'oper_user': '后台',
         'oper_time': datetime.now(),
-        'comments': '后台向充电桩发送停充命令[故障代码:{}]'.format(fault_code),
+        'comments': '后台向充电桩发送停充命令,故障代码:[{}]{},运行状态:{}'.format(fault_code, status_name, state_code),
     }
     create_oper_log(**req_send_cmd_data)
     logger.info("Leave server_send_stop_charging_cmd function")
