@@ -1342,7 +1342,7 @@ def pile_charging_status_handler(topic, byte_msg):
                 'oper_name': '进入充电中',
                 'oper_user': '充电桩',
                 'oper_time': datetime.datetime.now(),
-                'comments': '充电桩开始上传充电数据,所需电压值:{},所需电流值:{},输出电压值:{},输出电流值:{},枪头温度值:{}/{},柜内温度值:{}/{},当前电表读数{}'.format(voltage, current, output_voltage, output_current, gun_temp, gun_temp1, cab_temp, cab_temp1, current_readings),
+                'comments': '充电桩开始上传充电数据,所需电压值:{},所需电流值:{},输出电压值:{},输出电流值:{},枪头温度值:{}/{},柜内温度值:{}/{},当前电表读数{}'.format(voltage, current, output_voltage, output_current, gun_temp, gun_temp1, cab_temp, cab_temp1, curr_readings),
             }
             create_oper_log(**req_charging_data)
     except Order.DoesNotExist as ex:
