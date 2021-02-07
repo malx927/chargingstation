@@ -7,15 +7,17 @@ from django.conf import settings
 from rest_framework.authtoken import views
 from django.views.generic import TemplateView, RedirectView
 import xadmin
+from xadmin.plugins import xversion
 xadmin.autodiscover()
 
-from xadmin.plugins import xversion
+
 xversion.register_models()
+
 
 urlpatterns = [
     # url(r'^admin/', admin.site.urls),
     url(r'^ydadmin/', include(xadmin.site.urls)),
-    # url(r'^ydlogin/', include(xadmin.site.urls)),
+    url(r'^ueditor/', include('DjangoUeditor.urls')),
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token-auth/', views.obtain_auth_token),
     # url(r'^api/token/auth/', obtain_jwt_token),
