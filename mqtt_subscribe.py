@@ -941,7 +941,7 @@ def pile_reply_charging_cmd_handler(topic, byte_msg):
     logging.info("充电状态:{}".format(charg_status))
     begin_reading = byte2integer(byte_msg, 72, 76)
     # 保留（25字节）
-    begin_reading = decimal.Decimal(begin_reading * settings.FACTOR_READINGS)
+    begin_reading = decimal.Decimal(begin_reading * settings.FACTOR_READINGS).quantize(decimal.Decimal("0.01"))
     data = {
         "pile_sn": pile_sn,
         "gun_num": gun_num,
