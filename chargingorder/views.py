@@ -6,7 +6,7 @@ import json
 import random
 import decimal
 
-from chargingorder.utils import create_oper_log
+from chargingorder.utils import create_oper_log, get_fault_code
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
@@ -452,12 +452,15 @@ class OrderChargeStopView(View):
             }
             logger.info(stop_data)
             # 操作记录
+            faultCode = get_fault_code(stop_data["fault_code"])
+            status_name = faultCode.name if faultCode else '无'
+
             req_send_cmd_data = {
                 'out_trade_no': out_trade_no,
-                'oper_name': '用户发起停止充电请求',
+                'oper_name': '用户请求停止充电',
                 'oper_user': '用户',
                 'oper_time': datetime.now(),
-                'comments': '用户向后台发送停止充电请求[故障代码:{}]'.format(stop_data["fault_code"]),
+                'comments': '用户向后台发送停止充电请求,故障代码:[{}]{}'.format(stop_data["fault_code"], status_name),
             }
             create_oper_log(**req_send_cmd_data)
 
