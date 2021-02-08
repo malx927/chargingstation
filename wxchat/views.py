@@ -224,7 +224,7 @@ def createMenu(request):
                     {
                         "type": "view",
                         "name": "个人信息",
-                        "url": settings.ROOT_URL + "/wechat/personinfo/"
+                        "url": settings.ROOT_URL + "/news/"
                     },
                     {
                         "type": "view",
