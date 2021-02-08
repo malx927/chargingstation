@@ -212,22 +212,28 @@ def createMenu(request):
                 "name": "附近电站",
                 "url": settings.ROOT_URL + "/station/"
             },
-            # {
-            #     "type": "view",
-            #     "name": "充电桩",
-            #     "url": settings.ROOT_URL + "/order/"
-            # },
+
             {
                 "type": "view",
                 "name": "扫码充电",
                 "url": settings.ROOT_URL + "/wechat/scanqrcode/"
             },
             {
-                "type": "view",
                 "name": "个人中心",
-                "url": settings.ROOT_URL + "/wechat/personinfo/"
-            },
+                "sub_button": [
+                    {
+                        "type": "view",
+                        "name": "个人信息",
+                        "url": settings.ROOT_URL + "/wechat/personinfo/"
+                    },
+                    {
+                        "type": "view",
+                        "name": "资讯",
+                        "url": settings.ROOT_URL + "/wechat/personinfo/"
+                    },
+                ]
 
+            }
         ]
     })
     return HttpResponse(json.dumps(resp))
