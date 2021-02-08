@@ -17,3 +17,8 @@ class Article(models.Model):
     class Meta:
         verbose_name = "资讯"
         verbose_name_plural = verbose_name
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('article-detail', args=(self.id,))
+

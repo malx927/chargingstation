@@ -10,31 +10,19 @@
 {% block content %}
   <div class="container is-pc">
     <div class="usercenter">
-
-      <div class="plugin-list" type="v-widgets">
+    <h2 class="block-header">信息资讯</h2>
+      <div class="plugin-list">
         <div class="classic-group-wrapper">
           <div class="classic-group">
+            {% for article in articles  %}
             <div class="classic-group__item">
-              <a class="van-cell van-cell--clickable" href="#">
+              <a class="van-cell van-cell--clickable" href="{{ article.get_absolute_url }}">
                 <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/f9c1b3cb9e4f7ec7909e180ae2efbb6c.png'%}"></i>
-                <div class="van-cell__title"><span>我要充值</span></div>
+                <div class="van-cell__title"><span>{{ article.title }}</span></div>
                 <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
               </a>
             </div>
-             <div class="classic-group__item">
-              <a class="van-cell van-cell--clickable" href="{% url 'invoice-title' %}">
-                <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/fapiao.png' %}"></i>
-                <div class="van-cell__title"><span>发票抬头</span></div>
-                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-              </a>
-            </div>
-            <div class="classic-group__item">
-              <a class="van-cell van-cell--clickable" href="{% url 'wxchat-sub-account' %}">
-                <i class="van-icon van-icon--image van-cell__left-icon"><img src="{% static 'weixin/images/d12a725fd93576ac0e51294f13df52f5.png' %}"></i>
-                <div class="van-cell__title"><span>附属账号</span></div>
-                <i class="van-icon van-icon-arrow van-cell__right-icon"></i>
-              </a>
-            </div>
+              {% endfor %}
           </div>
         </div>
       </div>

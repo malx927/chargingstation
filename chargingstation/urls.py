@@ -36,4 +36,5 @@ urlpatterns = [
     url('^cards/', include("cards.urls")),
     url('^client/', include("client.urls", namespace="client")),
     url('^bill/', include("bill.urls")),
+    url('^news/', include("news.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
