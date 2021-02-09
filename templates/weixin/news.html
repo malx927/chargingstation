@@ -3,6 +3,17 @@
 {% block extra %}
     <link rel="stylesheet"  href="{% static 'weixin/css/member.css' %}" >
     <style>
+        .van-cell__title{
+            font-size:1rem;
+        }
+    .page{
+        margin: 10px 0;
+        text-align: center;
+    }
+    .page .pn{
+        padding: 0 20px;
+        font-size: 14px;
+    }
 
     </style>
 {% endblock extra %}
@@ -24,6 +35,15 @@
             </div>
               {% endfor %}
           </div>
+        </div>
+       <div class="page">
+           {% if articles.has_previous %}
+            <a class="van-button van-button--default van-button--mini" href="?page={{ articles.previous_page_number }}">上一页</a>
+           {% endif %}
+            <span class="pn">{{ articles.number }}/{{ articles.paginator.num_pages }}</span>
+            {% if articles.has_next %}
+            <a class="van-button van-button--default van-button--mini" href="?page={{ articles.next_page_number }}">下一页</a>
+            {% endif %}
         </div>
       </div>
     </div>

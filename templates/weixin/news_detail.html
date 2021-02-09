@@ -37,19 +37,20 @@
 {% endblock extra %}
 {% block title %}资讯详情{% endblock %}
 {% block content %}
-  <div class="container is-pc">
+  <div class="container">
     <div class="usercenter">
     <h2 class="block-header"><a href="javascript:history.go(-1)">返回</a></h2>
       <div class="plugin-list">
           {% if article %}
-        <div class="article">
-            <h2>{{ article.title }}</h2>
-            <div class="info">{{ article.add_time|date:'Y-m-d' }}</div>
-            <div class="bd">
-                {{ article.content|safe }}
+            <div class="article">
+                <h2>{{ article.title }}</h2>
+                <div class="info">{{ article.add_time|date:'Y-m-d' }}</div>
+                <div class="bd">
+                    {{ article.content|safe }}
+                </div>
             </div>
-        </div>
-        {% endif %}
+          {% endif %}
+
       </div>
     </div>
   </div>
