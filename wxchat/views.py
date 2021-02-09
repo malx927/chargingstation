@@ -223,12 +223,12 @@ def createMenu(request):
                 "sub_button": [
                     {
                         "type": "view",
-                        "name": "个人信息",
+                        "name": "信息资讯",
                         "url": settings.ROOT_URL + "/news/"
                     },
                     {
                         "type": "view",
-                        "name": "资讯",
+                        "name": "个人信息",
                         "url": settings.ROOT_URL + "/wechat/personinfo/"
                     },
                 ]
