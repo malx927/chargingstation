@@ -1680,8 +1680,8 @@ def calculate_order(**kwargs):
         order.total_readings = 0
     order.power_fee = accumulated_amount
     order.service_fee = accumulated_service_amount
-    order.park_fee = (order.total_hours() * price.charg_price.parking_fee).quantize(decimal.Decimal("0.01"))
-    order.consum_money = order.power_fee + order.service_fee + order.park_fee
+    # order.park_fee = (order.total_hours() * price.charg_price.parking_fee).quantize(decimal.Decimal("0.01"))
+    order.consum_money = order.power_fee + order.service_fee
     order.end_soc = currRec.current_soc
     order.charg_status = charg_status if charg_status is not None else gun.charg_status
     order.output_voltage = output_voltage
@@ -1689,7 +1689,7 @@ def calculate_order(**kwargs):
     if order_status:
         order.status = order_status
     order.save(update_fields=['end_time', 'prev_reading', 'end_reading',
-                              'total_readings', 'park_fee', 'power_fee', 'service_fee',
+                              'total_readings', 'power_fee', 'service_fee',
                               'consum_money', 'end_soc', 'charg_status', 'status', 'output_voltage', 'output_current'])
     return order
 
