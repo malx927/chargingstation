@@ -66,10 +66,6 @@ class Station(models.Model):
     purchase_amount = models.IntegerField(verbose_name='满减限额值(满)', blank=True, default=0, help_text='例如:满300减50')
     reduction = models.IntegerField(verbose_name='减免额度(减)', blank=True, default=0)
     # charg_policy = models.IntegerField(verbose_name='充电策略', default=0, blank=True, choices=CHARGING_PILE_POLICY)
-    subscribe_fee = models.DecimalField(verbose_name='预约费', max_digits=6, decimal_places=2, default=0.0, blank=True)
-    is_seat_fee = models.IntegerField(verbose_name="是否收占位费", default=0,  choices=((0, '否'), (1, '是')))
-    free_min = models.IntegerField(verbose_name="免占位费时间", default=0)
-    occupy_fee = models.DecimalField(verbose_name='每10分钟占位费', max_digits=6, decimal_places=2, default=0.0, blank=True)
     low_fee = models.DecimalField(verbose_name='小电流补偿费', max_digits=6, decimal_places=2, default=0.0, blank=True)
     low_restrict_val = models.IntegerField(verbose_name='小电流限制值',  default=0, blank=True)
     service_ratio = models.IntegerField(verbose_name='每订单服务费收取比例', blank=True, default=0, help_text='执行运营商收费时,公司收取')
@@ -275,8 +271,8 @@ class ChargingGun(models.Model):
     gun_temp = models.IntegerField(verbose_name='枪温度PT-1', null=True, blank=True)
     cab_temp = models.IntegerField(verbose_name='柜内温度', null=True, blank=True)
     subscribe_min = models.IntegerField(verbose_name='预约分钟数', null=True, blank=True)
-    recharge_min = models.IntegerField(verbose_name='充电分钟数', null=True, blank=True)
-    occupy_min = models.IntegerField(verbose_name='占位分钟数', null=True, blank=True)
+    # recharge_min = models.IntegerField(verbose_name='充电分钟数', null=True, blank=True)
+    # occupy_min = models.IntegerField(verbose_name='占位分钟数', null=True, blank=True)
     qrcode = models.ImageField(verbose_name='二维码', upload_to='qrcode/', blank=True, null=True) # pile_sn + gun_num
     add_time = models.DateTimeField(verbose_name='时间', auto_now=True)
     out_trade_no = models.CharField(verbose_name="最新订单号", max_length=32, blank=True, null=True)
@@ -385,6 +381,27 @@ class ChargingPriceDetail(models.Model):
         verbose_name = '价格明细表'
         verbose_name_plural = verbose_name
         ordering = ["begin_time"]
+
+
+class ParkingFee(models.Model):
+    """车辆占位费"""
+    PILE_TYPE = (
+        (1, '直流桩'),
+        (2, '交流桩'),
+    )
+    station = models.ForeignKey(Station, verbose_name='充电站', on_delete=models.CASCADE, db_constraint=False)
+    pile_type = models.IntegerField(verbose_name='桩类型', choices=PILE_TYPE)
+    flag = models.IntegerField(verbose_name="收费标志", default=0, choices=((0, '否'), (1, '收取')))
+    free_min = models.IntegerField(verbose_name="免费时间(分钟)", default=60)
+    interval = models.IntegerField(verbose_name="单位时间(分钟)", default=5, help_text="小于设置的单位时间按单位时间计算")
+    occupy_fee = models.FloatField(verbose_name='占位费(元)', default=0.0, blank=True)
+
+    def __str__(self):
+        return self.get_pile_type_display()
+
+    class Meta:
+        verbose_name = '占位费策略'
+        verbose_name_plural = verbose_name
 
 
 class PowerModuleStatus(models.Model):

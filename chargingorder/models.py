@@ -305,3 +305,34 @@ class Track(models.Model):
     class Meta:
         verbose_name = "用户充电轨迹"
         verbose_name_plural = verbose_name
+
+
+class ParkingFeeOrder(models.Model):
+    """占位费订单"""
+    out_trade_no = models.CharField(verbose_name='订单编号', max_length=32, db_index=True)
+    openid = models.CharField(verbose_name='用户ID(openid)', max_length=64, blank=True, null=True, )
+    name = models.CharField(verbose_name='姓名(或昵称)', max_length=64, blank=True, null=True, )
+    seller = models.ForeignKey(Seller, verbose_name='运营商', blank=True, null=True, on_delete=models.DO_NOTHING,
+                               db_constraint=False)
+    seller_name = models.CharField(verbose_name='运营商名', max_length=64, blank=True, null=True)
+    station = models.ForeignKey(Station, verbose_name='充电站', blank=True, null=True, on_delete=models.DO_NOTHING,
+                                db_constraint=False)
+    station_name = models.CharField(verbose_name='充电站名', max_length=100, blank=True, null=True)
+    charg_pile = models.ForeignKey(ChargingPile, verbose_name='充电桩', blank=True, null=True, on_delete=models.DO_NOTHING,
+                                   db_constraint=False)
+    pile_name = models.CharField(verbose_name='充电桩名', max_length=64, blank=True, null=True)
+    gun_num = models.CharField(verbose_name='枪口号', max_length=12, blank=True, null=True, )
+    begin_time = models.DateTimeField(verbose_name='开始时间', blank=True, null=True)
+    end_time = models.DateTimeField(verbose_name='结束时间', blank=True, null=True)
+    park_fee = models.DecimalField(verbose_name='停车费', blank=True, default=0, max_digits=6, decimal_places=2)
+    status = models.IntegerField(verbose_name='订单状态', choices=ORDER_STATUS, default=0)
+    balance = models.DecimalField(verbose_name='余额(元)', blank=True, default=0, max_digits=8, decimal_places=2)
+    create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+    def __str__(self):
+        return self.out_trade_no
+
+    class Meta:
+        verbose_name = '占位费订单'
+        verbose_name_plural = verbose_name
+        ordering = ["-create_time"]

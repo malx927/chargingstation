@@ -7,7 +7,7 @@ from django.urls import reverse
 from stationmanager.models import Station, ChargingPile
 import xadmin
 from xadmin.layout import Fieldset, Main, Side, Row, FormHelper, AppendedText, Col, TabHolder, Tab
-from .models import Order, OrderRecord, OrderChargDetail, ChargingOrder, Track, UnusualOrder
+from .models import Order, OrderRecord, OrderChargDetail, ChargingOrder, Track, UnusualOrder, ParkingFeeOrder
 
 CHARG_STATUS = 6    # 充电中编码
 
@@ -518,6 +518,67 @@ class OrderChargDetailAdmin(object):
 
 
 xadmin.site.register(OrderChargDetail, OrderChargDetailAdmin)
+
+
+# 占位费订单
+class ParkingFeeOrderAdmin(object):
+    list_display = [
+        'out_trade_no', 'name', 'station_name', 'pile_name', 'gun_num', 'begin_time', 'end_time', 'park_fee', 'status']
+    search_fields = ['out_trade_no', 'charg_pile__pile_sn', 'name', 'openid']
+    list_filter = ['seller', 'station', 'charg_pile', 'begin_time', 'status']
+    exclude = ['seller', 'station', 'charg_pile']
+
+    list_per_page = 50
+    model_icon = 'fa fa-file-text'
+    show_all_rel_details = False
+    readonly_fields = ["balance"]
+    relfield_style = 'fk_ajax'
+
+    form_layout = (
+        Main(
+            Fieldset(
+                '订单信息',
+                Row('out_trade_no', 'name'),
+                Row('seller_name', 'station_name'),
+                Row('pile_name', 'gun_num'),
+                Row(
+                    'openid',
+                    AppendedText('park_fee', '元'),
+                    ),
+                Row(
+                    'begin_time',
+                    'end_time',
+                ),
+                Row(
+                    'balance',
+                    'status',
+                ),
+            ),
+
+        ),
+    )
+
+    def queryset(self):
+        queryset = super(ParkingFeeOrderAdmin, self).queryset()
+        if self.request.user.station:
+            return queryset.filter(station=self.request.user.station)
+        elif self.request.user.seller:
+            return queryset.filter(seller=self.request.user.seller)
+        else:
+            return queryset
+
+    def formfield_for_dbfield(self, db_field,  **kwargs):
+        if db_field.name == 'charg_pile':
+            if self.request.user.is_superuser:
+                pass
+            elif self.request.user.station:
+                kwargs['queryset'] = ChargingPile.objects.filter(station=self.request.user.station)
+            elif self.request.user.seller:
+                kwargs['queryset'] = ChargingPile.objects.filter(station__seller=self.request.user.seller)
+        return super(ParkingFeeOrderAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
+
+
+xadmin.site.register(ParkingFeeOrder, ParkingFeeOrderAdmin)
 
 
 class TrackAdmin(object):

@@ -18,7 +18,7 @@ from xadmin.plugins.inline import Inline
 from xadmin.views import Dashboard, CommAdminView
 from xadmin.views.website import LoginView
 from .models import Seller, Station, ChargingPile, ChargingPrice, ChargingPriceDetail, ChargingGun, \
-    PowerModuleStatus, StationImage, FaultChargingGun
+    PowerModuleStatus, StationImage, FaultChargingGun, ParkingFee
 
 site.register_plugin(DashBoardPlugin, Dashboard)
 # site.register_plugin(WarningPlugin, CommAdminView)
@@ -138,14 +138,6 @@ class StationAdmin(object):
             Fieldset(
                 '费用收取设置',
                 Row(
-                    'is_seat_fee',
-                    AppendedText('occupy_fee', '元'),
-                ),
-                Row(
-                    AppendedText('free_min', '分钟'),
-                    AppendedText('subscribe_fee', '元'),
-                ),
-                Row(
                     AppendedText('low_restrict_val', '毫安'),
                     AppendedText('low_fee', '元')
                 ),
@@ -262,7 +254,6 @@ class ChargingGunInline(object):
         ),
         Fieldset(
             '其他信息',
-            Row('occupy_min', 'recharge_min'),
             Row('subscribe_min', 'qrcode'),
         ),
 
@@ -432,8 +423,7 @@ class ChargingGunAdmin(object):
         ),
         Fieldset(
             '其他信息',
-            Row('occupy_min', 'subscribe_min',),
-            Row('recharge_min', "qrcode"),
+            Row('subscribe_min', "qrcode"),
 
         ),
         Fieldset(
@@ -580,6 +570,38 @@ class ChargingPriceAdmin(object):
 
 
 xadmin.site.register(ChargingPrice, ChargingPriceAdmin)
+
+
+class ParkingFeeAdmin(object):
+    """
+    车辆占位费
+    """
+    list_display = ['station', 'pile_type', 'flag', 'free_min', 'interval', 'occupy_fee']
+    list_filter = ['station', 'pile_type']
+    model_icon = 'fa fa-sitemap'
+    save_as = True
+    show_all_rel_details = False
+
+    def queryset(self):
+        queryset = super(ParkingFeeAdmin, self).queryset()
+        if self.request.user.station:
+            return queryset.filter(station=self.request.user.station)
+        elif self.request.user.seller:
+            return queryset.filter(station__seller=self.request.user.seller)
+        else:
+            return queryset
+
+    def formfield_for_dbfield(self, db_field,  **kwargs):
+        if db_field.name == 'station':
+            if self.request.user.station:
+                kwargs['queryset'] = Station.objects.filter(id=self.request.user.station.id)
+            elif self.request.user.seller:
+                kwargs['queryset'] = Station.objects.filter(seller=self.request.user.seller)
+
+        return super(ParkingFeeAdmin, self).formfield_for_dbfield(db_field,  **kwargs)
+
+
+xadmin.site.register(ParkingFee, ParkingFeeAdmin)
 
 
 class PowerModuleStatusAdmin(object):

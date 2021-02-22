@@ -459,9 +459,9 @@ def server_reply_stage_tafiff(*arg, **kwargs):
     if charg_pile:
         charg_price = charg_pile.station.chargingprice_set.filter(default_flag=1).first()
         charg_price_details = charg_price.prices.all()
-        is_seat_fee = charg_pile.station.is_seat_fee
-        free_min = charg_pile.station.free_min
-        occupy_fee = int(charg_pile.station.occupy_fee * 100)
+        is_seat_fee = 0
+        free_min = 0
+        occupy_fee = 0
         for detail in charg_price_details:
 
             b_begin_hour = bytes([detail.begin_time.hour])
