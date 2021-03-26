@@ -48,7 +48,7 @@ PyHamcrest==1.9.0
 PyMySQL==0.9.3
 python-dateutil==2.8.0
 pytz==2019.1
-PyYAML==5.1.1
+PyYAML==5.4
 qrcode==6.1
 redis==3.2.1
 requests==2.22.0
