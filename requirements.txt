@@ -58,7 +58,7 @@ Twisted==19.2.1
 txaio==18.8.1
 urllib3==1.25.3
 vine==1.3.0
-websockets==7.0
+websockets==9.1
 wechatpy==1.8.2
 xlrd==1.2.0
 xlwt==1.3.0
